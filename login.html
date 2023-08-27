@@ -1,0 +1,20 @@
+<script language="javascript">
+<!--//
+/*This Script allows people to enter by using a form that asks for a
+UserID and Password*/
+function pasuser(form) {
+
+if (form.pass.value=="lohagung") {              
+location="page2.html" 
+} else {
+alert("Invalid Password")
+}
+
+}
+
+//-->
+</script>
+
+<form name="login"><input name="pass"     
+type="password"><input type="button" value="Login"
+onClick="pasuser(this.form)"></form>
