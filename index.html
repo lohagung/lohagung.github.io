@@ -12,20 +12,23 @@
    <link rel="stylesheet" href="css/style.css">
 
 </head>
-    <script language="JavaScript">
-        function Login(){ 
-            var user = document.getElementById("username").value;
-            var pass = document.getElementById("password").value;
+<script language="javascript">
+<!--//
+/*This Script allows people to enter by using a form that asks for a
+UserID and Password*/
+function pasuser(form) {
 
-            if (user=="lohagung" && passw=="lohagung"){
-                alert("Selamat anda berhasil login");
-            }else{
-                alert("Username dan password anda salah!");
-            }
-        }
-    </script>
+if (form.pass.value=="lohagung") {              
+location="page2.html" 
+} else {
+alert("Invalid Password")
+}
+
+}
+
+//-->
+</script>
 <body>
-
    <div class="container1">
 
       <div class="main-video-container">
@@ -161,7 +164,9 @@
 
 
 
-
+<form name="login"><input name="pass"     
+type="password"><input type="button" value="Login"
+onClick="pasuser(this.form)"></form>
 
 
 
