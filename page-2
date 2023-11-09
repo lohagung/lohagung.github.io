@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta content='width=device-width, initial-scale=1, user-scalable=1, minimum-scale=1, maximum-scale=5' name='viewport'/>
+   <link rel="icon" href="images/linux-hero.png">
+   <title>Pantuan CCTV Loh Agung</title>
+
+   <!-- custom css file link  -->
+   <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+   <div class="container1">
+
+      <div class="main-video-container">
+         <video src="images/vid-3.mp4" loop controls class="main-video"></video>
+         <h3 class="main-vid-title">Pembakaran Sampah Rumah Tangga #01</h3>
+      </div>
+
+
+
+
+
+
+	   
+      <div class="video-list-container">
+
+         <div class="list">
+            <video src="images/vid-6.mp4" class="list-video"></video>
+            <h3 class="list-title">Video #06</h3>
+         </div>
+
+         <div class="list">
+            <video src="images/vid-7.mp4" class="list-video"></video>
+            <h3 class="list-title">Video #07</h3>
+         </div>
+
+         <div class="list">
+            <video src="images/vid-8.mp4" class="list-video"></video>
+            <h3 class="list-title">Video #08</h3>
+         </div>
+
+         <div class="list">
+            <video src="images/vid-9.mp4" class="list-video"></video>
+            <h3 class="list-title">Video #09</h3>
+         </div>
+		 
+         <div class="list">
+            <video src="images/vid-10.mp4" class="list-video"></video>
+            <h3 class="list-title">Video #10</h3>
+         </div>
+ <a href="/page-2.html" class="prev">&laquo; Previous</a>
+<a href="/page-3.html" class="next">Next &raquo;</a>
+
+
+	      
+      </div>
+   </div>
+   <!-- custom js file link  -->
+   <script src="js/script.js"></script>
+
+</body>
+
+</html>
