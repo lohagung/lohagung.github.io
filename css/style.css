@@ -64,8 +64,22 @@ body::-webkit-scrollbar{
     padding: 15px;
     padding-top: 0;
     border-top: 0px solid #c90000;
+    text-align: center;
 }
-
+.video-list-container a.prev {
+    background: #c90000;
+    border-radius: 5px;
+    padding: 5px 15px;
+    text-align: center;
+    color: #fff;
+}
+.video-list-container a.next {
+    background: #c90000;
+    border-radius: 5px;
+    padding: 5px 15px;
+    text-align: center;
+    color: #fff;
+}
 .container1 .video-list-container::-webkit-scrollbar{
    width: 0px;
 }
