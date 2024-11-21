@@ -1,0 +1,254 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to Text</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @keyframes typing {
+            0% { border-right-color: rgba(0, 0, 0, 0); }
+            50% { border-right-color: black; }
+            100% { border-right-color: rgba(0, 0, 0, 0); }
+        }
+        .typing {
+            border-right: 2px solid;
+            animation: typing 1s steps(1) infinite;
+        }
+        .microphone-inactive {
+            background-color: red;
+            border: 2px solid white;
+            padding: 3px;
+            border-radius: 50%;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .microphone-active {
+            background-color: green;
+            border: 2px solid white;
+            padding: 3px;
+            border-radius: 50%;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .editor {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        @media (orientation: landscape) {
+            .container {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const textarea = document.querySelector('textarea');
+            const wordCount = document.querySelector('#wordCount');
+            const microphone = document.querySelector('#microphone');
+            const undoButton = document.querySelector('#undo');
+            const redoButton = document.querySelector('#redo');
+            const printButton = document.querySelector('#print');
+            const clipboardButton = document.querySelector('#clipboard');
+            const pasteButton = document.querySelector('#paste');
+            const fullscreenButton = document.querySelector('#fullscreen');
+            const downloadButton = document.querySelector('#download');
+
+            let history = [];
+            let historyIndex = -1;
+            let lastSpeechTime = 0;
+            let recognition;
+            let isRecognizing = false;
+
+            function updateWordCount() {
+                const text = textarea.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                wordCount.textContent = `${words} kata`;
+            }
+
+            function saveHistory() {
+                history = history.slice(0, historyIndex + 1);
+                history.push(textarea.value);
+                historyIndex++;
+            }
+
+            function undo() {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    textarea.value = history[historyIndex];
+                    updateWordCount();
+                }
+            }
+
+            function redo() {
+                if (historyIndex < history.length - 1) {
+                    historyIndex++;
+                    textarea.value = history[historyIndex];
+                    updateWordCount();
+                }
+            }
+
+            function copyToClipboard() {
+                textarea.select();
+                document.execCommand('copy');
+            }
+
+            function pasteFromClipboard() {
+                navigator.clipboard.readText().then(text => {
+                    textarea.value += text;
+                    saveHistory();
+                    updateWordCount();
+                });
+            }
+
+            function printText() {
+                const printWindow = window.open('', '', 'height=400,width=600');
+                printWindow.document.write('<pre>' + textarea.value + '</pre>');
+                printWindow.document.close();
+                printWindow.print();
+            }
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+
+            function downloadText() {
+                const blob = new Blob([textarea.value], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'text.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            function startRecognition() {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'id-ID';
+                recognition.continuous = true;
+
+                recognition.onresult = function (event) {
+                    const currentTime = new Date().getTime();
+                    const timeDiff = currentTime - lastSpeechTime;
+
+                    if (timeDiff > 2000) {
+                        textarea.value += '\n\n';
+                    } else if (timeDiff > 1000) {
+                        textarea.value += ', ';
+                    }
+
+                    const transcript = event.results[event.resultIndex][0].transcript
+                        .replace('koma', ',')
+                        .replace('titik', '.')
+                        .replace('enter', '\n\n')
+                        .replace('tanda tanya', '?')
+                        .replace('tanda seru', '!');
+                    textarea.value += transcript + ' ';
+                    saveHistory();
+                    updateWordCount();
+                    lastSpeechTime = currentTime;
+                };
+
+                recognition.onspeechstart = function () {
+                    textarea.classList.add('typing');
+                };
+
+                recognition.onspeechend = function () {
+                    textarea.classList.remove('typing');
+                };
+
+                recognition.start();
+                isRecognizing = true;
+                microphone.classList.remove('microphone-inactive');
+                microphone.classList.add('microphone-active');
+            }
+
+            function stopRecognition() {
+                if (recognition) {
+                    recognition.stop();
+                    isRecognizing = false;
+                    microphone.classList.remove('microphone-active');
+                    microphone.classList.add('microphone-inactive');
+                }
+            }
+
+            microphone.addEventListener('click', function () {
+                if (isRecognizing) {
+                    stopRecognition();
+                } else {
+                    startRecognition();
+                }
+            });
+
+            textarea.addEventListener('input', function () {
+                saveHistory();
+                updateWordCount();
+            });
+
+            undoButton.addEventListener('click', undo);
+            redoButton.addEventListener('click', redo);
+            clipboardButton.addEventListener('click', copyToClipboard);
+            pasteButton.addEventListener('click', pasteFromClipboard);
+            printButton.addEventListener('click', printText);
+            fullscreenButton.addEventListener('click', toggleFullscreen);
+            downloadButton.addEventListener('click', downloadText);
+
+            saveHistory();
+        });
+    </script>
+</head>
+<body class="bg-gray-100 h-screen">
+    <div class="container max-w-md mx-auto h-full bg-white rounded-lg shadow-md flex flex-col">
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-t-lg">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-microphone-alt text-orange-500"></i>
+                <span class="font-semibold">Bahasa indonesia</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i id="fullscreen" class="fas fa-expand cursor-pointer"></i>
+            </div>
+        </div>
+        <!-- Toolbar -->
+        <div class="flex items-center justify-between p-2 bg-teal-500 text-white">
+            <div class="flex items-center space-x-4">
+                <i id="clipboard" class="fas fa-file-alt cursor-pointer"></i>
+                <i id="print" class="fas fa-print cursor-pointer"></i>
+            </div>
+        </div>
+        <!-- Text Area -->
+        <div class="p-4 flex-grow">
+            <textarea class="w-full h-full border-none focus:outline-none editor" placeholder="hasil suara ke text akan muncul disini...."></textarea>
+        </div>
+        <!-- Bottom Bar -->
+        <div class="flex items-center justify-between p-4 bg-gray-200 rounded-b-lg">
+            <div class="flex items-center space-x-4">
+                <i id="clipboard" class="fas fa-clipboard cursor-pointer"></i>
+                <i id="paste" class="fas fa-paste cursor-pointer"></i>
+                <i id="undo" class="fas fa-undo cursor-pointer"></i>
+                <i id="redo" class="fas fa-redo cursor-pointer"></i>
+            </div>
+            <div class="flex items-center space-x-4">
+                <i id="microphone" class="fas fa-microphone text-2xl cursor-pointer microphone-inactive"></i>
+                <i id="download" class="fas fa-download text-teal-500 text-2xl cursor-pointer"></i>
+                <span id="wordCount">0 kata</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
