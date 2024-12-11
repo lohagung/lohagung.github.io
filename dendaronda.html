@@ -9,7 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-	    <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <style>
         .draggable {
             position: fixed;
         }
@@ -24,6 +25,7 @@
             background-color: #fbbf24;
         }
         main {
+            margin-top: 70px; /* Adjust this value based on the height of your header */
             margin-bottom: 90px;
         }
         @media print {
@@ -34,11 +36,17 @@
                 zoom: 75%;
             }
         }
+		.nota {
+    border-radius: 50%;
+    position: absolute;
+    margin-top: -15px;
+    margin-right: -15px;
+}
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
         <div class="flex items-center">
             <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="40"/>
             <span class="text-white font-bold ml-2">Denda Ronda</span>
@@ -75,7 +83,7 @@
                         <th class="py-2 px-4 border-b">M3</th>
                         <th class="py-2 px-4 border-b">M4</th>
                         <th class="py-2 px-4 border-b">Jumlah</th>
-                        <th class="py-2 px-4 border-b">Bayar</th>
+                        <th class="py-2 px-4 border-b cursor-pointer" onclick="openNotaPopup(this)">Bayar</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -146,29 +154,24 @@
             <h2 class="text-xl font-bold mb-4">Edit Data</h2>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <input type="text" id="editNama" class="w-full px-3 py-2 border rounded-md"/>
-				<input type="text" id="editBlok" class="w-full px-3 py-2 border rounded-md"/>
+                <input type="text" id="editBlok" class="w-full px-3 py-2 border rounded-md"/>
             </div>
             <div class="mb-4">
                 <label for="editKurang" class="block text-gray-700">Kurang</label>
                 <input type="text" id="editKurang" class="w-full px-3 py-2 border rounded-md"/>
             </div>
-			 <label for="enableToggle" class="block text-gray-700 mr-2">Jenis Denda Ronda</label>
+            <label for="enableToggle" class="block text-gray-700 mr-2">Jenis Denda Ronda</label>
             <div class="mb-4 flex items-center">
-               
                 <input type="checkbox" id="enableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleInputs()"/>
-				<label for="editM1" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
-				
+                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
                 <input type="checkbox" id="editM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="editM1" class="block text-gray-700 mr-2">&nbsp;M1</label>
-
+                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;M1</label>
                 <input type="checkbox" id="editM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="editM2" class="block text-gray-700 mr-2">&nbsp;M2</label>
-
+                <label for="editM2" class="block text-gray-700 mr-2">&nbsp;M2</label>
                 <input type="checkbox" id="editM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="editM3" class="block text-gray-700 mr-2">&nbsp;M3</label>
-
+                <label for="editM3" class="block text-gray-700 mr-2">&nbsp;M3</label>
                 <input type="checkbox" id="editM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="editM4" class="block text-gray-700 mr-2">&nbsp;M4</label>
+                <label for="editM4" class="block text-gray-700 mr-2">&nbsp;M4</label>
             </div>
             <div class="mb-4">
                 <label for="editBayar" class="block text-gray-700">Bayar</label>
@@ -197,29 +200,24 @@
                 <input type="text" id="addKurang" class="w-full px-3 py-2 border rounded-md"/>
             </div>
             <div class="mb-4 flex items-center">
-                
                 <input type="checkbox" id="addEnableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleAddInputs()"/>
-				<label for="addEnableToggle" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
+                <label for="addEnableToggle" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
             </div>
             <div class="mb-4 flex items-center">
-                
                 <input type="checkbox" id="addM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="addM1" class="block text-gray-700 mr-2">&nbsp;Minggu 1</label>
+                <label for="addM1" class="block text-gray-700 mr-2">&nbsp;Minggu 1</label>
             </div>
             <div class="mb-4 flex items-center">
-                
                 <input type="checkbox" id="addM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="addM2" class="block text-gray-700 mr-2">&nbsp;Minggu 2</label>
+                <label for="addM2" class="block text-gray-700 mr-2">&nbsp;Minggu 2</label>
             </div>
             <div class="mb-4 flex items-center">
-                
                 <input type="checkbox" id="addM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="addM3" class="block text-gray-700 mr-2">&nbsp;Minggu 3</label>
+                <label for="addM3" class="block text-gray-700 mr-2">&nbsp;Minggu 3</label>
             </div>
             <div class="mb-4 flex items-center">
-                
                 <input type="checkbox" id="addM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-				<label for="addM4" class="block text-gray-700 mr-2">&nbsp;Minggu 4</label>
+                <label for="addM4" class="block text-gray-700 mr-2">&nbsp;Minggu 4</label>
             </div>
             <div class="mb-4">
                 <label for="addBayar" class="block text-gray-700">&nbsp;Bayar</label>
@@ -242,7 +240,42 @@
             <ul id="searchResults" class="list-disc pl-5">
                 <!-- Search results will be dynamically inserted here -->
             </ul>
+        </div>
+    </div>
+    <!-- Nota Popup -->
+    <div id="notaPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 w-80">
+		            <div class="flex justify-end space-x-4">
+                <button class="bg-red-500 text-white px-4 py-2 nota" onclick="closeNotaPopup()">X</button>
+            </div>
 
+            <h2 id="notaTitle" class="text-xl font-bold mb-4">NOTA</h2>
+            <div class="mb-4">
+                <div class="flex justify-between">
+                    <span>Minggu 1:</span>
+                    <span id="notaM1"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Minggu 2:</span>
+                    <span id="notaM2"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Minggu 3:</span>
+                    <span id="notaM3"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Minggu 4:</span>
+                    <span id="notaM4"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Tunggakan:</span>
+                    <span id="notaKurang"></span>
+                </div>
+                <div class="flex justify-between font-bold">
+                    <span>Total Tagihan:</span>
+                    <span id="notaJumlah"></span>
+                </div>
+            </div>
         </div>
     </div>
     <!-- Success Alert -->
@@ -481,8 +514,9 @@
             tr.appendChild(tdJumlah);
 
             const tdBayar = document.createElement('td');
-            tdBayar.className = 'py-2 px-4 border-b';
+            tdBayar.className = 'py-2 px-4 border-b cursor-pointer';
             tdBayar.textContent = document.getElementById('addBayar').value;
+            tdBayar.onclick = () => openNotaPopup(tdBayar);
             tr.appendChild(tdBayar);
 
             tableBody.appendChild(tr);
@@ -529,6 +563,10 @@
                         td.classList.add('cursor-pointer');
                         td.onclick = () => openEditData(tr);
                     }
+                    if (cellIndex === 9) {
+                        td.classList.add('cursor-pointer');
+                        td.onclick = () => openNotaPopup(td);
+                    }
                     tr.appendChild(td);
                 });
                 tableBody.appendChild(tr);
@@ -573,7 +611,6 @@
 
         // Fungsi untuk menghapus pengguna berdasarkan nama
         function delUserFunction() {
-
             const nameToDelete = prompt("Masukkan nama pengguna yang ingin dihapus:");
             if (nameToDelete) {
                 const tableBody = document.getElementById('tableBody');
@@ -667,7 +704,7 @@
         }
 
         // Fungsi untuk memperbarui total jumlah dan bayar
-        function updateTotal() {
+		function updateTotal() {
             const tableBody = document.getElementById('tableBody');
             const rows = Array.from(tableBody.children);
             let totalJumlah = 0;
@@ -682,10 +719,45 @@
             document.getElementById('totalBayar').textContent = formatCurrency(totalBayar);
         }
 
+        // Fungsi untuk membuka popup nota
+        function openNotaPopup(cell) {
+            const row = cell.parentElement;
+            const cells = row.children;
+
+            document.getElementById('notaTitle').textContent = `Rincian ${cells[1].textContent}`;
+            document.getElementById('notaM1').textContent = formatCurrency(cells[4].textContent);
+            document.getElementById('notaM2').textContent = formatCurrency(cells[5].textContent);
+            document.getElementById('notaM3').textContent = formatCurrency(cells[6].textContent);
+            document.getElementById('notaM4').textContent = formatCurrency(cells[7].textContent);
+            document.getElementById('notaKurang').textContent = formatCurrency(cells[3].textContent);
+            document.getElementById('notaJumlah').textContent = formatCurrency(cells[8].textContent);
+
+            const popup = document.getElementById('notaPopup');
+            popup.classList.remove('hidden');
+        }
+
+        // Fungsi untuk menutup popup nota
+        function closeNotaPopup() {
+            const popup = document.getElementById('notaPopup');
+            popup.classList.add('hidden');
+        }
+
         // Muat data tabel saat halaman dimuat
         window.onload = loadTableData;
+
+        // Inisialisasi SortableJS untuk drag-and-drop
+        new Sortable(document.getElementById('tableBody'), {
+            handle: 'td:first-child', // Hanya kolom pertama (No) yang bisa digunakan untuk drag
+            animation: 150,
+            onEnd: function (/**Event*/evt) {
+                // Update nomor urut setelah drag-and-drop
+                const rows = Array.from(document.getElementById('tableBody').children);
+                rows.forEach((row, index) => {
+                    row.children[0].textContent = index + 1;
+                });
+                saveTableData();
+            }
+        });
     </script>
 </body>
 </html>
-
-
