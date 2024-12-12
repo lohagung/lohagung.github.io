@@ -6,6 +6,8 @@
     <link rel="icon" href="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
     <style>
         .draggable {
             position: absolute;
@@ -22,15 +24,15 @@
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
-                <i class="fas fa-download text-white"></i>
-                <i class="fas fa-file-import text-white"></i>
-                <i class="fas fa-expand text-white"></i>
+                <i class="fas fa-download text-white" onclick="exportToExcel()"></i>
+                <i class="fas fa-file-import text-white" onclick="importFromFile()"></i>
+                <i class="fas fa-expand text-white" onclick="toggleFullScreen()"></i>
                 <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
             </div>
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 hidden" id="dropdownMenu">
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Setting</a>
                 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Bendahara</a>
                 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Jimpitan</a>
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Denda Ronda</a>
             </div>
         </div>
     </header>
@@ -63,30 +65,35 @@
                 </tfoot>
             </table>
         </div>
+        <!-- Import Button -->
+        <div class="hidden" id="importContainer">
+            <input type="file" id="importFile" accept=".xlsx" class="mb-4">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="importFromFile()">Import</button>
+        </div>
     </main>
     <!-- Footer -->
     <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
-        <div class="flex flex-col items-center" onclick="exportFunction()">
+        <div class="flex flex-col items-center" onclick="exportToExcel()">
             <i class="fas fa-file-export text-green-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Export</span>
         </div>
-        <div class="flex flex-col items-center" onclick="pdfFunction()">
+        <div class="flex flex-col items-center" onclick="exportToPDF()">
             <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">PDF</span>
         </div>
-        <div class="flex flex-col items-center" onclick="printFunction()">
+        <div class="flex flex-col items-center" onclick="printTable()">
             <i class="fas fa-print text-yellow-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Print</span>
         </div>
-        <div class="flex flex-col items-center" onclick="delUserFunction()">
+        <div class="flex flex-col items-center" onclick="deleteUser()">
             <i class="fas fa-user-times text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Del User</span>
         </div>
-        <div class="flex flex-col items-center" onclick="clearFunction()">
+        <div class="flex flex-col items-center" onclick="clearTable()">
             <i class="fas fa-times-circle text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Clear</span>
         </div>
-        <div class="flex flex-col items-center" onclick="delAllFunction()">
+        <div class="flex flex-col items-center" onclick="deleteAll()">
             <i class="fas fa-trash text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Del All</span>
         </div>
@@ -159,6 +166,9 @@
                 <div class="flex items-center justify-between">
                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="saveEditData()">
                         Simpan
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="deleteRow()">
+                        Hapus
                     </button>
                     <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleEditPopup()">
                         Batal
@@ -293,6 +303,13 @@
             toggleEditPopup();
         }
 
+        function deleteRow() {
+            currentEditRow.remove();
+            updateTotals();
+            saveDataToLocalStorage();
+            toggleEditPopup();
+        }
+
         function saveDataToLocalStorage() {
             const table = document.querySelector('table tbody');
             const data = [];
@@ -324,7 +341,6 @@
                 newRow.innerHTML = `
                     <td class="border px-4 py-2">${index + 1}</td>
                     <td class="border px-4 py-2 cursor-pointer" onclick="editData(this)">${rowData.nama}</td>
-                    
                     <td class="border px-4 py-2">${rowData.blok}</td>
                     <td class="border px-4 py-2">${rowData.pemasukan}</td>
                     <td class="border px-4 py-2">${rowData.jenisPemasukan}</td>
@@ -339,6 +355,112 @@
             }
 
             updateTotals();
+        }
+
+        function exportToExcel() {
+            const table = document.querySelector('table');
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, 'data.xlsx');
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.autoTable({ html: 'table' });
+            doc.save('data.pdf');
+        }
+
+        function printTable() {
+            const table = document.querySelector('table').outerHTML;
+            const newWindow = window.open();
+            newWindow.document.write(table);
+            newWindow.print();
+        }
+
+        function deleteUser() {
+            const name = prompt("Enter the name of the user to delete:");
+            if (name) {
+                const table = document.querySelector('table tbody');
+                for (let i = 0; i < table.rows.length; i++) {
+                    if (table.rows[i].cells[1].innerText === name) {
+                        table.rows[i].remove();
+                        updateTotals();
+                        saveDataToLocalStorage();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function clearTable() {
+            const table = document.querySelector('table tbody');
+            for (let i = 0; i < table.rows.length; i++) {
+                table.rows[i].cells[3].innerText = '';
+                table.rows[i].cells[4].innerText = '';
+                table.rows[i].cells[5].innerText = '';
+                table.rows[i].cells[6].innerText = '';
+            }
+            updateTotals();
+            saveDataToLocalStorage();
+        }
+
+        function deleteAll() {
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+            table.innerHTML = '';
+            updateTotals();
+            saveDataToLocalStorage();
+            tableContainer.classList.add('hidden');
+            document.getElementById('importContainer').classList.remove('hidden');
+        }
+
+        function importFromFile() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                const tableContainer = document.getElementById('tableContainer');
+                const table = tableContainer.querySelector('table tbody');
+                table.innerHTML = '';
+
+                jsonData.forEach((row, index) => {
+                    if (index === 0) return; // Skip header row
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="border px-4 py-2">${index}</td>
+                        <td class="border px-4 py-2 cursor-pointer" onclick="editData(this)">${row[1]}</td>
+                        <td class="border px-4 py-2">${row[2]}</td>
+                        <td class="border px-4 py-2">${row[3]}</td>
+                        <td class="border px-4 py-2">${row[4]}</td>
+                        <td class="border px-4 py-2">${row[5]}</td>
+                        <td class="border px-4 py-2">${row[6]}</td>
+                    `;
+                    table.appendChild(newRow);
+                });
+
+                updateTotals();
+                saveDataToLocalStorage();
+                tableContainer.classList.remove('hidden');
+                document.getElementById('importContainer').classList.add('hidden');
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', loadDataFromLocalStorage);
