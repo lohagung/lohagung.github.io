@@ -38,7 +38,7 @@
                     <i class="fas fa-download text-white"></i>
                 </a>
                 <i class="fas fa-file-import text-white cursor-pointer" onclick="document.getElementById('importFile').click()"></i>
-            
+                <i class="fas fa-file-pdf text-white cursor-pointer" onclick="exportToPDF()"></i>
                 <i class="fas fa-expand text-white cursor-pointer" onclick="toggleFullScreen()"></i>
                 <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
             </div>
@@ -172,7 +172,14 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="editPemasukan">Pemasukan</label>
                     <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPemasukan" type="number" placeholder="Pemasukan">
                 </div>
-               
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editJenisPemasukan">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editJenisPemasukan" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPengeluaran">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPengeluaran" type="number" placeholder="Pengeluaran">
+                </div>
                 <div class="flex items-center justify-between">
                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="saveEditData()">
                         Simpan
