@@ -2,8 +2,8 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Admin Jimpitan</title>
-    <link rel="icon" href="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" type="image/jpeg"/>
+    <title>Admin Selokan</title>
+    <link rel="icon" href="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -13,14 +13,24 @@
             position: absolute;
             cursor: move;
         }
+        table, th, td {
+            border: 1px solid #e1e0e0;
+            white-space: nowrap;
+        }
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .hover-highlight:hover {
+            background-color: #fbbf24;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 w-full z-10">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" width="40"/>
-            <span class="text-white font-bold ml-2">Admin Jimpitan</span>
+            <img alt="Logo of Admin Selokan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="40"/>
+            <span class="text-white font-bold ml-2">Admin Selokan</span>
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
@@ -37,7 +47,7 @@
         </div>
     </header>
     <!-- Main Content -->
-    <main class="flex-grow p-4">
+    <main class="flex-grow p-4 mt-16">
         <!-- Table Container -->
         <div class="overflow-x-auto hidden" id="tableContainer">
             <table class="min-w-full bg-white border border-gray-200">
@@ -69,6 +79,10 @@
         <div class="hidden" id="importContainer">
             <input type="file" id="importFile" accept=".xlsx" class="mb-4">
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="importFromFile()">Import</button>
+        </div>
+        <!-- Copyright -->
+        <div class="text-center mt-4">
+            <p>2024 © Copyright YOUSHE</p>
         </div>
     </main>
     <!-- Footer -->
@@ -204,6 +218,21 @@
             </form>
         </div>
     </div>
+    <!-- Delete Confirmation Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="deleteConfirmationPopupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Hapus Data</h2>
+            <p>Apakah Anda yakin ingin menghapus data ini?</p>
+            <div class="flex items-center justify-between mt-4">
+                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="confirmDelete()">
+                    Hapus
+                </button>
+                <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleDeleteConfirmationPopup()">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
@@ -225,6 +254,11 @@
             popup.classList.toggle('hidden');
         }
 
+        function toggleDeleteConfirmationPopup() {
+            const popup = document.getElementById('deleteConfirmationPopupForm');
+            popup.classList.toggle('hidden');
+        }
+
         function addData() {
             // Get form values
             const nama = document.getElementById('nama').value;
@@ -235,6 +269,7 @@
             const saldo = pemasukan - pengeluaran;
 
             // Find the table
+            
             const tableContainer = document.getElementById('tableContainer');
             const table = tableContainer.querySelector('table tbody');
 
@@ -244,10 +279,10 @@
             // Create cells
             newRow.innerHTML = `
                 <td class="border px-4 py-2">${table.rows.length + 1}</td>
-                <td class="border px-4 py-2 cursor-pointer" onclick="editData(this)">${nama}</td>
+                <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${nama}</td>
                 <td class="border px-4 py-2">${blok}</td>
                 <td class="border px-4 py-2">${pemasukan}</td>
-                <td class="border px-4 py-2 cursor-pointer" onclick="editJenisPemasukanData(this)">${jenisPemasukan}</td>
+                <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${jenisPemasukan}</td>
                 <td class="border px-4 py-2">${pengeluaran}</td>
                 <td class="border px-4 py-2">${saldo}</td>
             `;
@@ -286,7 +321,6 @@
         }
 
         let currentEditRow;
-        let currentJenisPemasukanCell;
 
         function editData(cell) {
             currentEditRow = cell.parentElement;
@@ -344,11 +378,11 @@
         }
 
         function editJenisPemasukanData(cell) {
-            currentJenisPemasukanCell = cell;
+            currentEditRow = cell.parentElement;
 
             // Get current values
-            const jenisPemasukan = currentJenisPemasukanCell.innerText;
-            const pengeluaran = currentJenisPemasukanCell.nextElementSibling.innerText;
+            const jenisPemasukan = currentEditRow.cells[4].innerText;
+            const pengeluaran = currentEditRow.cells[5].innerText;
 
             // Set values in the edit form
             document.getElementById('editJenisPemasukanInput').value = jenisPemasukan;
@@ -361,4 +395,195 @@
         function saveEditJenisPemasukanData() {
             // Get form values
             const jenisPemasukan = document.getElementById('editJenisPemasukanInput').value;
-            const pengeluaran = document.getElementById('editPe
+            const pengeluaran = document.getElementById('editPengeluaranInput').value;
+            const pemasukan = currentEditRow.cells[3].innerText;
+            const saldo = pemasukan - pengeluaran;
+
+            // Update the row with new values
+            currentEditRow.cells[4].innerText = jenisPemasukan;
+            currentEditRow.cells[5].innerText = pengeluaran;
+            currentEditRow.cells[6].innerText = saldo;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditJenisPemasukanPopup();
+        }
+
+        function deleteJenisPemasukanRow() {
+            currentEditRow.cells[4].innerText = '';
+            currentEditRow.cells[5].innerText = '';
+            currentEditRow.cells[6].innerText = currentEditRow.cells[3].innerText;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditJenisPemasukanPopup();
+        }
+
+        function saveDataToLocalStorage() {
+            const table = document.querySelector('table tbody');
+            const data = [];
+
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = {
+                    no: row.cells[0].innerText,
+                    nama: row.cells[1].innerText,
+                    blok: row.cells[2].innerText,
+                    pemasukan: row.cells[3].innerText,
+                    jenisPemasukan: row.cells[4].innerText,
+                    pengeluaran: row.cells[5].innerText,
+                    saldo: row.cells[6].innerText
+                };
+                data.push(rowData);
+            }
+
+            localStorage.setItem('tableData', JSON.stringify(data));
+        }
+
+        function loadDataFromLocalStorage() {
+            const data = JSON.parse(localStorage.getItem('tableData')) || [];
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+
+            data.forEach((rowData, index) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="border px-4 py-2">${index + 1}</td>
+                    <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${rowData.nama}</td>
+                    <td class="border px-4 py-2">${rowData.blok}</td>
+                    <td class="border px-4 py-2">${rowData.pemasukan}</td>
+                    <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${rowData.jenisPemasukan}</td>
+                    <td class="border px-4 py-2">${rowData.pengeluaran}</td>
+                    <td class="border px-4 py-2">${rowData.saldo}</td>
+                `;
+                table.appendChild(newRow);
+            });
+
+            if (data.length > 0) {
+                tableContainer.classList.remove('hidden');
+            }
+
+            updateTotals();
+        }
+
+        function exportToExcel() {
+            const table = document.querySelector('table');
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet JS" });
+            XLSX.writeFile(wb, 'data.xlsx');
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.autoTable({ html: 'table' });
+            doc.save('data.pdf');
+        }
+
+        function printTable() {
+            const printContents = document.querySelector('table').outerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();
+        }
+
+        function deleteUser() {
+            const nama = prompt("Masukkan nama yang ingin dihapus:");
+            if (nama) {
+                const table = document.querySelector('table tbody');
+                for (let i = 0; i < table.rows.length; i++) {
+                    if (table.rows[i].cells[1].innerText === nama) {
+                        table.rows[i].remove();
+                        updateTotals();
+                        saveDataToLocalStorage();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function clearTable() {
+            const table = document.querySelector('table tbody');
+            for (let i = 0; i < table.rows.length; i++) {
+                table.rows[i].cells[3].innerText = '';
+                table.rows[i].cells[4].innerText = '';
+                table.rows[i].cells[5].innerText = '';
+                table.rows[i].cells[6].innerText = '';
+            }
+            updateTotals();
+            saveDataToLocalStorage();
+        }
+
+        function deleteAll() {
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+            table.innerHTML = '';
+            updateTotals();
+            saveDataToLocalStorage();
+            tableContainer.classList.add('hidden');
+            document.getElementById('importContainer').classList.remove('hidden');
+        }
+
+        function importFromFile() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                const tableContainer = document.getElementById('tableContainer');
+                const table = tableContainer.querySelector('table tbody');
+                table.innerHTML = '';
+
+                jsonData.slice(1).forEach((row, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="border px-4 py-2">${index + 1}</td>
+                        <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${row[1]}</td>
+                        <td class="border px-4 py-2">${row[2]}</td>
+                        <td class="border px-4 py-2">${row[3]}</td>
+                        <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${row[4]}</td>
+                        <td class="border px-4 py-2">${row[5]}</td>
+                        <td class="border px-4 py-2">${row[6]}</td>
+                    `;
+                    table.appendChild(newRow);
+                });
+
+                updateTotals();
+                saveDataToLocalStorage();
+                tableContainer.classList.remove('hidden');
+                document.getElementById('importContainer').classList.add('hidden');
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDataFromLocalStorage);
+    </script>
+</body>
+</html>
