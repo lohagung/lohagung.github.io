@@ -1,1 +1,347 @@
-ed
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Jimpitan</title>
+    <link rel="icon" href="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" type="image/jpeg"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <style>
+        .draggable {
+            position: absolute;
+            cursor: move;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" width="40"/>
+            <span class="text-white font-bold ml-2">Admin Jimpitan</span>
+        </div>
+        <div class="relative">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-download text-white"></i>
+                <i class="fas fa-file-import text-white"></i>
+                <i class="fas fa-expand text-white"></i>
+                <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
+            </div>
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 hidden" id="dropdownMenu">
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Setting</a>
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Bendahara</a>
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Jimpitan</a>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-grow p-4">
+        <!-- Table Container -->
+        <div class="overflow-x-auto hidden" id="tableContainer">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 border-b">No</th>
+                        <th class="px-4 py-2 border-b">Nama</th>
+                        <th class="px-4 py-2 border-b">Blok</th>
+                        <th class="px-4 py-2 border-b">Pemasukan</th>
+                        <th class="px-4 py-2 border-b">Jenis Pemasukan</th>
+                        <th class="px-4 py-2 border-b">Pengeluaran</th>
+                        <th class="px-4 py-2 border-b">Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="border px-4 py-2 font-bold" colspan="3">Total</td>
+                        <td class="border px-4 py-2 font-bold" id="totalPemasukan"></td>
+                        <td class="border px-4 py-2"></td>
+                        <td class="border px-4 py-2 font-bold" id="totalPengeluaran"></td>
+                        <td class="border px-4 py-2 font-bold" id="totalSaldo"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
+        <div class="flex flex-col items-center" onclick="exportFunction()">
+            <i class="fas fa-file-export text-green-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Export</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="pdfFunction()">
+            <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">PDF</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="printFunction()">
+            <i class="fas fa-print text-yellow-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Print</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="delUserFunction()">
+            <i class="fas fa-user-times text-red-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Del User</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="clearFunction()">
+            <i class="fas fa-times-circle text-red-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Clear</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="delAllFunction()">
+            <i class="fas fa-trash text-red-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Del All</span>
+        </div>
+    </footer>
+    <!-- Floating Plus Button -->
+    <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-plus" style="right: 10px; bottom: 50%; transform: translateY(50%);" onclick="togglePopup()">
+        <i class="fas fa-plus text-lg"></i>
+    </div>
+    <!-- Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="popupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Tambah Data</h2>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="nama">Nama</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nama" type="text" placeholder="Nama">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="blok">Blok</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="blok" type="text" placeholder="Blok">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="pemasukan">Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pemasukan" type="number" placeholder="Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="jenisPemasukan">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="jenisPemasukan" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="pengeluaran">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pengeluaran" type="number" placeholder="Pengeluaran">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="addData()">
+                        Tambah
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="togglePopup()">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="editPopupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Edit Data</h2>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editNama">Nama</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editNama" type="text" placeholder="Nama">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editBlok">Blok</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editBlok" type="text" placeholder="Blok">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPemasukan">Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPemasukan" type="number" placeholder="Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editJenisPemasukan">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editJenisPemasukan" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPengeluaran">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPengeluaran" type="number" placeholder="Pengeluaran">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="saveEditData()">
+                        Simpan
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleEditPopup()">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function togglePopup() {
+            const popup = document.getElementById('popupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        function toggleEditPopup() {
+            const popup = document.getElementById('editPopupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        function addData() {
+            // Get form values
+            const nama = document.getElementById('nama').value;
+            const blok = document.getElementById('blok').value;
+            const pemasukan = document.getElementById('pemasukan').value;
+            const jenisPemasukan = document.getElementById('jenisPemasukan').value;
+            const pengeluaran = document.getElementById('pengeluaran').value;
+            const saldo = pemasukan - pengeluaran;
+
+            // Find the table
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+
+            // Create a new row
+            const newRow = document.createElement('tr');
+
+            // Create cells
+            newRow.innerHTML = `
+                <td class="border px-4 py-2">${table.rows.length + 1}</td>
+                <td class="border px-4 py-2 cursor-pointer" onclick="editData(this)">${nama}</td>
+                <td class="border px-4 py-2">${blok}</td>
+                <td class="border px-4 py-2">${pemasukan}</td>
+                <td class="border px-4 py-2">${jenisPemasukan}</td>
+                <td class="border px-4 py-2">${pengeluaran}</td>
+                <td class="border px-4 py-2">${saldo}</td>
+            `;
+
+            // Append the new row to the table
+            table.appendChild(newRow);
+
+            // Update totals
+            updateTotals();
+
+            // Show the table if hidden
+            tableContainer.classList.remove('hidden');
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the popup
+            togglePopup();
+        }
+
+        function updateTotals() {
+            const table = document.querySelector('table tbody');
+            let totalPemasukan = 0;
+            let totalPengeluaran = 0;
+
+            for (let i = 0; i < table.rows.length; i++) {
+                totalPemasukan += parseFloat(table.rows[i].cells[3].innerText) || 0;
+                totalPengeluaran += parseFloat(table.rows[i].cells[5].innerText) || 0;
+            }
+
+            const totalSaldo = totalPemasukan - totalPengeluaran;
+
+            document.getElementById('totalPemasukan').innerText = totalPemasukan;
+            document.getElementById('totalPengeluaran').innerText = totalPengeluaran;
+            document.getElementById('totalSaldo').innerText = totalSaldo;
+        }
+
+        let currentEditRow;
+
+        function editData(cell) {
+            currentEditRow = cell.parentElement;
+
+            // Get current values
+            const nama = currentEditRow.cells[1].innerText;
+            const blok = currentEditRow.cells[2].innerText;
+            const pemasukan = currentEditRow.cells[3].innerText;
+            const jenisPemasukan = currentEditRow.cells[4].innerText;
+            const pengeluaran = currentEditRow.cells[5].innerText;
+
+            // Set values in the edit form
+            document.getElementById('editNama').value = nama;
+            document.getElementById('editBlok').value = blok;
+            document.getElementById('editPemasukan').value = pemasukan;
+            document.getElementById('editJenisPemasukan').value = jenisPemasukan;
+            document.getElementById('editPengeluaran').value = pengeluaran;
+
+            // Show the edit popup
+            toggleEditPopup();
+        }
+
+        function saveEditData() {
+            // Get form values
+            const nama = document.getElementById('editNama').value;
+            const blok = document.getElementById('editBlok').value;
+            const pemasukan = document.getElementById('editPemasukan').value;
+            const jenisPemasukan = document.getElementById('editJenisPemasukan').value;
+            const pengeluaran = document.getElementById('editPengeluaran').value;
+            const saldo = pemasukan - pengeluaran;
+
+            // Update the row with new values
+            currentEditRow.cells[1].innerText = nama;
+            currentEditRow.cells[2].innerText = blok;
+            currentEditRow.cells[3].innerText = pemasukan;
+            currentEditRow.cells[4].innerText = jenisPemasukan;
+            currentEditRow.cells[5].innerText = pengeluaran;
+            currentEditRow.cells[6].innerText = saldo;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditPopup();
+        }
+
+        function saveDataToLocalStorage() {
+            const table = document.querySelector('table tbody');
+            const data = [];
+
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = {
+                    no: row.cells[0].innerText,
+                    nama: row.cells[1].innerText,
+                    blok: row.cells[2].innerText,
+                    pemasukan: row.cells[3].innerText,
+                    jenisPemasukan: row.cells[4].innerText,
+                    pengeluaran: row.cells[5].innerText,
+                    saldo: row.cells[6].innerText
+                };
+                data.push(rowData);
+            }
+
+            localStorage.setItem('tableData', JSON.stringify(data));
+        }
+
+        function loadDataFromLocalStorage() {
+            const data = JSON.parse(localStorage.getItem('tableData')) || [];
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+
+            data.forEach((rowData, index) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="border px-4 py-2">${index + 1}</td>
+                    <td class="border px-4 py-2 cursor-pointer" onclick="editData(this)">${rowData.nama}</td>
+                    
+                    <td class="border px-4 py-2">${rowData.blok}</td>
+                    <td class="border px-4 py-2">${rowData.pemasukan}</td>
+                    <td class="border px-4 py-2">${rowData.jenisPemasukan}</td>
+                    <td class="border px-4 py-2">${rowData.pengeluaran}</td>
+                    <td class="border px-4 py-2">${rowData.saldo}</td>
+                `;
+                table.appendChild(newRow);
+            });
+
+            if (data.length > 0) {
+                tableContainer.classList.remove('hidden');
+            }
+
+            updateTotals();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDataFromLocalStorage);
+    </script>
+</body>
+</html>
