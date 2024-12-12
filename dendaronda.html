@@ -2,17 +2,16 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Denda Ronda</title>
+    <title>Admin Selokan</title>
     <link rel="icon" href="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <style>
         .draggable {
-            position: fixed;
+            position: absolute;
+            cursor: move;
         }
         table, th, td {
             border: 1px solid #e1e0e0;
@@ -24,89 +23,75 @@
         .hover-highlight:hover {
             background-color: #fbbf24;
         }
-        main {
-            margin-top: 70px; /* Adjust this value based on the height of your header */
-            margin-bottom: 90px;
-        }
-        @media print {
-            footer, .draggable, .relative {
-                display: none;
-            }
-            body {
-                zoom: 75%;
-            }
-        }
-		.nota {
-    border-radius: 50%;
-    position: absolute;
-    margin-top: -15px;
-    margin-right: -15px;
-}
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 w-full z-10">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="40"/>
-            <span class="text-white font-bold ml-2">Denda Ronda</span>
+            <img alt="Logo of Admin Selokan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="40"/>
+            <span class="text-white font-bold ml-2">Admin Selokan</span>
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
-                <i class="fas fa-search text-white cursor-pointer" onclick="openSearchPopup()"></i>
-                <a href="/denda-ronda.xlsx" download>
-                    <i class="fas fa-download text-white"></i>
-                </a>
-                <i class="fas fa-file-import text-white cursor-pointer" onclick="document.getElementById('fileInput').click()"></i>
-                <i class="fas fa-expand text-white cursor-pointer" onclick="toggleFullScreen()"></i>
+                <i class="fas fa-download text-white" onclick="exportToExcel()"></i>
+                <i class="fas fa-file-import text-white" onclick="importFromFile()"></i>
+                <i class="fas fa-expand text-white" onclick="toggleFullScreen()"></i>
                 <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
             </div>
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 hidden" id="dropdownMenu">
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer" onclick="openSettings()">Setting</a>
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/bendahara.html">Bendahara</a>
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/jimpitan.html">Jimpitan</a>
-		 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/dendaronda.html">Denda Ronda</a>    
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Bendahara</a>
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Jimpitan</a>
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Denda Ronda</a>
             </div>
         </div>
     </header>
     <!-- Main Content -->
-    <main class="flex-grow p-4">
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white" id="dataTable">
+    <main class="flex-grow p-4 mt-16">
+        <!-- Table Container -->
+        <div class="overflow-x-auto hidden" id="tableContainer">
+            <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4 border-b">No</th>
-                        <th class="py-2 px-4 border-b">Nama</th>
-                        <th class="py-2 px-4 border-b">Blok</th>
-                        <th class="py-2 px-4 border-b">Kurang</th>
-                        <th class="py-2 px-4 border-b">M1</th>
-                        <th class="py-2 px-4 border-b">M2</th>
-                        <th class="py-2 px-4 border-b">M3</th>
-                        <th class="py-2 px-4 border-b">M4</th>
-                        <th class="py-2 px-4 border-b">Jumlah</th>
-                        <th class="py-2 px-4 border-b cursor-pointer" onclick="openNotaPopup(this)">Bayar</th>
+                        <th class="px-4 py-2 border-b">No</th>
+                        <th class="px-4 py-2 border-b">Nama</th>
+                        <th class="px-4 py-2 border-b">Blok</th>
+                        <th class="px-4 py-2 border-b">Pemasukan</th>
+                        <th class="px-4 py-2 border-b">Jenis Pemasukan</th>
+                        <th class="px-4 py-2 border-b">Pengeluaran</th>
+                        <th class="px-4 py-2 border-b">Saldo</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <!-- Table rows will be dynamically inserted here -->
+                <tbody>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="8" class="py-2 px-4 border-b text-right font-bold">TOTAL</td>
-                        <td id="totalJumlah" class="py-2 px-4 border-b font-bold text-red-600"></td>
-                        <td id="totalBayar" class="py-2 px-4 border-b font-bold text-red-600"></td>
+                        <td class="border px-4 py-2 font-bold" colspan="3">Total</td>
+                        <td class="border px-4 py-2 font-bold" id="totalPemasukan"></td>
+                        <td class="border px-4 py-2"></td>
+                        <td class="border px-4 py-2 font-bold" id="totalPengeluaran"></td>
+                        <td class="border px-4 py-2 font-bold" id="totalSaldo"></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
+        <!-- Import Button -->
+        <div class="hidden" id="importContainer">
+            <input type="file" id="importFile" accept=".xlsx" class="mb-4">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="importFromFile()">Import</button>
+        </div>
+        <!-- Copyright -->
+        <div class="text-center mt-4">
+            <p>2024 © Copyright YOUSHE</p>
+        </div>
     </main>
     <!-- Footer -->
     <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
-        <div class="flex flex-col items-center" onclick="exportTableToExcel()">
+        <div class="flex flex-col items-center" onclick="exportToExcel()">
             <i class="fas fa-file-export text-green-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Export</span>
         </div>
-        <div class="flex flex-col items-center" onclick="exportTableToPDF()">
+        <div class="flex flex-col items-center" onclick="exportToPDF()">
             <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">PDF</span>
         </div>
@@ -114,544 +99,480 @@
             <i class="fas fa-print text-yellow-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Print</span>
         </div>
-        <div class="flex flex-col items-center" onclick="delUserFunction()">
+        <div class="flex flex-col items-center" onclick="deleteUser()">
             <i class="fas fa-user-times text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Del User</span>
         </div>
-        <div class="flex flex-col items-center" onclick="clearFunction()">
+        <div class="flex flex-col items-center" onclick="clearTable()">
             <i class="fas fa-times-circle text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Clear</span>
         </div>
-        <div class="flex flex-col items-center" onclick="delAllFunction()">
+        <div class="flex flex-col items-center" onclick="deleteAll()">
             <i class="fas fa-trash text-red-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Del All</span>
         </div>
     </footer>
     <!-- Floating Plus Button -->
-    <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" style="right: 10px; bottom: 50%; transform: translateY(50%);" onclick="openAddData()">
+    <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-plus" style="right: 10px; bottom: 50%; transform: translateY(50%);" onclick="togglePopup()">
         <i class="fas fa-plus text-lg"></i>
     </div>
-    <!-- Settings Popup -->
-    <div id="settingsPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-80">
-            <h2 class="text-xl font-bold mb-4">Settings</h2>
-            <div class="mb-4">
-                <label for="harian" class="block text-gray-700">Harian</label>
-                <input type="text" id="harian" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="mb-4">
-                <label for="bulanan" class="block text-gray-700">Bulanan</label>
-                <input type="text" id="bulanan" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeSettings()">Batal</button>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="saveSettings()">Simpan</button>
-            </div>
-        </div>
-    </div>
-    <!-- Edit Data Popup -->
-    <div id="editDataPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-80">
-            <h2 class="text-xl font-bold mb-4">Edit Data</h2>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <input type="text" id="editNama" class="w-full px-3 py-2 border rounded-md"/>
-                <input type="text" id="editBlok" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="mb-4">
-                <label for="editKurang" class="block text-gray-700">Kurang</label>
-                <input type="text" id="editKurang" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <label for="enableToggle" class="block text-gray-700 mr-2">Jenis Denda Ronda</label>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="enableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleInputs()"/>
-                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
-                <input type="checkbox" id="editM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;M1</label>
-                <input type="checkbox" id="editM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM2" class="block text-gray-700 mr-2">&nbsp;M2</label>
-                <input type="checkbox" id="editM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM3" class="block text-gray-700 mr-2">&nbsp;M3</label>
-                <input type="checkbox" id="editM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM4" class="block text-gray-700 mr-2">&nbsp;M4</label>
-            </div>
-            <div class="mb-4">
-                <label for="editBayar" class="block text-gray-700">Bayar</label>
-                <input type="text" id="editBayar" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeEditData()">Batal</button>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="saveEditData()">Simpan</button>
-            </div>
-        </div>
-    </div>
-    <!-- Add Data Popup -->
-    <div id="addDataPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-80">
+    <!-- Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="popupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
             <h2 class="text-xl font-bold mb-4">Tambah Data</h2>
-            <div class="mb-4">
-                <label for="addNama" class="block text-gray-700">Nama</label>
-                <input type="text" id="addNama" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="mb-4">
-                <label for="addBlok" class="block text-gray-700">Blok</label>
-                <input type="text" id="addBlok" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="mb-4">
-                <label for="addKurang" class="block text-gray-700">Kurang</label>
-                <input type="text" id="addKurang" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addEnableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleAddInputs()"/>
-                <label for="addEnableToggle" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM1" class="block text-gray-700 mr-2">&nbsp;Minggu 1</label>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM2" class="block text-gray-700 mr-2">&nbsp;Minggu 2</label>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM3" class="block text-gray-700 mr-2">&nbsp;Minggu 3</label>
-            </div>
-            <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM4" class="block text-gray-700 mr-2">&nbsp;Minggu 4</label>
-            </div>
-            <div class="mb-4">
-                <label for="addBayar" class="block text-gray-700">&nbsp;Bayar</label>
-                <input type="text" id="addBayar" class="w-full px-3 py-2 border rounded-md"/>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeAddData()">Batal</button>
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="saveAddData()">Simpan</button>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="nama">Nama</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nama" type="text" placeholder="Nama">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="blok">Blok</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="blok" type="text" placeholder="Blok">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="pemasukan">Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pemasukan" type="number" placeholder="Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="jenisPemasukan">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="jenisPemasukan" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="pengeluaran">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="pengeluaran" type="number" placeholder="Pengeluaran">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="addData()">
+                        Tambah
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="togglePopup()">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="editPopupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Edit Data</h2>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editNama">Nama</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editNama" type="text" placeholder="Nama">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editBlok">Blok</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editBlok" type="text" placeholder="Blok">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPemasukan">Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPemasukan" type="number" placeholder="Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editJenisPemasukan">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editJenisPemasukan" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPengeluaran">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPengeluaran" type="number" placeholder="Pengeluaran">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="saveEditData()">
+                        Simpan
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="deleteRow()">
+                        Hapus
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleEditPopup()">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Jenis Pemasukan Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="editJenisPemasukanPopupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Edit Jenis Pemasukan</h2>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editJenisPemasukanInput">Jenis Pemasukan</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editJenisPemasukanInput" type="text" placeholder="Jenis Pemasukan">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="editPengeluaranInput">Pengeluaran</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="editPengeluaranInput" type="number" placeholder="Pengeluaran">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="saveEditJenisPemasukanData()">
+                        Simpan
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="deleteJenisPemasukanRow()">
+                        Hapus
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleEditJenisPemasukanPopup()">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Delete Confirmation Popup Form -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="deleteConfirmationPopupForm">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Hapus Data</h2>
+            <p>Apakah Anda yakin ingin menghapus data ini?</p>
+            <div class="flex items-center justify-between mt-4">
+                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="confirmDelete()">
+                    Hapus
+                </button>
+                <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onclick="toggleDeleteConfirmationPopup()">
+                    Batal
+                </button>
             </div>
         </div>
     </div>
-    <!-- Search Popup -->
-    <div id="searchPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-80 relative">
-            <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center" onclick="closeSearchPopup()">X</button>
-            <h2 class="text-xl font-bold mb-4"></h2>
-            <div class="mb-4">
-                <input type="text" id="searchNama" placeholder="Cari Nama Warga" class="w-full px-3 py-2 border rounded-md" oninput="searchUser()"/>
-            </div>
-            <ul id="searchResults" class="list-disc pl-5">
-                <!-- Search results will be dynamically inserted here -->
-            </ul>
-        </div>
-    </div>
-    <!-- Nota Popup -->
-    <div id="notaPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-80">
-		            <div class="flex justify-end space-x-4">
-                <button class="bg-red-500 text-white px-4 py-2 nota" onclick="closeNotaPopup()">X</button>
-            </div>
-
-            <h2 id="notaTitle" class="text-xl font-bold mb-4">NOTA</h2>
-            <div class="mb-4">
-                <div class="flex justify-between">
-                    <span>Minggu 1:</span>
-                    <span id="notaM1"></span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Minggu 2:</span>
-                    <span id="notaM2"></span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Minggu 3:</span>
-                    <span id="notaM3"></span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Minggu 4:</span>
-                    <span id="notaM4"></span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Tunggakan:</span>
-                    <span id="notaKurang"></span>
-                </div>
-                <div class="flex justify-between font-bold">
-                    <span>Total Tagihan:</span>
-                    <span id="notaJumlah"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Success Alert -->
-    <div id="successAlert" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-4 rounded-md shadow-lg hidden">
-        <i class="fas fa-check-circle mr-2"></i> Settingan telah sukses disimpan
-    </div>
-    <!-- File Input for Import -->
-    <input type="file" id="fileInput" class="hidden" accept=".xlsx" onchange="importFile(event)"/>
     <script>
-        let currentEditRow = null;
-        let harianSetting = localStorage.getItem('harianSetting') || 0;
-        let bulananSetting = localStorage.getItem('bulananSetting') || 0;
-
-        // Fungsi untuk menutup popup pengaturan
-        function closeSettings() {
-            const popup = document.getElementById('settingsPopup');
-            popup.classList.add('hidden');
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('hidden');
         }
 
-        // Fungsi untuk membuka popup pengaturan
-        function openSettings() {
-            document.getElementById('harian').value = harianSetting;
-            document.getElementById('bulanan').value = bulananSetting;
-            const popup = document.getElementById('settingsPopup');
-            popup.classList.remove('hidden');
+        function togglePopup() {
+            const popup = document.getElementById('popupForm');
+            popup.classList.toggle('hidden');
         }
 
-        // Fungsi untuk menyimpan pengaturan
-        function saveSettings() {
-            harianSetting = document.getElementById('harian').value;
-            bulananSetting = document.getElementById('bulanan').value;
-
-            // Simpan pengaturan ke localStorage
-            localStorage.setItem('harianSetting', harianSetting);
-            localStorage.setItem('bulananSetting', bulananSetting);
-
-            // Tampilkan pesan sukses
-            const successAlert = document.getElementById('successAlert');
-            successAlert.classList.remove('hidden');
-
-            // Sembunyikan pesan sukses setelah 3 detik
-            setTimeout(() => {
-                successAlert.classList.add('hidden');
-            }, 3000);
-
-            // Tutup popup
-            closeSettings();
+        function toggleEditPopup() {
+            const popup = document.getElementById('editPopupForm');
+            popup.classList.toggle('hidden');
         }
 
-        // Fungsi untuk mengimpor file
-        function importFile(event) {
-            const file = event.target.files[0];
+        function toggleEditJenisPemasukanPopup() {
+            const popup = document.getElementById('editJenisPemasukanPopupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        function toggleDeleteConfirmationPopup() {
+            const popup = document.getElementById('deleteConfirmationPopupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        function addData() {
+            // Get form values
+            const nama = document.getElementById('nama').value;
+            const blok = document.getElementById('blok').value;
+            const pemasukan = document.getElementById('pemasukan').value;
+            const jenisPemasukan = document.getElementById('jenisPemasukan').value;
+            const pengeluaran = document.getElementById('pengeluaran').value;
+            const saldo = pemasukan - pengeluaran;
+
+            // Find the table
+            
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+
+            // Create a new row
+            const newRow = document.createElement('tr');
+
+            // Create cells
+            newRow.innerHTML = `
+                <td class="border px-4 py-2">${table.rows.length + 1}</td>
+                <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${nama}</td>
+                <td class="border px-4 py-2">${blok}</td>
+                <td class="border px-4 py-2">${pemasukan}</td>
+                <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${jenisPemasukan}</td>
+                <td class="border px-4 py-2">${pengeluaran}</td>
+                <td class="border px-4 py-2">${saldo}</td>
+            `;
+
+            // Append the new row to the table
+            table.appendChild(newRow);
+
+            // Update totals
+            updateTotals();
+
+            // Show the table if hidden
+            tableContainer.classList.remove('hidden');
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the popup
+            togglePopup();
+        }
+
+        function updateTotals() {
+            const table = document.querySelector('table tbody');
+            let totalPemasukan = 0;
+            let totalPengeluaran = 0;
+
+            for (let i = 0; i < table.rows.length; i++) {
+                totalPemasukan += parseFloat(table.rows[i].cells[3].innerText) || 0;
+                totalPengeluaran += parseFloat(table.rows[i].cells[5].innerText) || 0;
+            }
+
+            const totalSaldo = totalPemasukan - totalPengeluaran;
+
+            document.getElementById('totalPemasukan').innerText = totalPemasukan;
+            document.getElementById('totalPengeluaran').innerText = totalPengeluaran;
+            document.getElementById('totalSaldo').innerText = totalSaldo;
+        }
+
+        let currentEditRow;
+
+        function editData(cell) {
+            currentEditRow = cell.parentElement;
+
+            // Get current values
+            const nama = currentEditRow.cells[1].innerText;
+            const blok = currentEditRow.cells[2].innerText;
+            const pemasukan = currentEditRow.cells[3].innerText;
+            const jenisPemasukan = currentEditRow.cells[4].innerText;
+            const pengeluaran = currentEditRow.cells[5].innerText;
+
+            // Set values in the edit form
+            document.getElementById('editNama').value = nama;
+            document.getElementById('editBlok').value = blok;
+            document.getElementById('editPemasukan').value = pemasukan;
+            document.getElementById('editJenisPemasukan').value = jenisPemasukan;
+            document.getElementById('editPengeluaran').value = pengeluaran;
+
+            // Show the edit popup
+            toggleEditPopup();
+        }
+
+        function saveEditData() {
+            // Get form values
+            const nama = document.getElementById('editNama').value;
+            const blok = document.getElementById('editBlok').value;
+            const pemasukan = document.getElementById('editPemasukan').value;
+            const jenisPemasukan = document.getElementById('editJenisPemasukan').value;
+            const pengeluaran = document.getElementById('editPengeluaran').value;
+            const saldo = pemasukan - pengeluaran;
+
+            // Update the row with new values
+            currentEditRow.cells[1].innerText = nama;
+            currentEditRow.cells[2].innerText = blok;
+            currentEditRow.cells[3].innerText = pemasukan;
+            currentEditRow.cells[4].innerText = jenisPemasukan;
+            currentEditRow.cells[5].innerText = pengeluaran;
+            currentEditRow.cells[6].innerText = saldo;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditPopup();
+        }
+
+        function deleteRow() {
+            currentEditRow.remove();
+            updateTotals();
+            saveDataToLocalStorage();
+            toggleEditPopup();
+        }
+
+        function editJenisPemasukanData(cell) {
+            currentEditRow = cell.parentElement;
+
+            // Get current values
+            const jenisPemasukan = currentEditRow.cells[4].innerText;
+            const pengeluaran = currentEditRow.cells[5].innerText;
+
+            // Set values in the edit form
+            document.getElementById('editJenisPemasukanInput').value = jenisPemasukan;
+            document.getElementById('editPengeluaranInput').value = pengeluaran;
+
+            // Show the edit popup
+            toggleEditJenisPemasukanPopup();
+        }
+
+        function saveEditJenisPemasukanData() {
+            // Get form values
+            const jenisPemasukan = document.getElementById('editJenisPemasukanInput').value;
+            const pengeluaran = document.getElementById('editPengeluaranInput').value;
+            const pemasukan = currentEditRow.cells[3].innerText;
+            const saldo = pemasukan - pengeluaran;
+
+            // Update the row with new values
+            currentEditRow.cells[4].innerText = jenisPemasukan;
+            currentEditRow.cells[5].innerText = pengeluaran;
+            currentEditRow.cells[6].innerText = saldo;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditJenisPemasukanPopup();
+        }
+
+        function deleteJenisPemasukanRow() {
+            currentEditRow.cells[4].innerText = '';
+            currentEditRow.cells[5].innerText = '';
+            currentEditRow.cells[6].innerText = currentEditRow.cells[3].innerText;
+
+            // Update totals
+            updateTotals();
+
+            // Save data to localStorage
+            saveDataToLocalStorage();
+
+            // Close the edit popup
+            toggleEditJenisPemasukanPopup();
+        }
+
+        function saveDataToLocalStorage() {
+            const table = document.querySelector('table tbody');
+            const data = [];
+
+            for (let i = 0; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = {
+                    no: row.cells[0].innerText,
+                    nama: row.cells[1].innerText,
+                    blok: row.cells[2].innerText,
+                    pemasukan: row.cells[3].innerText,
+                    jenisPemasukan: row.cells[4].innerText,
+                    pengeluaran: row.cells[5].innerText,
+                    saldo: row.cells[6].innerText
+                };
+                data.push(rowData);
+            }
+
+            localStorage.setItem('tableData', JSON.stringify(data));
+        }
+
+        function loadDataFromLocalStorage() {
+            const data = JSON.parse(localStorage.getItem('tableData')) || [];
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+
+            data.forEach((rowData, index) => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td class="border px-4 py-2">${index + 1}</td>
+                    <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${rowData.nama}</td>
+                    <td class="border px-4 py-2">${rowData.blok}</td>
+                    <td class="border px-4 py-2">${rowData.pemasukan}</td>
+                    <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${rowData.jenisPemasukan}</td>
+                    <td class="border px-4 py-2">${rowData.pengeluaran}</td>
+                    <td class="border px-4 py-2">${rowData.saldo}</td>
+                `;
+                table.appendChild(newRow);
+            });
+
+            if (data.length > 0) {
+                tableContainer.classList.remove('hidden');
+            }
+
+            updateTotals();
+        }
+
+        function exportToExcel() {
+            const table = document.querySelector('table');
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet JS" });
+            XLSX.writeFile(wb, 'data.xlsx');
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.autoTable({ html: 'table' });
+            doc.save('data.pdf');
+        }
+
+        function printTable() {
+            const printContents = document.querySelector('table').outerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();
+        }
+
+        function deleteUser() {
+            const nama = prompt("Masukkan nama yang ingin dihapus:");
+            if (nama) {
+                const table = document.querySelector('table tbody');
+                for (let i = 0; i < table.rows.length; i++) {
+                    if (table.rows[i].cells[1].innerText === nama) {
+                        table.rows[i].remove();
+                        updateTotals();
+                        saveDataToLocalStorage();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function clearTable() {
+            const table = document.querySelector('table tbody');
+            for (let i = 0; i < table.rows.length; i++) {
+                table.rows[i].cells[3].innerText = '';
+                table.rows[i].cells[4].innerText = '';
+                table.rows[i].cells[5].innerText = '';
+                table.rows[i].cells[6].innerText = '';
+            }
+            updateTotals();
+            saveDataToLocalStorage();
+        }
+
+        function deleteAll() {
+            const tableContainer = document.getElementById('tableContainer');
+            const table = tableContainer.querySelector('table tbody');
+            table.innerHTML = '';
+            updateTotals();
+            saveDataToLocalStorage();
+            tableContainer.classList.add('hidden');
+            document.getElementById('importContainer').classList.remove('hidden');
+        }
+
+        function importFromFile() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
             const reader = new FileReader();
 
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-                // Hapus data tabel yang ada
-                const tableBody = document.getElementById('tableBody');
-                tableBody.innerHTML = '';
+                const tableContainer = document.getElementById('tableContainer');
+                const table = tableContainer.querySelector('table tbody');
+                table.innerHTML = '';
 
-                // Isi tabel dengan data baru
-                jsonData.forEach((row, index) => {
-                    if (index === 0) return; // Lewati baris header
-                    const tr = document.createElement('tr');
-                    row.forEach((cell, cellIndex) => {
-                        const td = document.createElement('td');
-                        td.className = 'py-2 px-4 border-b hover-highlight';
-                        td.textContent = cell;
-                        if (cellIndex === 1) {
-                            td.classList.add('cursor-pointer');
-                            td.onclick = () => openEditData(tr);
-                        }
-                        tr.appendChild(td);
-                    });
-                    tableBody.appendChild(tr);
+                jsonData.slice(1).forEach((row, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td class="border px-4 py-2">${index + 1}</td>
+                        <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editData(this)">${row[1]}</td>
+                        <td class="border px-4 py-2">${row[2]}</td>
+                        <td class="border px-4 py-2">${row[3]}</td>
+                        <td class="border px-4 py-2 cursor-pointer hover-highlight" onclick="editJenisPemasukanData(this)">${row[4]}</td>
+                        <td class="border px-4 py-2">${row[5]}</td>
+                        <td class="border px-4 py-2">${row[6]}</td>
+                    `;
+                    table.appendChild(newRow);
                 });
 
-                // Simpan data ke localStorage
-                localStorage.setItem('tableData', JSON.stringify(jsonData));
-                updateTotal();
+                updateTotals();
+                saveDataToLocalStorage();
+                tableContainer.classList.remove('hidden');
+                document.getElementById('importContainer').classList.add('hidden');
             };
 
             reader.readAsArrayBuffer(file);
         }
 
-        // Fungsi untuk menampilkan atau menyembunyikan menu dropdown
-        function toggleMenu() {
-            const dropdownMenu = document.getElementById('dropdownMenu');
-            dropdownMenu.classList.toggle('hidden');
-        }
-
-        // Fungsi untuk membuka popup edit data
-        function openEditData(row) {
-            currentEditRow = row;
-            const cells = row.children;
-            document.getElementById('editNama').value = cells[1].textContent;
-            document.getElementById('editBlok').value = cells[2].textContent;
-            document.getElementById('editKurang').value = cells[3].textContent;
-            document.getElementById('editM1').checked = cells[4].textContent == harianSetting;
-            document.getElementById('editM2').checked = cells[5].textContent == harianSetting;
-            document.getElementById('editM3').checked = cells[6].textContent == harianSetting;
-            document.getElementById('editM4').checked = cells[7].textContent == harianSetting;
-            document.getElementById('editBayar').value = cells[9].textContent;
-
-            const popup = document.getElementById('editDataPopup');
-            popup.classList.remove('hidden');
-        }
-
-        // Fungsi untuk menutup popup edit data
-        function closeEditData() {
-            const popup = document.getElementById('editDataPopup');
-            popup.classList.add('hidden');
-        }
-
-        // Fungsi untuk menyimpan data yang telah diedit
-        function saveEditData() {
-            const cells = currentEditRow.children;
-            cells[1].textContent = document.getElementById('editNama').value;
-            cells[2].textContent = document.getElementById('editBlok').value;
-            cells[3].textContent = document.getElementById('editKurang').value;
-            cells[4].textContent = document.getElementById('editM1').checked ? harianSetting : 0;
-            cells[5].textContent = document.getElementById('editM2').checked ? harianSetting : 0;
-            cells[6].textContent = document.getElementById('editM3').checked ? harianSetting : 0;
-            cells[7].textContent = document.getElementById('editM4').checked ? harianSetting : 0;
-            cells[9].textContent = document.getElementById('editBayar').value;
-
-            // Hitung jumlah
-            const kurang = parseFloat(cells[3].textContent) || 0;
-            const m1 = parseFloat(cells[4].textContent) || 0;
-            const m2 = parseFloat(cells[5].textContent) || 0;
-            const m3 = parseFloat(cells[6].textContent) || 0;
-            const m4 = parseFloat(cells[7].textContent) || 0;
-            const bayar = parseFloat(cells[9].textContent) || 0;
-            const enable = document.getElementById('enableToggle').checked ? parseFloat(bulananSetting) : 0;
-            cells[8].textContent = kurang + m1 + m2 + m3 + m4 + enable - bayar;
-
-            // Simpan data ke localStorage
-            saveTableData();
-            updateTotal();
-
-            closeEditData();
-        }
-
-        // Fungsi untuk mengaktifkan atau menonaktifkan input
-        function toggleInputs() {
-            const isEnabled = document.getElementById('enableToggle').checked;
-            document.getElementById('editM1').disabled = isEnabled;
-            document.getElementById('editM2').disabled = isEnabled;
-            document.getElementById('editM3').disabled = isEnabled;
-            document.getElementById('editM4').disabled = isEnabled;
-        }
-
-        // Fungsi untuk membuka popup tambah data
-        function openAddData() {
-            document.getElementById('addNama').value = '';
-            document.getElementById('addBlok').value = '';
-            document.getElementById('addKurang').value = '';
-            document.getElementById('addEnableToggle').checked = false;
-            document.getElementById('addM1').checked = false;
-            document.getElementById('addM2').checked = false;
-            document.getElementById('addM3').checked = false;
-            document.getElementById('addM4').checked = false;
-            document.getElementById('addBayar').value = '';
-
-            const popup = document.getElementById('addDataPopup');
-            popup.classList.remove('hidden');
-        }
-
-        // Fungsi untuk menutup popup tambah data
-        function closeAddData() {
-            const popup = document.getElementById('addDataPopup');
-            popup.classList.add('hidden');
-        }
-
-        // Fungsi untuk menyimpan data yang telah ditambahkan
-        function saveAddData() {
-            const tableBody = document.getElementById('tableBody');
-            const tr = document.createElement('tr');
-
-            const tdNo = document.createElement('td');
-            tdNo.className = 'py-2 px-4 border-b';
-            tdNo.textContent = tableBody.children.length + 1;
-            tr.appendChild(tdNo);
-
-            const tdNama = document.createElement('td');
-            tdNama.className = 'py-2 px-4 border-b cursor-pointer hover-highlight';
-            tdNama.textContent = document.getElementById('addNama').value;
-            tdNama.onclick = () => openEditData(tr);
-            tr.appendChild(tdNama);
-
-            const tdBlok = document.createElement('td');
-            tdBlok.className = 'py-2 px-4 border-b';
-            tdBlok.textContent = document.getElementById('addBlok').value;
-            tr.appendChild(tdBlok);
-
-            const tdKurang = document.createElement('td');
-            tdKurang.className = 'py-2 px-4 border-b';
-            tdKurang.textContent = document.getElementById('addKurang').value;
-            tr.appendChild(tdKurang);
-
-            const tdM1 = document.createElement('td');
-            tdM1.className = 'py-2 px-4 border-b';
-            tdM1.textContent = document.getElementById('addM1').checked ? harianSetting : 0;
-            tr.appendChild(tdM1);
-
-            const tdM2 = document.createElement('td');
-            tdM2.className = 'py-2 px-4 border-b';
-            tdM2.textContent = document.getElementById('addM2').checked ? harianSetting : 0;
-            tr.appendChild(tdM2);
-
-            const tdM3 = document.createElement('td');
-            tdM3.className = 'py-2 px-4 border-b';
-            tdM3.textContent = document.getElementById('addM3').checked ? harianSetting : 0;
-            tr.appendChild(tdM3);
-
-            const tdM4 = document.createElement('td');
-            tdM4.className = 'py-2 px-4 border-b';
-            tdM4.textContent = document.getElementById('addM4').checked ? harianSetting : 0;
-            tr.appendChild(tdM4);
-
-            const tdJumlah = document.createElement('td');
-            tdJumlah.className = 'py-2 px-4 border-b';
-            const kurang = parseFloat(tdKurang.textContent) || 0;
-            const m1 = parseFloat(tdM1.textContent) || 0;
-            const m2 = parseFloat(tdM2.textContent) || 0;
-            const m3 = parseFloat(tdM3.textContent) || 0;
-            const m4 = parseFloat(tdM4.textContent) || 0;
-            const bayar = parseFloat(document.getElementById('addBayar').value) || 0;
-            const enable = document.getElementById('addEnableToggle').checked ? parseFloat(bulananSetting) : 0;
-            tdJumlah.textContent = kurang + m1 + m2 + m3 + m4 + enable - bayar;
-            tr.appendChild(tdJumlah);
-
-            const tdBayar = document.createElement('td');
-            tdBayar.className = 'py-2 px-4 border-b cursor-pointer';
-            tdBayar.textContent = document.getElementById('addBayar').value;
-            tdBayar.onclick = () => openNotaPopup(tdBayar);
-            tr.appendChild(tdBayar);
-
-            tableBody.appendChild(tr);
-
-            // Simpan data ke localStorage
-            saveTableData();
-            updateTotal();
-
-            closeAddData();
-        }
-
-        // Fungsi untuk mengaktifkan atau menonaktifkan input pada tambah data
-        function toggleAddInputs() {
-            const isEnabled = document.getElementById('addEnableToggle').checked;
-            document.getElementById('addM1').disabled = isEnabled;
-            document.getElementById('addM2').disabled = isEnabled;
-            document.getElementById('addM3').disabled = isEnabled;
-            document.getElementById('addM4').disabled = isEnabled;
-        }
-
-        // Fungsi untuk menyimpan data tabel ke localStorage
-        function saveTableData() {
-            const tableBody = document.getElementById('tableBody');
-            const rows = Array.from(tableBody.children);
-            const data = rows.map(row => {
-                return Array.from(row.children).map(cell => cell.textContent);
-            });
-            localStorage.setItem('tableData', JSON.stringify(data));
-        }
-
-        // Fungsi untuk memuat data tabel dari localStorage
-        function loadTableData() {
-            const tableData = JSON.parse(localStorage.getItem('tableData')) || [];
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-
-            tableData.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                row.forEach((cell, cellIndex) => {
-                    const td = document.createElement('td');
-                    td.className = 'py-2 px-4 border-b hover-highlight';
-                    td.textContent = cell;
-                    if (cellIndex === 1) {
-                        td.classList.add('cursor-pointer');
-                        td.onclick = () => openEditData(tr);
-                    }
-                    if (cellIndex === 9) {
-                        td.classList.add('cursor-pointer');
-                        td.onclick = () => openNotaPopup(td);
-                    }
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            });
-            updateTotal();
-        }
-
-        // Fungsi untuk mengekspor tabel ke file Excel
-        function exportTableToExcel() {
-            const table = document.querySelector('table');
-            const workbook = XLSX.utils.table_to_book(table, { sheet: "2025" });
-            XLSX.writeFile(workbook, 'Denda_Ronda.xlsx');
-        }
-
-        // Fungsi untuk mengekspor tabel ke file PDF
-        async function exportTableToPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const table = document.querySelector('table');
-            const rows = Array.from(table.querySelectorAll('tr')).map(tr => {
-                return Array.from(tr.querySelectorAll('th, td')).map(td => td.textContent);
-            });
-
-            doc.autoTable({
-                head: [rows[0]],
-                body: rows.slice(1),
-            });
-
-            doc.save('Denda_Ronda.pdf');
-        }
-
-        // Fungsi untuk mencetak tabel
-        function printTable() {
-            const printContents = document.getElementById('dataTable').outerHTML;
-            const originalContents = document.body.innerHTML;
-
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-            window.location.reload();
-        }
-
-        // Fungsi untuk menghapus pengguna berdasarkan nama
-        function delUserFunction() {
-            const nameToDelete = prompt("Masukkan nama pengguna yang ingin dihapus:");
-            if (nameToDelete) {
-                const tableBody = document.getElementById('tableBody');
-                const rows = Array.from(tableBody.children);
-                rows.forEach(row => {
-                    if (row.children[1].textContent === nameToDelete) {
-                        tableBody.removeChild(row);
-                    }
-                });
-                saveTableData();
-                updateTotal();
-            }
-        }
-
-        // Fungsi untuk menghapus isi kolom (Kurang, M1, M2, M3, M4, Jumlah, Bayar)
-        function clearFunction() {
-            const tableBody = document.getElementById('tableBody');
-            const rows = Array.from(tableBody.children);
-            rows.forEach(row => {
-                row.children[3].textContent = '';
-                row.children[4].textContent = '';
-                row.children[5].textContent = '';
-                row.children[6].textContent = '';
-                row.children[7].textContent = '';
-                row.children[8].textContent = '';
-                row.children[9].textContent = '';
-            });
-            saveTableData();
-            updateTotal();
-        }
-
-        // Fungsi untuk menghapus semua data
-        function delAllFunction() {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-            localStorage.removeItem('tableData');
-            updateTotal();
-        }
-
-        // Fungsi untuk mengaktifkan mode layar penuh
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -662,103 +583,7 @@
             }
         }
 
-        // Fungsi untuk membuka popup pencarian
-        function openSearchPopup() {
-            const popup = document.getElementById('searchPopup');
-            popup.classList.remove('hidden');
-        }
-
-        // Fungsi untuk menutup popup pencarian
-        function closeSearchPopup() {
-            const popup = document.getElementById('searchPopup');
-            popup.classList.add('hidden');
-        }
-
-        // Fungsi untuk mencari pengguna berdasarkan nama
-        function searchUser() {
-            const searchValue = document.getElementById('searchNama').value.toLowerCase();
-            const tableBody = document.getElementById('tableBody');
-            const rows = Array.from(tableBody.children);
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = '';
-
-            const filteredRows = rows.filter(row => row.children[1].textContent.toLowerCase().includes(searchValue)).slice(0, 5);
-
-            filteredRows.forEach(row => {
-                const li = document.createElement('li');
-                li.className = 'cursor-pointer hover:bg-gray-200 p-2 rounded flex justify-between items-center';
-                li.innerHTML = `
-                    <span>${row.children[1].textContent}</span>
-                    <span class="font-bold text-red-600">${formatCurrency(row.children[8].textContent)}</span>
-                `;
-                li.onclick = () => {
-                    openEditData(row);
-                    closeSearchPopup();
-                };
-                searchResults.appendChild(li);
-            });
-        }
-
-        // Fungsi untuk memformat angka menjadi mata uang Indonesia
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
-        }
-
-        // Fungsi untuk memperbarui total jumlah dan bayar
-		function updateTotal() {
-            const tableBody = document.getElementById('tableBody');
-            const rows = Array.from(tableBody.children);
-            let totalJumlah = 0;
-            let totalBayar = 0;
-
-            rows.forEach(row => {
-                totalJumlah += parseFloat(row.children[8].textContent) || 0;
-                totalBayar += parseFloat(row.children[9].textContent) || 0;
-            });
-
-            document.getElementById('totalJumlah').textContent = formatCurrency(totalJumlah);
-            document.getElementById('totalBayar').textContent = formatCurrency(totalBayar);
-        }
-
-        // Fungsi untuk membuka popup nota
-        function openNotaPopup(cell) {
-            const row = cell.parentElement;
-            const cells = row.children;
-
-            document.getElementById('notaTitle').textContent = `Rincian ${cells[1].textContent}`;
-            document.getElementById('notaM1').textContent = formatCurrency(cells[4].textContent);
-            document.getElementById('notaM2').textContent = formatCurrency(cells[5].textContent);
-            document.getElementById('notaM3').textContent = formatCurrency(cells[6].textContent);
-            document.getElementById('notaM4').textContent = formatCurrency(cells[7].textContent);
-            document.getElementById('notaKurang').textContent = formatCurrency(cells[3].textContent);
-            document.getElementById('notaJumlah').textContent = formatCurrency(cells[8].textContent);
-
-            const popup = document.getElementById('notaPopup');
-            popup.classList.remove('hidden');
-        }
-
-        // Fungsi untuk menutup popup nota
-        function closeNotaPopup() {
-            const popup = document.getElementById('notaPopup');
-            popup.classList.add('hidden');
-        }
-
-        // Muat data tabel saat halaman dimuat
-        window.onload = loadTableData;
-
-        // Inisialisasi SortableJS untuk drag-and-drop
-        new Sortable(document.getElementById('tableBody'), {
-            handle: 'td:first-child', // Hanya kolom pertama (No) yang bisa digunakan untuk drag
-            animation: 150,
-            onEnd: function (/**Event*/evt) {
-                // Update nomor urut setelah drag-and-drop
-                const rows = Array.from(document.getElementById('tableBody').children);
-                rows.forEach((row, index) => {
-                    row.children[0].textContent = index + 1;
-                });
-                saveTableData();
-            }
-        });
+        document.addEventListener('DOMContentLoaded', loadDataFromLocalStorage);
     </script>
 </body>
 </html>
