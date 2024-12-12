@@ -1,4 +1,4 @@
-            <html lang="en">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -23,7 +23,99 @@
         .hover-highlight:hover {
             background-color: #fbbf24;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .modal-content, #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+        @keyframes zoom {
+            from {transform: scale(0)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageContainer = document.getElementById('imageContainer');
+            const storedImages = JSON.parse(localStorage.getItem('uploadedImages')) || [];
+
+            storedImages.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'Uploaded image';
+                img.className = 'w-full h-auto mb-4 cursor-pointer';
+                img.onclick = function() {
+                    openModal(src);
+                };
+                imageContainer.appendChild(img);
+            });
+
+            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = 'Uploaded image';
+                    img.className = 'w-full h-auto mb-4 cursor-pointer';
+                    img.onclick = function() {
+                        openModal(e.target.result);
+                    };
+                    imageContainer.appendChild(img);
+
+                    storedImages.push(e.target.result);
+                    localStorage.setItem('uploadedImages', JSON.stringify(storedImages));
+                };
+
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function openModal(src) {
+            const modal = document.getElementById('myModal');
+            const modalImg = document.getElementById('img01');
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = "none";
+        }
+    </script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
@@ -85,6 +177,13 @@
         </div>
         <!-- Copyright -->
         <div class="text-center mt-4">
+            <form id="uploadForm" class="mb-4">
+                <input type="file" id="fileInput" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Upload</button>
+            </form>
+            <div id="imageContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Uploaded images will appear here -->
+            </div>
             <p>2024 © Copyright YOUSHE</p>
         </div>
     </main>
@@ -236,6 +335,11 @@
             </div>
         </div>
     </div>
+    <!-- Image Modal -->
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
     <script>
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
@@ -267,7 +371,7 @@
             const nama = document.getElementById('nama').value;
             const blok = document.getElementById('blok').value;
             const pemasukan = document.getElementById('pemasukan').value;
-const jenisPemasukan = document.getElementById('jenisPemasukan').value;
+            const jenisPemasukan = document.getElementById('jenisPemasukan').value;
             const pengeluaran = document.getElementById('pengeluaran').value;
             const saldo = pemasukan - pengeluaran;
 
