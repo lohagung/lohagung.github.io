@@ -2,13 +2,16 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Admin Jimpitan</title>
+    <title>Surat Undangan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <style>
         @media print {
             body {
-                zoom: 75%;
+
+            }
+            .no-print {
+                display: none !important;
             }
         }
         .kop {
@@ -18,7 +21,34 @@
             display: none;
         }
         .ml-5 {
-            margin-left: 2.25rem;
+            margin-left: 3.25rem;
+        }
+		#invitations-container{padding:10px; zoom: 97%;}
+        #invitations {
+            width: 210mm;
+            height:297mm;
+            margin: 10mm auto;
+        }
+        @page {
+            size: A4;
+            margin: 5px;
+        }
+        @media print {
+            html, body {
+                width: 210mm;
+                min-height: 297mm;      
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            #invitations {
+                margin: 0;
+                border-radius: initial;
+                width: initial;
+                min-height: initial;
+                box-shadow: initial;
+                background: initial;
+            }
         }
     </style>
     <script>
@@ -43,73 +73,80 @@
             const keperluan = document.getElementById('keperluan').value;
             const catatan = document.getElementById('catatan').value;
 
-            const container = document.getElementById('invitations');
+            const container = document.getElementById('invitations-container');
             container.innerHTML = '';
 
-            nama.forEach(name => {
+            nama.forEach((name, index) => {
                 const invitation = `
-                    <div id="isisurat" class="bg-white p-10 border border-black mb-4">
-                        <div class="flex">
-                            <img alt="Logo of the event organizer" class="w-12 h-12" height="50" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="50"/>
-                            <div class="kop text-center ml-4">
-                                <h1 class="font-bold text-base">PANITIA PEMILIHAN KETUA RT 09 RW 23</h1>
-                                <h2 class="font-bold text-base">JATEN KARANGANYAR</h2>
-                                <h3 class="font-bold text-base">PERIODE JABATAN 2024 - 2025</h3>
-                            </div>
-                        </div>
-                        <hr class="border-black mb-4"/>
-                        <div class="mb-4">
-                            <div class="flex justify-between">
-                                <table class="mb-4 text-left">
-                                    <tr><td>Nomor </td><td>: ${nomor}</td></tr>
-                                    <tr><td>Lamp </td><td>: -</td></tr>
-                                    <tr><td>Hal </td><td>: <strong>${hal}</strong></td></tr>
-                                </table>
-                                <div class="text-right">
-                                    <p>Jaten, ${tglsurat}</p>
+                    <div id="invitations" class="bg-white mb-4">
+                        <div id="isisurat" class="p-10 border border-black ">
+                            <div class="flex">
+                                <img alt="Logo of the event organizer" class="w-12 h-12" height="50" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="50"/>
+                                <div class="kop text-center ml-4">
+                                    <h1 class="font-bold text-base">PANITIA PEMILIHAN KETUA RT 09 RW 23</h1>
+                                    <h2 class="font-bold text-base">JATEN KARANGANYAR</h2>
+                                    <h3 class="font-bold text-base">PERIODE JABATAN 2024 - 2025</h3>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-4">
-                            <p>Kepada Yth :</p>
-                            <p><strong>Bpk. ${name.trim()}</strong></p>
-                            <p>di</p>
-                            <p><span class="ml-5">Tempat</span></p>
-                        </div>
-                            <p><span class="ml-5">Dengan Hormat,</span> </p>
-                            <p><span class="ml-5">Salam sejahtera,</span> salam silaturahmi kami sampaikan, semoga segala aktiva kita selalu mendapatkan kelancaran dan kemudahan dari Tuhan YME aamiin</p>
-                            <p class="ml-5">Kami mengharap kehadiran bapak-bapak pada:</p>
-                        <table class="mb-4 w-full">
-                            <tr>
-                                <td class="pr-4" style="max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Hari / Tanggal</td>
-                                <td>: ${haritgl}</td>
-                            </tr>
-                            <tr>
-                                <td class="pr-4">Waktu</td>
-                                <td>: ${jam} - Selesai</td>
-                            </tr>
-                            <tr>
-                                <td class="pr-4">Tempat</td>
-                                <td>:<strong> ${tempat}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="pr-4">Keperluan</td>
-                                <td>: <strong>${keperluan}</strong></td>
-                            </tr>
-                        </table>
-                        <p><span class="ml-5">Demikian </span>Surat undangan ini kami sampaikan. Atas perhatian dan kerjasamanya kami ucapkan terima kasih.</p>
-                        <div class="mb-4">
-                            <b>NB:</b>
-                            <i>${catatan}</i>
-                        </div>
-                        <div class="text-center">
-                            <p>Ketua RT09 RW23</p><br/><br/>
-                            <b>Bayu Adi Nugroho</b>
-                            <p>Ketua RT</p>
+                            <hr class="border-black mb-4"/>
+                            <div class="mb-4">
+                                <div class="flex justify-between">
+                                    <table class="mb-4 text-left">
+                                        <tr><td>Nomor </td><td>: ${nomor}</td></tr>
+                                        <tr><td>Lamp </td><td>: -</td></tr>
+                                        <tr><td>Hal </td><td>: <strong>${hal}</strong></td></tr>
+                                    </table>
+                                    <div class="text-right">
+                                        <p>Jaten, ${tglsurat}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <p>Kepada Yth :</p>
+                                <p><strong>Bpk. ${name.trim()}</strong></p>
+                                <p>di</p>
+                                <p><span class="ml-5">Tempat</span></p>
+                            </div>
+                                <p><span class="ml-5">Dengan Hormat,</span> </p>
+                                <p><span class="ml-5">Salam sejahtera,</span> salam silaturahmi kami sampaikan, semoga segala aktiva kita selalu mendapatkan kelancaran dan kemudahan dari Tuhan YME aamiin</p>
+                                <p class="ml-5">Kami mengharap kehadiran bapak-bapak pada:</p>
+                            <table class="mb-4 w-full">
+                                <tr>
+                                    <td class="pr-4" style="max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Hari / Tanggal</td>
+                                    <td>: ${haritgl}</td>
+                                </tr>
+                                <tr>
+                                    <td class="pr-4">Waktu</td>
+                                    <td>: ${jam} - Selesai</td>
+                                </tr>
+                                <tr>
+                                    <td class="pr-4">Tempat</td>
+                                    <td>:<strong> ${tempat}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="pr-4">Keperluan</td>
+                                    <td>: <strong>${keperluan}</strong></td>
+                                </tr>
+                            </table>
+                            <p><span class="ml-5">Demikian </span>Surat undangan ini kami sampaikan. Atas perhatian dan kerjasamanya kami ucapkan terima kasih.</p>
+                            <div class="mb-4">
+                                <b>NB:</b>
+                                <i>${catatan}</i>
+                            </div>
+                            <div class="text-center">
+                                <p>Ketua RT09 RW23</p><br/><br/>
+                                <b>Bayu Adi Nugroho</b>
+                                <p>Ketua RT</p>
+                            </div>
                         </div>
                     </div>
                 `;
                 container.innerHTML += invitation;
+
+                // Add a page break after every 2 invitations
+                if ((index + 1) % 1 === 0) {
+                    container.innerHTML += '<div class="page-break"></div>';
+                }
             });
 
             // Close the modal after generating invitations
@@ -134,7 +171,7 @@
         }
 
         function downloadPDF() {
-            const element = document.getElementById('invitations');
+            const element = document.getElementById('invitations-container');
             html2pdf(element);
         }
 
@@ -146,10 +183,10 @@
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 no-print">
         <div class="flex items-center">
             <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/Mce1JuWHfeUNjot1U5UuSSdj2s2x46fRYvQjpOJH870IFVlPB.jpg" width="40"/>
-            <span class="text-white font-bold ml-2">Admin Jimpitan</span>
+            <span class="text-white font-bold ml-2">Surat Undangan</span>
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
@@ -167,7 +204,7 @@
     </header>
     <!-- Main Content -->
     <main class="flex-grow p-4 mt-16">
-        <div id="invitations" class="max-w-2xl mx-auto"></div>
+        <div id="invitations-container" class="mx-auto"></div>
     </main>
 
     <!-- Modal -->
@@ -219,7 +256,7 @@
         </div>
     </div>
     <!-- Floating Action Button with Print and PDF -->
-    <div class="fixed bottom-10 right-10 flex flex-col items-center space-y-2">
+    <div class="fixed bottom-10 right-10 flex flex-col items-center space-y-2 no-print">
         <div class="bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg cursor-pointer" onclick="printInvitations()">
             <i class="fas fa-print text-lg"></i>
         </div>
