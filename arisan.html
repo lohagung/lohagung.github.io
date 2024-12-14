@@ -176,6 +176,43 @@
             color: #fff;
             cursor: pointer;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 102;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -259,8 +296,9 @@
                     </ul>
                 </div>
                 <div class="footer-icons">
-                    <i class="fas fa-cog"></i>
-                    <i class="fas fa-save"></i>
+                    <i class="fas fa-cog" id="settingsIcon"></i>
+                    <i class="fas fa-save" id="saveIcon"></i>
+                    <i class="fas fa-upload" id="uploadIcon"></i>
                 </div>
                 <footer>
                     @2024 by YOUSHE
@@ -268,6 +306,17 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal for settings -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-bold mb-4">Add Participants</h2>
+            <textarea id="participantsTextarea" class="w-full p-2 border rounded" rows="5" placeholder="Enter names separated by commas"></textarea>
+            <button id="addParticipantsButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Add Participants</button>
+        </div>
+    </div>
+
     <script>
         const pesertaList = document.getElementById('pesertaList');
         const pemenangList = document.getElementById('pemenangList');
@@ -277,6 +326,13 @@
         const lastWinner = document.getElementById('lastWinner');
         const remainingParticipants = document.getElementById('remainingParticipants');
         const winnersCount = document.getElementById('winnersCount');
+        const settingsIcon = document.getElementById('settingsIcon');
+        const saveIcon = document.getElementById('saveIcon');
+        const uploadIcon = document.getElementById('uploadIcon');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeModal = document.querySelector('.close');
+        const addParticipantsButton = document.getElementById('addParticipantsButton');
+        const participantsTextarea = document.getElementById('participantsTextarea');
 
         const updateParticipantStats = () => {
             const remaining = pesertaList.getElementsByTagName('li').length;
@@ -363,6 +419,85 @@
 
         // Initial stats update
         updateParticipantStats();
+
+        // Settings modal functionality
+        settingsIcon.addEventListener('click', () => {
+            settingsModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+        });
+
+        addParticipantsButton.addEventListener('click', () => {
+            const names = participantsTextarea.value.split(',').map(name => name.trim()).filter(name => name);
+            names.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                pesertaList.appendChild(li);
+            });
+            participantsTextarea.value = '';
+            settingsModal.style.display = 'none';
+            updateParticipantStats();
+        });
+
+        // Save participants and winners to a text file
+        saveIcon.addEventListener('click', () => {
+            const participants = Array.from(pesertaList.getElementsByTagName('li')).map(li => li.textContent);
+            const winners = Array.from(pemenangList.getElementsByTagName('li')).map(li => li.textContent);
+            const data = `Participants:\n${participants.join('\n')}\n\nWinners:\n${winners.join('\n')}`;
+            const blob = new Blob([data], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'arisan_data.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Load participants and winners from a text file
+        uploadIcon.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+            input.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const content = e.target.result;
+                        const [participantsSection, winnersSection] = content.split('\n\nWinners:\n');
+                        const participants = participantsSection.replace('Participants:\n', '').split('\n').filter(name => name);
+                        const winners = winnersSection ? winnersSection.split('\n').filter(name => name) : [];
+
+                        pesertaList.innerHTML = '';
+                        pemenangList.innerHTML = '';
+
+                        participants.forEach(name => {
+                            const li = document.createElement('li');
+                            li.textContent = name;
+                            pesertaList.appendChild(li);
+                        });
+
+                        winners.forEach(name => {
+                            const li = document.createElement('li');
+                            li.textContent = name;
+                            pemenangList.appendChild(li);
+                        });
+
+                        updateParticipantStats();
+                    };
+                    reader.readAsText(file);
+                }
+            });
+            input.click();
+        });
 
         var canvas = document.getElementById('beerCanvas');
         var ctx = canvas.getContext('2d');
