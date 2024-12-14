@@ -93,9 +93,11 @@
             align-items: center;
             transition: transform 0.2s;
         }
-.h-25 {
-    height: 25rem;
-}
+
+        .h-25 {
+            height: 25rem;
+        }
+
         ul li:nth-child(1) { background: #f3f4f6; color: #111827; }
         ul li:nth-child(2) { background: #e5e7eb; color: #1f2937; }
         ul li:nth-child(3) { background: #d1d5db; color: #374151; }
@@ -301,6 +303,7 @@
                     <i class="fas fa-cog" id="settingsIcon"></i>
                     <i class="fas fa-save" id="saveIcon"></i>
                     <i class="fas fa-upload" id="uploadIcon"></i>
+                    <a href="/data-arisan.txt" download><i class="fas fa-download"></i></a>
                 </div>
                 <footer>
                     @2024 by YOUSHE
@@ -347,6 +350,12 @@
             return prompt(`Wes yakin pengen ngehapus ${name}? lebokno nomor PIN rahasiane!!`);
         };
 
+        const playWinnerAnnouncement = (name) => {
+            const msg = new SpeechSynthesisUtterance(`Selamat, yang memperoleh arisan malam ini bapak ${name}`);
+            msg.lang = 'id-ID';
+            window.speechSynthesis.speak(msg);
+        };
+
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
             if (pesertaItems.length === 0) {
@@ -355,6 +364,8 @@
             }
 
             shuffleButton.classList.add('rotate');
+            shuffleButton.innerHTML = '<img src="https://avatars.githubusercontent.com/u/61934361" alt="Rotating image of a GitHub user avatar" class="w-full h-full rounded-full">';
+
             let interval;
             let counter = 0;
             const maxCounter = 100; // 10 seconds with 100ms interval
@@ -365,9 +376,11 @@
                 if (counter >= maxCounter) {
                     clearInterval(interval);
                     shuffleButton.classList.remove('rotate');
+                    shuffleButton.innerHTML = 'Kocok';
                     const selectedPeserta = pesertaItems[randomIndex];
                     pemenangList.appendChild(selectedPeserta);
                     updateParticipantStats();
+                    playWinnerAnnouncement(selectedPeserta.textContent);
                 }
             };
 
@@ -391,7 +404,7 @@
 
                 e.target.classList.add('active');
             });
-        });
+
 
         pemenangList.addEventListener('click', (e) => {
             if (e.target.tagName === 'LI') {
