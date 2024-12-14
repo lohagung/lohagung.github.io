@@ -1,19 +1,25 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embed HTML dengan AJAX</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Index Page</title>
+    <script>
+        function loadComingSoon() {
+            fetch('comingsoon.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('coming-soon-container').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading comingsoon.html:', error));
+        }
+
+        window.onload = loadComingSoon;
+    </script>
 </head>
 <body>
-    <h1>Halaman Utama</h1>
-    <div id="content"></div>
-
-    <script>
-        $(document).ready(function() {
-            $("#content").load("/comingsoon.html");
-        });
-    </script>
+    <h1>Welcome to Index Page</h1>
+    <div id="coming-soon-container"></div>
 </body>
 </html>
