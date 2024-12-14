@@ -1,13 +1,16 @@
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>LOH AGUNG</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
-    <style>
-        body {
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   LOH AGUNG
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
             font-family: 'Roboto', sans-serif;
             transition: background 3s ease;
         }
@@ -63,6 +66,10 @@
             background-color: #e91e63;
         }
 
+        .hover-arisan:hover {
+            background-color: #ff9800;
+        }
+
         .title-bendahara {
             background-color: #ffeb3b;
             border-radius: 5px;
@@ -111,6 +118,14 @@
             padding-right: 10px;
         }
 
+        .title-arisan {
+            background-color: #ff9800;
+            border-radius: 5px;
+            color: #fff;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
         .tutorial-popup {
             position: fixed;
             bottom: 20px;
@@ -146,62 +161,103 @@
         .tutorial-popup button:hover {
             background: #45a049;
         }
-    </style>
-</head>
-<body class="flex flex-col items-center justify-center min-h-screen">
-    <div class="container mx-auto p-4">
-        <div class="flex flex-col items-center mb-8 text-center">
-            <img alt="Logo of the application" class="w-24 h-24 rounded-full" height="96" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="96"/>
-            <h1 class="text-3xl font-bold text-white mt-4">Manajemen Data RT</h1>
-            <h2 class="text-lg text-white mt-2">Tools untuk mempermudah mengelola Data RT</h2>
-        </div>
-        <div class="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-bendahara" href="/bendahara.html">
-                <img alt="Icon representing Bendahara with a financial theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/rEVdutyCeehov0IrGhySb1k0OlI28PEmxCMONbYygW6jVn6TA.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-bendahara">Bendahara</h2>
-            </a>
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-jimpitan" href="/jimpitan.html">
-                <img alt="Icon representing Jimpitan with a community collection theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/23ArdQHioN6VGh17ftCEHSQ3jyP6m60pRrlf2TkiZF5fqO1nA.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-jimpitan">Jimpitan</h2>
-            </a>
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-keamanan" href="/dendaronda.html">
-                <img alt="Icon representing Keamanan with a security theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/Yvx0askz03ZvKRKLZwg3KhenyvaggX4cLCHhRWmehaMlVn6TA.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-keamanan">Keamanan</h2>
-            </a>
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-selokan" href="/selokan.html">
-                <img alt="Icon representing Selokan with a drainage system theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/BLWXh0na8v47O5rVe7HelMlqaENjiLC6LMUtz7DyUligVn6TA.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-selokan">Selokan</h2>
-            </a>
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-suratundangan" href="/suratundanganrapat.html">
-                <img alt="Icon representing Surat Undangan with a meeting invitation theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/4pNeJbUdY2U7MaH3eRaevq65N8XMxaFfxNGo8QdGuD1IWdqPB.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-suratundangan">Surat</h2>
-            </a>
-            <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-lainnya" href="/comingsoon.html">
-                <img alt="Icon representing Lainnya with a miscellaneous theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/znBfsY7f2knYJUe2eza18qiUaKf8bEGZnUDSKLp36tj3s6UfE.jpg" width="64"/>
-                <h2 class="text-xl font-bold mb-2 title-lainnya">Lainnya</h2>
-            </a>
-        </div>
-    </div>
-    <footer class="mt-8 text-white">
-        @2024 Oleh YOUSHE
-    </footer>
-
-    <div id="tutorial-popup" class="tutorial-popup hidden">
-        <h3>Tutorial Penggunaan</h3>
-        <p>Selamat datang di aplikasi Manajemen Data RT. Berikut adalah beberapa langkah untuk memulai:</p>
-        <ul class="list-disc list-inside">
-            <li>Klik pada menu Bendahara untuk mengelola keuangan RT.</li>
-            <li>Klik pada menu Jimpitan untuk mengelola jimpitan warga.</li>
-            <li>Klik pada menu Keamanan untuk mengelola denda ronda.</li>
-            <li>Klik pada menu Selokan untuk mengelola iuran dan pengeluaran selokan.</li>
-            <li>Klik pada menu Surat untuk mengelola surat undangan rapat.</li>
-            <li>Klik pada menu Lainnya untuk fitur lainnya akan ditambahkan menyusul..</li>
-        </ul>
-        <button onclick="closeTutorial()">Tutup</button>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+  </style>
+ </head>
+ <body class="flex flex-col items-center justify-center min-h-screen">
+  <div class="container mx-auto p-4">
+   <div class="flex flex-col items-center mb-8 text-center">
+    <img alt="Logo of the application" class="w-24 h-24 rounded-full" height="96" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="96"/>
+    <h1 class="text-3xl font-bold text-white mt-4">
+     Manajemen Data RT
+    </h1>
+    <h2 class="text-lg text-white mt-2">
+     Tools untuk mempermudah mengelola Data RT
+    </h2>
+   </div>
+   <div class="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-bendahara" href="/bendahara.html">
+     <img alt="Icon representing Bendahara with a financial theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/7Zga0Jfb6gxXPyfySlmU4Nkf1sRfqpDUeRhZwItcvgK4zFWfE.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-bendahara">
+      Bendahara
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-jimpitan" href="/jimpitan.html">
+     <img alt="Icon representing Jimpitan with a community collection theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/4cV7G3JtCUZwP5tULnZrXIYhHuN0WfXSRmVBfBfsZwc0ch1nA.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-jimpitan">
+      Jimpitan
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-keamanan" href="/dendaronda.html">
+     <img alt="Icon representing Keamanan with a security theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/THi8pfw1z7WjJKOcfwp6O31rGHfsfjxlX37h01ZfGPIN0FWfE.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-keamanan">
+      Keamanan
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-selokan" href="/selokan.html">
+     <img alt="Icon representing Selokan with a drainage system theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/PCeeIiinm7kieI8XNqvQL18pYAf1BCrfDjFeMwbpMva6mLseJA.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-selokan">
+      Selokan
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-suratundangan" href="/suratundanganrapat.html">
+     <img alt="Icon representing Surat Undangan with a meeting invitation theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/vIwiWNMzfj1rMCH0cLG0C8xZJaQnCpFp0F3XcC37l2wOXY9JA.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-suratundangan">
+      Surat
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-arisan" href="/arisan.html">
+     <img alt="Icon representing Arisan with a social gathering theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/4pNeJbUdY2U7MaH3eRaevq65N8XMxaFfxNGo8QdGuD1IWdqPB.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-arisan">
+      Arisan
+     </h2>
+    </a>
+    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-lainnya" href="/comingsoon.html">
+     <img alt="Icon representing Lainnya with a miscellaneous theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/frU1StQFY6VDICknMAfKsbe9Epp3yUWrdGsSI9A02e0K6CrPB.jpg" width="64"/>
+     <h2 class="text-xl font-bold mb-2 title-lainnya">
+      Lainnya
+     </h2>
+    </a>
+   </div>
+  </div>
+  <footer class="mt-8 text-white">
+   @2024 Oleh YOUSHE
+  </footer>
+  <div class="tutorial-popup hidden" id="tutorial-popup">
+   <h3>
+    Tutorial Penggunaan
+   </h3>
+   <p>
+    Selamat datang di aplikasi Manajemen Data RT. Berikut adalah beberapa langkah untuk memulai:
+   </p>
+   <ul class="list-disc list-inside">
+    <li>
+     Klik pada menu Bendahara untuk mengelola keuangan RT.
+    </li>
+    <li>
+     Klik pada menu Jimpitan untuk mengelola jimpitan warga.
+    </li>
+    <li>
+     Klik pada menu Keamanan untuk mengelola denda ronda.
+    </li>
+    <li>
+     Klik pada menu Selokan untuk mengelola iuran dan pengeluaran selokan.
+    </li>
+    <li>
+     Klik pada menu Surat untuk mengelola surat undangan rapat.
+    </li>
+    <li>
+     Klik pada menu Arisan untuk mengelola kegiatan arisan.
+    </li>
+    <li>
+     Klik pada menu Lainnya untuk fitur lainnya akan ditambahkan menyusul..
+    </li>
+   </ul>
+   <button onclick="closeTutorial()">
+    Tutup
+   </button>
+  </div>
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
             if (!localStorage.getItem('tutorialShown')) {
                 document.getElementById('tutorial-popup').classList.remove('hidden');
                 localStorage.setItem('tutorialShown', 'true');
@@ -211,8 +267,6 @@
         function closeTutorial() {
             document.getElementById('tutorial-popup').classList.add('hidden');
         }
-    </script>
-
-
-</body>
+  </script>
+ </body>
 </html>
