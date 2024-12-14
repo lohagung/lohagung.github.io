@@ -24,16 +24,17 @@
         .ml-5 {
             margin-left: 3.25rem;
         }
- .border {
-    border-width: 0px;  } 
+        .border {
+            border-width: 0px;
+        } 
         hr {
-    height: 0;
-    color: inherit;
-    border-top-width: 5px;
-    border-bottom-width: 1px;
-    padding: 1px;
-}
-#invitations-container {
+            height: 0;
+            color: inherit;
+            border-top-width: 5px;
+            border-bottom-width: 1px;
+            padding: 1px;
+        }
+        #invitations-container {
             padding: 10px;
             zoom: 97%;
         }
@@ -42,13 +43,13 @@
             height: 297mm;
             margin: 10mm auto;
             padding: 15px;
+            background: transparent;
         }
         @page {
             size: A4;
             margin: 10px;
         }
         @media print {
-
             html, body {
                 width: 210mm;
                 min-height: 297mm;      
@@ -65,8 +66,8 @@
                 background: initial;
             }
             .border {
-    border-width: 1px;
-}
+                border-width: 1px;
+            }
         }
     </style>
     <script>
@@ -96,8 +97,8 @@
 
             nama.forEach((name, index) => {
                 const invitation = `
-                    <div id="invitations" class="bg-white mb-4">
-                        <div id="isisurat" class="p-10 border border-black ">
+                    <div id="invitations" class="mb-4">
+                        <div id="isisurat" class="p-10 border border-black bg-white">
                             <div class="flex">
                                 <img alt="Logo of the event organizer" class="w-12 h-12" height="50" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" width="50"/>
                                 <div class="kop text-center ml-4">
@@ -199,7 +200,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+<body class="bg-black flex flex-col min-h-screen">
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 no-print">
         <div class="flex items-center">
@@ -208,8 +209,6 @@
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
-                <i class="fas fa-download text-white"></i>
-                <i class="fas fa-file-import text-white"></i>
                 <i class="fas fa-expand text-white"></i>
                 <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
             </div>
