@@ -356,6 +356,21 @@
             window.speechSynthesis.speak(msg);
         };
 
+        const saveWinnersToLocalStorage = () => {
+            const winners = Array.from(pemenangList.getElementsByTagName('li')).map(li => li.textContent);
+            localStorage.setItem('winners', JSON.stringify(winners));
+        };
+
+        const loadWinnersFromLocalStorage = () => {
+            const winners = JSON.parse(localStorage.getItem('winners')) || [];
+            winners.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                pemenangList.appendChild(li);
+            });
+            updateParticipantStats();
+        };
+
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
             if (pesertaItems.length === 0) {
@@ -381,6 +396,7 @@
                     pemenangList.appendChild(selectedPeserta);
                     updateParticipantStats();
                     playWinnerAnnouncement(selectedPeserta.textContent);
+                    saveWinnersToLocalStorage();
                 }
             };
 
@@ -404,7 +420,6 @@
 
                 e.target.classList.add('active');
             });
-
         });
 
         pemenangList.addEventListener('click', (e) => {
@@ -414,6 +429,7 @@
                 if (pin === '6666') {
                     pesertaList.appendChild(e.target);
                     updateParticipantStats();
+                    saveWinnersToLocalStorage();
                 } else {
                     alert('PIN salah. Gagal menghapus.');
                 }
@@ -435,6 +451,9 @@
 
         // Initial stats update
         updateParticipantStats();
+
+        // Load winners from local storage
+        loadWinnersFromLocalStorage();
 
         // Settings modal functionality
         settingsIcon.addEventListener('click', () => {
@@ -508,6 +527,7 @@
                         });
 
                         updateParticipantStats();
+                        saveWinnersToLocalStorage();
                     };
                     reader.readAsText(file);
                 }
