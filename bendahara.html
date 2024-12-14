@@ -1,1 +1,19 @@
-<!--#include virtual="comingsoon.html" -->
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#coming-soon-container').load('comingsoon.html');
+        });
+    </script>
+</head>
+<body>
+    <h1>Welcome to Index Page</h1>
+    <div id="coming-soon-container"></div>
+</body>
+</html>
