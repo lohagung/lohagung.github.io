@@ -281,29 +281,29 @@
         const closeModal = document.querySelector('.close');
         const addParticipantsButton = document.getElementById('addParticipantsButton');
         const participantsTextarea = document.getElementById('participantsTextarea');
-
+// Memperbarui statistik peserta
         const updateParticipantStats = () => {
             const remaining = pesertaList.getElementsByTagName('li').length;
             const winners = pemenangList.getElementsByTagName('li').length;
             remainingParticipants.textContent = remaining;
             winnersCount.textContent = winners;
         };
-
+// Meminta PIN untuk konfirmasi penghapusan
         const promptForPin = (name) => {
             return prompt(`Wes yakin pengen ngehapus ${name}? lebokno nomor PIN rahasiane!!`);
         };
-
+// Memutar pengumuman pemenang
         const playWinnerAnnouncement = (name) => {
             const msg = new SpeechSynthesisUtterance(`Selamat, yang memperoleh arisan malam ini bapak ${name}.Mohon Bapak ${name} setelah acara arisan selesai, silahkan merapat ke bendahara untuk mengambil uang arisan`);
             msg.lang = 'id-ID';
             window.speechSynthesis.speak(msg);
         };
-
+// Menyimpan pemenang ke Local Storage
         const saveWinnersToLocalStorage = () => {
             const winners = Array.from(pemenangList.getElementsByTagName('li')).map(li => li.textContent);
             localStorage.setItem('winners', JSON.stringify(winners));
         };
-
+// Memuat pemenang dari Local Storage
         const loadWinnersFromLocalStorage = () => {
             const winners = JSON.parse(localStorage.getItem('winners')) || [];
             winners.forEach(name => {
@@ -313,12 +313,12 @@
             });
             updateParticipantStats();
         };
-
+// Menyimpan peserta ke Local Storage
         const saveParticipantsToLocalStorage = () => {
             const participants = Array.from(pesertaList.getElementsByTagName('li')).map(li => li.textContent);
             localStorage.setItem('participants', JSON.stringify(participants));
         };
-
+// Memuat peserta dari Local Storage
         const loadParticipantsFromLocalStorage = () => {
             const participants = JSON.parse(localStorage.getItem('participants')) || [];
             participants.forEach(name => {
@@ -328,7 +328,7 @@
             });
             updateParticipantStats();
         };
-
+// Event listener untuk tombol kocok
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
             if (pesertaItems.length === 0) {
@@ -361,7 +361,7 @@
 
             interval = setInterval(randomizeNames, 100);
         });
-
+// Event listener untuk tab link
         tabLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -380,7 +380,7 @@
                 e.target.classList.add('active');
             });
         });
-
+// Event listener untuk menghapus pemenang
         pemenangList.addEventListener('click', (e) => {
             if (e.target.tagName === 'LI') {
                 const winnerName = e.target.textContent;
@@ -395,7 +395,7 @@
                 }
             }
         });
-
+// Event listener untuk menghapus peserta
         pesertaList.addEventListener('click', (e) => {
             if (e.target.tagName === 'LI') {
                 const participantName = e.target.textContent;
@@ -410,28 +410,28 @@
             }
         });
 
-        // Initial stats update
+// Memperbarui statistik peserta saat pertama kali
         updateParticipantStats();
 
-        // Load participants and winners from local storage
+// Memuat peserta dan pemenang dari Local Storage saat pertama kali
         loadParticipantsFromLocalStorage();
         loadWinnersFromLocalStorage();
 
-        // Settings modal functionality
+// Event listener untuk membuka modal pengaturan
         settingsIcon.addEventListener('click', () => {
             settingsModal.style.display = 'block';
         });
-
+// Event listener untuk menutup modal pengaturan
         closeModal.addEventListener('click', () => {
             settingsModal.style.display = 'none';
         });
-
+// Event listener untuk menutup modal pengaturan saat mengklik di luar modal
         window.addEventListener('click', (event) => {
             if (event.target == settingsModal) {
                 settingsModal.style.display = 'none';
             }
         });
-
+// Event listener untuk menambahkan peserta baru
         addParticipantsButton.addEventListener('click', () => {
             const names = participantsTextarea.value.split(',').map(name => name.trim()).filter(name => name);
             names.forEach(name => {
@@ -445,7 +445,7 @@
             saveParticipantsToLocalStorage();
         });
 
-        // Save participants and winners to a text file
+// Event listener untuk menyimpan peserta dan pemenang ke file teks
         saveIcon.addEventListener('click', () => {
             const participants = Array.from(pesertaList.getElementsByTagName('li')).map(li => li.textContent);
             const winners = Array.from(pemenangList.getElementsByTagName('li')).map(li => li.textContent);
@@ -459,7 +459,7 @@
             URL.revokeObjectURL(url);
         });
 
-        // Load participants and winners from a text file
+// Event listener untuk memuat peserta dan pemenang dari file teks
         uploadIcon.addEventListener('click', () => {
             const input = document.createElement('input');
             input.type = 'file';
@@ -498,7 +498,7 @@
             });
             input.click();
         });
-
+// Inisialisasi partikel untuk animasi latar belakang
         var canvas = document.getElementById('beerCanvas');
         var ctx = canvas.getContext('2d');
         var particles = [];
