@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Text Editor</title>
+    <title>Text Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -101,14 +101,17 @@
                 <h1 class="text-2xl font-bold">Text Editor</h1>
                 <div class="flex space-x-4">
                     <label for="fileInput" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
-                        <i class="fas fa-folder-open"></i> Open File
+                        <i class="fas fa-folder-open"></i>
                     </label>
                     <input type="file" id="fileInput" class="hidden">
                     <button id="openModal" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 cursor-pointer">
-                        <i class="fas fa-plus"></i> Add Text
+                        <i class="fas fa-plus"></i>
                     </button>
                     <button id="toggleFullscreen" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 cursor-pointer">
-                        <i class="fas fa-expand"></i> Full Screen
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button id="refreshPage" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
             </div>
@@ -126,7 +129,7 @@
         </div>
     </div>
 
-    <audio id="typeSound" src="https://la6.my.id/keyboard.mp3" preload="auto"></audio>
+    <audio id="typeSound" src="https://la6.my.id/keyboard.mp3" preload="auto" loop></audio>
 
     <script>
         document.getElementById('fileInput').addEventListener('change', function(event) {
@@ -164,6 +167,10 @@
             } else {
                 document.exitFullscreen();
             }
+        });
+
+        document.getElementById('refreshPage').addEventListener('click', function() {
+            location.reload();
         });
 
         function animateText(text) {
@@ -207,14 +214,18 @@
                             }
                         }
                     }
-                    typeSound.currentTime = 0;
-                    typeSound.play();
                     index++;
+                    if (editor.childElementCount > 4 && editor.children[editor.childElementCount - 4].getBoundingClientRect().bottom < editor.getBoundingClientRect().bottom) {
+                        editor.scrollTop = editor.scrollHeight;
+                    }
                     setTimeout(typeCharacter, 50);
+                } else {
+                    typeSound.pause();
                 }
             }
 
             editor.textContent = '';
+            typeSound.play();
             typeCharacter();
         }
     </script>
