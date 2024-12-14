@@ -1,0 +1,222 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        .typing {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid;
+            animation: typing 4s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: black; }
+        }
+        .p-4 {
+            padding: 1rem;
+            height: 90%;
+        }
+        #editor {
+            overflow: scroll;
+            max-height: 100%;
+        }
+        .typing {
+            overflow: scroll;
+            white-space: wrap;
+            animation: typing 10s steps(40, end), blink-caret .10s step-end infinite;
+        }
+        html {
+            overflow: scroll;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; /* make scrollbar transparent */
+        }
+        .line-numbers {
+            counter-reset: line;
+        }
+        .line-numbers > div {
+            display: flex;
+        }
+        .line-numbers > div::before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            width: 2rem;
+            text-align: right;
+            margin-right: 1rem;
+            color: gray;
+            border-right: 4px solid #649753;
+            padding-right: 15px;
+        }
+        .indent {
+            padding-left: 1.25rem; /* 5 spaces equivalent */
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-roboto">
+    <div class="container mx-auto p-4">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Text Editor</h1>
+                <div class="flex space-x-4">
+                    <label for="fileInput" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
+                        <i class="fas fa-folder-open"></i> Open File
+                    </label>
+                    <input type="file" id="fileInput" class="hidden">
+                    <button id="openModal" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 cursor-pointer">
+                        <i class="fas fa-plus"></i> Add Text
+                    </button>
+                    <button id="toggleFullscreen" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 cursor-pointer">
+                        <i class="fas fa-expand"></i> Full Screen
+                    </button>
+                </div>
+            </div>
+            <div class="border p-4 rounded-lg bg-gray-50">
+                <div id="editor" class="text-lg typing line-numbers"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <textarea id="manualInput" class="w-full h-40 p-2 border rounded" placeholder="Enter your text here..."></textarea>
+            <button id="submitText" class="bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600">Submit</button>
+        </div>
+    </div>
+
+    <audio id="typeSound" src="/keyboard.mp3" preload="auto"></audio>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileContent = e.target.result;
+                    animateText(fileContent);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('openModal').addEventListener('click', function() {
+            document.getElementById('myModal').style.display = "block";
+        });
+
+        document.querySelector('.close').addEventListener('click', function() {
+            document.getElementById('myModal').style.display = "none";
+        });
+
+        document.getElementById('submitText').addEventListener('click', function() {
+            const manualText = document.getElementById('manualInput').value;
+            document.getElementById('myModal').style.display = "none";
+            animateText(manualText);
+        });
+
+        document.getElementById('toggleFullscreen').addEventListener('click', function() {
+            const editorContainer = document.querySelector('.container');
+            if (!document.fullscreenElement) {
+                editorContainer.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        function animateText(text) {
+            const editor = document.getElementById('editor');
+            const typeSound = document.getElementById('typeSound');
+            let index = 0;
+            let insideTag = false;
+
+            function typeCharacter() {
+                if (index < text.length) {
+                    if (text.charAt(index) === '<') {
+                        insideTag = true;
+                    } else if (text.charAt(index) === '>') {
+                        insideTag = false;
+                    }
+
+                    if (text.charAt(index) === '\n') {
+                        const newLine = document.createElement('div');
+                        editor.appendChild(newLine);
+                    } else {
+                        if (!editor.lastChild || editor.lastChild.nodeType !== Node.ELEMENT_NODE) {
+                            const newLine = document.createElement('div');
+                            editor.appendChild(newLine);
+                        }
+                        if (insideTag) {
+                            editor.lastChild.textContent += text.charAt(index);
+                        } else {
+                            if (editor.lastChild.textContent.endsWith('>')) {
+                                const newSpan = document.createElement('span');
+                                newSpan.classList.add('indent');
+                                newSpan.textContent = text.charAt(index);
+                                editor.lastChild.appendChild(newSpan);
+                            } else {
+                                if (!editor.lastChild.lastChild || editor.lastChild.lastChild.nodeType !== Node.ELEMENT_NODE) {
+                                    const newSpan = document.createElement('span');
+                                    newSpan.textContent = text.charAt(index);
+                                    editor.lastChild.appendChild(newSpan);
+                                } else {
+                                    editor.lastChild.lastChild.textContent += text.charAt(index);
+                                }
+                            }
+                        }
+                    }
+                    typeSound.currentTime = 0;
+                    typeSound.play();
+                    index++;
+                    setTimeout(typeCharacter, 50);
+                }
+            }
+
+            editor.textContent = '';
+            typeCharacter();
+        }
+    </script>
+</body>
+</html>
