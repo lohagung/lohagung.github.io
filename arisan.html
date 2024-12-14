@@ -351,7 +351,7 @@
         };
 
         const playWinnerAnnouncement = (name) => {
-            const msg = new SpeechSynthesisUtterance(`Selamat, yang memperoleh arisan malam ini bapak ${name}`);
+            const msg = new SpeechSynthesisUtterance(`Selamat, yang memperoleh arisan malam ini bapak ${name}.Mohon Bapak ${name} setelah acara arisan selesai, silahkan merapat ke bendahara untuk mengambil uang arisan`);
             msg.lang = 'id-ID';
             window.speechSynthesis.speak(msg);
         };
