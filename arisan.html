@@ -16,21 +16,19 @@
             height: 100%;
             font-family: 'Roboto', sans-serif;
         }
-html {
-  overflow:   scroll;
-}
-
-::-webkit-scrollbar {
-    width: 0px;
-    background: transparent; /* make scrollbar transparent */
-}
+        html {
+            overflow: scroll;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; /* make scrollbar transparent */
+        }
         section {
             position: relative;
             width: 100%;
             height: 100%;
             background: radial-gradient(circle, #FBB600, #DA5900);
         }
-
         #beerCanvas {
             position: absolute;
             top: 0;
@@ -39,7 +37,6 @@ html {
             height: 100%;
             z-index: 100;
         }
-
         .coming_content {
             position: absolute;
             top: 50%;
@@ -51,46 +48,37 @@ html {
             text-align: center;
             z-index: 101;
         }
-
         .tab-content {
             display: none;
         }
-
         .tab-content.active {
             display: block;
         }
-
         .rotate {
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .tab-link {
             padding: 10px 20px;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
             text-decoration: none;
         }
-
         .tab-link.active {
             background-color: #1d4ed8;
             color: white;
         }
-
         .tab-link:hover {
             background-color: #2563eb;
             color: white;
         }
-
         ul {
             list-style-type: none;
             padding: 0;
         }
-
         ul li {
             margin: 5px 0;
             padding: 10px;
@@ -100,11 +88,9 @@ html {
             align-items: center;
             transition: transform 0.2s;
         }
-
         .h-25 {
             height: 20rem;
         }
-
         ul li:nth-child(1) { background: #f3f4f6; color: #111827; }
         ul li:nth-child(2) { background: #e5e7eb; color: #1f2937; }
         ul li:nth-child(3) { background: #d1d5db; color: #374151; }
@@ -150,11 +136,9 @@ html {
         ul li:nth-child(43) { background: #374151; color: #d1d5db; }
         ul li:nth-child(44) { background: #1f2937; color: #9ca3af; }
         ul li:nth-child(45) { background: #111827; color: #6b7280; }
-
         ul li:hover {
             transform: scale(1.05);
         }
-
         ul li::before {
             content: "\f007";
             font-family: "Font Awesome 5 Free";
@@ -162,32 +146,27 @@ html {
             margin-right: 10px;
             color: #1d4ed8;
         }
-
         .winner {
             color: #00FF00; /* Bright green */
             font-size: 2rem; /* Double the font size */
         }
-
         footer {
             text-align: center;
             font-size: 0.75rem; /* Small font size */
             margin-top: 20px;
             color: #fff;
         }
-
         .footer-icons {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
         }
-
         .footer-icons i {
             font-size: 1.5rem;
             color: #fff;
             cursor: pointer;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -201,7 +180,6 @@ html {
             background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
         }
-
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -210,14 +188,12 @@ html {
             width: 80%;
             max-width: 500px;
         }
-
         .close {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
         }
-
         .close:hover,
         .close:focus {
             color: black;
@@ -255,48 +231,7 @@ html {
                 <div id="peserta" class="tab-content active mb-4 h-25 overflow-y-scroll">
                     <h2 class="text-2xl font-bold mb-2">Peserta</h2>
                     <ul id="pesertaList">
-                        <li>Iswadi C12</li>
-                        <li>Didik B5</li>
-                        <li>Bayu Adi Nugroho A11</li>
-                        <li>Muhammad Rodhi Kavling</li>
-                        <li>Agus Gunawan Kavling</li>
-                        <li>Heru Kavling</li>
-                        <li>Bagas Kavling</li>
-                        <li>Budi Setiawan C7</li>
-                        <li>Tuhu C9</li>
-                        <li>Niki Wahyudi C6</li>
-                        <li>Ciptono C3</li>
-                        <li>Ardi C4</li>
-                        <li>Suwoko A6</li>
-                        <li>Muhammad Syafrudin A12</li>
-                        <li>Akbar E1</li>
-                        <li>Bambang B12</li>
-                        <li>Thomas Hendro B9</li>
-                        <li>Susyanto B11</li>
-                        <li>Muhammad Dicky B7</li>
-                        <li>Wahyudi Ruko A1</li>
-                        <li>Rahmad Agung Pambudi A10</li>
-                        <li>Medi Ruko B2</li>
-                        <li>Agus Priyanto B3</li>
-                        <li>Eko Santoso A4b</li>
-                        <li>Bondan B4</li>
-                        <li>Arif Fajar Santoso A7</li>
-                        <li>Ariyanto A8</li>
-                        <li>Zulham B2</li>
-                        <li>Yuyun Kavling</li>
-                        <li>Wisnu Kavling</li>
-                        <li>Ihsan Ruko B1</li>
-                        <li>Hari Susanto A11</li>
-                        <li>Tika C2</li>
-                        <li>Cahyo Ruko C2</li>
-                        <li>Eko Hartanto B10</li>
-                        <li>Nesia B1</li>
-                        <li>Eko A2</li>
-                        <li>Candra Kavling</li>
-                        <li>Widia A4a</li>
-                        <li>Amin Kavling</li>
-                        <li>Rinaldi Kavling</li>
-                        <li>Andre C6</li>
+                        <!-- Participants will be added here -->
                     </ul>
                 </div>
                 <div id="pemenang" class="tab-content mb-4 h-52 overflow-y-scroll">
@@ -377,6 +312,21 @@ html {
             updateParticipantStats();
         };
 
+        const saveParticipantsToLocalStorage = () => {
+            const participants = Array.from(pesertaList.getElementsByTagName('li')).map(li => li.textContent);
+            localStorage.setItem('participants', JSON.stringify(participants));
+        };
+
+        const loadParticipantsFromLocalStorage = () => {
+            const participants = JSON.parse(localStorage.getItem('participants')) || [];
+            participants.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                pesertaList.appendChild(li);
+            });
+            updateParticipantStats();
+        };
+
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
             if (pesertaItems.length === 0) {
@@ -385,7 +335,7 @@ html {
             }
 
             shuffleButton.classList.add('rotate');
-            shuffleButton.innerHTML = '<img src="https://avatars.githubusercontent.com/u/61934361" alt="Rotating image of a GitHub user avatar" class="w-full h-full rounded-full">';
+            shuffleButton.innerHTML = '<img src="https://placehold.co/100x100" alt="Rotating image of a placeholder">';
 
             let interval;
             let counter = 0;
@@ -403,6 +353,7 @@ html {
                     updateParticipantStats();
                     playWinnerAnnouncement(selectedPeserta.textContent);
                     saveWinnersToLocalStorage();
+                    saveParticipantsToLocalStorage();
                 }
             };
 
@@ -436,6 +387,7 @@ html {
                     pesertaList.appendChild(e.target);
                     updateParticipantStats();
                     saveWinnersToLocalStorage();
+                    saveParticipantsToLocalStorage();
                 } else {
                     alert('PIN salah. Gagal menghapus.');
                 }
@@ -449,6 +401,7 @@ html {
                 if (pin === '6666') {
                     e.target.remove();
                     updateParticipantStats();
+                    saveParticipantsToLocalStorage();
                 } else {
                     alert('PIN salah. Gagal menghapus.');
                 }
@@ -458,7 +411,8 @@ html {
         // Initial stats update
         updateParticipantStats();
 
-        // Load winners from local storage
+        // Load participants and winners from local storage
+        loadParticipantsFromLocalStorage();
         loadWinnersFromLocalStorage();
 
         // Settings modal functionality
@@ -486,6 +440,7 @@ html {
             participantsTextarea.value = '';
             settingsModal.style.display = 'none';
             updateParticipantStats();
+            saveParticipantsToLocalStorage();
         });
 
         // Save participants and winners to a text file
@@ -534,6 +489,7 @@ html {
 
                         updateParticipantStats();
                         saveWinnersToLocalStorage();
+                        saveParticipantsToLocalStorage();
                     };
                     reader.readAsText(file);
                 }
