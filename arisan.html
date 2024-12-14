@@ -245,51 +245,90 @@
                 <div id="peserta" class="tab-content active mb-4 h-52 overflow-y-scroll">
                     <h2 class="text-2xl font-bold mb-2">Peserta</h2>
                     <ul id="pesertaList">
-                        <li>Participant 1</li>
-                        <li>Participant 2</li>
-                        <li>Participant 3</li>
-                        <li>Participant 4</li>
-                        <li>Participant 5</li>
-                        <li>Participant 6</li>
-                        <li>Participant 7</li>
-                        <li>Participant 8</li>
-                        <li>Participant 9</li>
-                        <li>Participant 10</li>
-                        <li>Participant 11</li>
-                        <li>Participant 12</li>
-                        <li>Participant 13</li>
-                        <li>Participant 14</li>
-                        <li>Participant 15</li>
-                        <li>Participant 16</li>
-                        <li>Participant 17</li>
-                        <li>Participant 18</li>
-                        <li>Participant 19</li>
-                        <li>Participant 20</li>
-                        <li>Participant 21</li>
-                        <li>Participant 22</li>
-                        <li>Participant 23</li>
-                        <li>Participant 24</li>
-                        <li>Participant 25</li>
-                        <li>Participant 26</li>
-                        <li>Participant 27</li>
-                        <li>Participant 28</li>
-                        <li>Participant 29</li>
-                        <li>Participant 30</li>
-                        <li>Participant 31</li>
-                        <li>Participant 32</li>
-                        <li>Participant 33</li>
-                        <li>Participant 34</li>
-                        <li>Participant 35</li>
-                        <li>Participant 36</li>
-                        <li>Participant 37</li>
-                        <li>Participant 38</li>
-                        <li>Participant 39</li>
-                        <li>Participant 40</li>
-                        <li>Participant 41</li>
-                        <li>Participant 42</li>
-                        <li>Participant 43</li>
-                        <li>Participant 44</li>
-                        <li>Participant 45</li>
+                        <li>Iswadi</li>
+
+<li>Didik</li>
+
+<li>Bayu A.N</li>
+
+<li>M.Rodhi</li>
+
+<li>Agus Gunawan</li>
+
+<li>Heru</li>
+
+<li>Bagas</li>
+
+<li>Budi Setiawan</li>
+
+<li>Tuhu</li>
+
+<li>Niki Wahyudi</li>
+
+<li>Ciptono</li>
+
+<li>Ardi</li>
+
+<li>Suwoko</li>
+
+<li>M.Syafrudin</li>
+
+<li>Akbar</li>
+
+<li>Bambang</li>
+
+<li>Thomas H</li>
+
+<li>Susyanto</li>
+
+<li>M.Dicky</li>
+
+<li>Wahyudi</li>
+
+<li>R.Agung.P</li>
+
+<li>Medi</li>
+
+<li>Agus Priyanto</li>
+
+<li>Eko Santoso</li>
+
+<li>Bondan</li>
+
+<li>Arif Fajar S</li>
+
+<li>Ariyanto</li>
+
+<li>Zulham</li>
+
+<li>Yuyun</li>
+
+<li>Wisnu</li>
+
+<li>Ihsan</li>
+
+<li>Hari Susanto</li>
+
+<li>Tika</li>
+
+<li>Cahyo</li>
+
+<li>Eko Hartanto</li>
+
+<li>Nesia</li>
+
+<li>Eko</li>
+
+<li>Candra Kav</li>
+
+<li>Widia</li>
+
+<li>Amin</li>
+
+<li>Rinaldi</li>
+
+<li>A3</li>
+<li>Andre</li>
                     </ul>
                 </div>
                 <div id="pemenang" class="tab-content mb-4 h-52 overflow-y-scroll">
@@ -351,7 +390,7 @@
         };
 
         const speakWinner = (name) => {
-            const utterance = new SpeechSynthesisUtterance(name);
+            const utterance = new SpeechSynthesisUtterance(`Selamat, yang mendapatkan arisan malam ini adalah bapak ${name}`);
             utterance.lang = 'id-ID';
             speechSynthesis.speak(utterance);
         };
@@ -380,6 +419,7 @@
                     pemenangList.appendChild(selectedPeserta);
                     updateParticipantStats();
                     speakWinner(selectedPeserta.textContent);
+                   
                     saveData();
                 }
             };
