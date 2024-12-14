@@ -226,6 +226,7 @@
                 </div>
                 <div class="flex justify-center mb-4">
                     <button id="shuffleButton" class="bg-blue-500 text-white w-24 h-24 rounded-full hover:bg-blue-700 flex items-center justify-center text-xl border-2 border-white p-5">Kocok</button>
+                    <img id="shuffleImage" src="https://yt3.ggpht.com/wiACRxQmO56kaq4gYqaMLUoDg2dy3MIr5a9J3yXVAai0JuXl5AsKHF9S6NNkG41xFthrhChhaw=s176-c-k-c0x00ffffff-no-rj-mo" alt="A spinning image of a person with a bright background" class="hidden w-24 h-24 rounded-full">
                 </div>
                 <div class="flex justify-center mb-4">
                     <div id="participantStats" class="text-sm font-semibold text-green-800 text-center">
@@ -244,7 +245,51 @@
                 <div id="peserta" class="tab-content active mb-4 h-52 overflow-y-scroll">
                     <h2 class="text-2xl font-bold mb-2">Peserta</h2>
                     <ul id="pesertaList">
-                        
+                        <li>Participant 1</li>
+                        <li>Participant 2</li>
+                        <li>Participant 3</li>
+                        <li>Participant 4</li>
+                        <li>Participant 5</li>
+                        <li>Participant 6</li>
+                        <li>Participant 7</li>
+                        <li>Participant 8</li>
+                        <li>Participant 9</li>
+                        <li>Participant 10</li>
+                        <li>Participant 11</li>
+                        <li>Participant 12</li>
+                        <li>Participant 13</li>
+                        <li>Participant 14</li>
+                        <li>Participant 15</li>
+                        <li>Participant 16</li>
+                        <li>Participant 17</li>
+                        <li>Participant 18</li>
+                        <li>Participant 19</li>
+                        <li>Participant 20</li>
+                        <li>Participant 21</li>
+                        <li>Participant 22</li>
+                        <li>Participant 23</li>
+                        <li>Participant 24</li>
+                        <li>Participant 25</li>
+                        <li>Participant 26</li>
+                        <li>Participant 27</li>
+                        <li>Participant 28</li>
+                        <li>Participant 29</li>
+                        <li>Participant 30</li>
+                        <li>Participant 31</li>
+                        <li>Participant 32</li>
+                        <li>Participant 33</li>
+                        <li>Participant 34</li>
+                        <li>Participant 35</li>
+                        <li>Participant 36</li>
+                        <li>Participant 37</li>
+                        <li>Participant 38</li>
+                        <li>Participant 39</li>
+                        <li>Participant 40</li>
+                        <li>Participant 41</li>
+                        <li>Participant 42</li>
+                        <li>Participant 43</li>
+                        <li>Participant 44</li>
+                        <li>Participant 45</li>
                     </ul>
                 </div>
                 <div id="pemenang" class="tab-content mb-4 h-52 overflow-y-scroll">
@@ -257,6 +302,7 @@
                     <i class="fas fa-cog" id="settingsIcon"></i>
                     <i class="fas fa-save" id="saveIcon"></i>
                     <i class="fas fa-upload" id="uploadIcon"></i>
+                    <a href="/data-arisan.txt" download><i class="fas fa-download"></i></a>
                 </div>
                 <footer>
                     @2024 by YOUSHE
@@ -279,6 +325,7 @@
         const pesertaList = document.getElementById('pesertaList');
         const pemenangList = document.getElementById('pemenangList');
         const shuffleButton = document.getElementById('shuffleButton');
+        const shuffleImage = document.getElementById('shuffleImage');
         const tabLinks = document.querySelectorAll('.tab-link');
         const tabContents = document.querySelectorAll('.tab-content');
         const lastWinner = document.getElementById('lastWinner');
@@ -303,6 +350,12 @@
             return prompt(`Wes yakin pengen ngehapus ${name}? lebokno nomor PIN rahasiane!!`);
         };
 
+        const speakWinner = (name) => {
+            const utterance = new SpeechSynthesisUtterance(name);
+            utterance.lang = 'id-ID';
+            speechSynthesis.speak(utterance);
+        };
+
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
             if (pesertaItems.length === 0) {
@@ -321,13 +374,29 @@
                 if (counter >= maxCounter) {
                     clearInterval(interval);
                     shuffleButton.classList.remove('rotate');
+                    shuffleButton.classList.remove('hidden');
+                    shuffleImage.classList.add('hidden');
                     const selectedPeserta = pesertaItems[randomIndex];
                     pemenangList.appendChild(selectedPeserta);
                     updateParticipantStats();
+                    speakWinner(selectedPeserta.textContent);
+                    saveData();
                 }
             };
 
             interval = setInterval(randomizeNames, 100);
+
+            setTimeout(() => {
+                shuffleButton.classList.add('hidden');
+                shuffleImage.classList.remove('hidden');
+                shuffleImage.classList.add('rotate');
+            }, 2000);
+
+            setTimeout(() => {
+                shuffleImage.classList.remove('rotate');
+                shuffleImage.classList.add('hidden');
+                shuffleButton.classList.remove('hidden');
+            }, 8000);
         });
 
         tabLinks.forEach(link => {
@@ -356,6 +425,7 @@
                 if (pin === '6666') {
                     pesertaList.appendChild(e.target);
                     updateParticipantStats();
+                    saveData();
                 } else {
                     alert('PIN salah. Gagal menghapus.');
                 }
@@ -369,6 +439,7 @@
                 if (pin === '6666') {
                     e.target.remove();
                     updateParticipantStats();
+                    saveData();
                 } else {
                     alert('PIN salah. Gagal menghapus.');
                 }
@@ -403,6 +474,7 @@
             participantsTextarea.value = '';
             settingsModal.style.display = 'none';
             updateParticipantStats();
+            saveData();
         });
 
         // Save participants and winners to a text file
@@ -450,12 +522,47 @@
                         });
 
                         updateParticipantStats();
+                        saveData();
                     };
                     reader.readAsText(file);
                 }
             });
             input.click();
         });
+
+        // Save data to localStorage
+        const saveData = () => {
+            const participants = Array.from(pesertaList.getElementsByTagName('li')).map(li => li.textContent);
+            const winners = Array.from(pemenangList.getElementsByTagName('li')).map(li => li.textContent);
+            localStorage.setItem('participants', JSON.stringify(participants));
+            localStorage.setItem('winners', JSON.stringify(winners));
+        };
+
+        // Load data from localStorage
+        const loadData = () => {
+            const participants = JSON.parse(localStorage.getItem('participants')) || [];
+            const winners = JSON.parse(localStorage.getItem('winners')) || [];
+
+            pesertaList.innerHTML = '';
+            pemenangList.innerHTML = '';
+
+            participants.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                pesertaList.appendChild(li);
+            });
+
+            winners.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                pemenangList.appendChild(li);
+            });
+
+            updateParticipantStats();
+        };
+
+        // Load data on page load
+        window.addEventListener('load', loadData);
 
         var canvas = document.getElementById('beerCanvas');
         var ctx = canvas.getContext('2d');
