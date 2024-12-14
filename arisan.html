@@ -238,7 +238,7 @@
                 </div>
                 <div class="flex justify-center mb-4">
                     <ul class="flex space-x-4">
-                        <li><a href="#" data-tab="peserta" class="tab-link text-blue-500">Peserta</a></li>
+                        <li><a href="#" data-tab="peserta" class="tab-link text-blue-500 active">Peserta</a></li>
                         <li><a href="#" data-tab="pemenang" class="tab-link text-blue-500">Pemenang</a></li>
                     </ul>
                 </div>
@@ -386,6 +386,8 @@
             interval = setInterval(randomizeNames, 100);
 
             setTimeout(() => {
+                shuffleButton.classList.add('hidden');
+                shuffleImage.classList.removesetTimeout(() => {
                 shuffleButton.classList.add('hidden');
                 shuffleImage.classList.remove('hidden');
                 shuffleImage.classList.add('rotate');
