@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arisan Online</title>
+    <title>Arisan RT09</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -16,16 +16,29 @@
         .tab-content.active {
             display: block;
         }
+        .rotate {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold text-center mb-4">Aplikasi Arisan Online</h1>
+        <h1 class="text-3xl font-bold text-center mb-4">ARISAN RT09</h1>
         <div class="flex justify-center mb-4">
             <div id="lastWinner" class="text-2xl font-bold text-red-500 mb-4"></div>
         </div>
         <div class="flex justify-center mb-4">
-            <button id="shuffleButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Kocok</button>
+            <button id="shuffleButton" class="bg-blue-500 text-white w-24 h-24 rounded-full hover:bg-blue-700 flex items-center justify-center text-xl">Kocok</button>
+        </div>
+        <div class="flex justify-center mb-4">
+            <div id="participantStats" class="text-sm font-semibold text-green-800 text-center">
+                <span>Sisa Peserta: <span id="remainingParticipants" class="bg-red-500 text-white rounded px-2"></span></span>
+                <span class="ml-4">Sudah memperoleh arisan: <span id="winnersCount" class="bg-red-500 text-white rounded px-2"></span></span>
+            </div>
         </div>
         <div class="flex justify-center mb-4">
             <ul class="flex space-x-4">
@@ -96,6 +109,19 @@
         const tabLinks = document.querySelectorAll('.tab-link');
         const tabContents = document.querySelectorAll('.tab-content');
         const lastWinner = document.getElementById('lastWinner');
+        const remainingParticipants = document.getElementById('remainingParticipants');
+        const winnersCount = document.getElementById('winnersCount');
+
+        const updateParticipantStats = () => {
+            const remaining = pesertaList.getElementsByTagName('li').length;
+            const winners = pemenangList.getElementsByTagName('li').length;
+            remainingParticipants.textContent = remaining;
+            winnersCount.textContent = winners;
+        };
+
+        const promptForPin = (name) => {
+            return prompt(`Wes yakin pengen ngehapus ${name}? lebokno nomor PIN rahasiane!!`);
+        };
 
         shuffleButton.addEventListener('click', () => {
             const pesertaItems = pesertaList.getElementsByTagName('li');
@@ -104,6 +130,7 @@
                 return;
             }
 
+            shuffleButton.classList.add('rotate');
             let interval;
             let counter = 0;
             const maxCounter = 100; // 10 seconds with 100ms interval
@@ -113,8 +140,10 @@
                 counter++;
                 if (counter >= maxCounter) {
                     clearInterval(interval);
+                    shuffleButton.classList.remove('rotate');
                     const selectedPeserta = pesertaItems[randomIndex];
                     pemenangList.appendChild(selectedPeserta);
+                    updateParticipantStats();
                 }
             };
 
@@ -133,6 +162,35 @@
                 document.getElementById(targetTab).classList.add('active');
             });
         });
+
+        pemenangList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                const winnerName = e.target.textContent;
+                const pin = promptForPin(winnerName);
+                if (pin === '6666') {
+                    pesertaList.appendChild(e.target);
+                    updateParticipantStats();
+                } else {
+                    alert('PIN salah. Gagal menghapus.');
+                }
+            }
+        });
+
+        pesertaList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                const participantName = e.target.textContent;
+                const pin = promptForPin(participantName);
+                if (pin === '6666') {
+                    e.target.remove();
+                    updateParticipantStats();
+                } else {
+                    alert('PIN salah. Gagal menghapus.');
+                }
+            }
+        });
+
+        // Initial stats update
+        updateParticipantStats();
     </script>
 </body>
 </html>
