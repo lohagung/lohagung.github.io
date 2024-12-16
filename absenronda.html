@@ -3,10 +3,9 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Aben Ronda</title>
-    <link href="/logo.png" rel="icon" type="image/jpeg"/>
+    <link href="https://placehold.co/40x40" rel="icon" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <style>
         .draggable {
             position: fixed;
@@ -41,8 +40,7 @@
         }
         @media print {
             body {
-                zoom: 62%;
-				background:#fff;
+                zoom: 61%;
             }
         }
     </style>
@@ -51,7 +49,7 @@
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="logo.png" width="40"/>
+            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/ZYeewI9Sc5rgBEKzfZYGtuc2xf0ZPu4YwRiDDMyeHiEE9gcfE.jpg" width="40"/>
             <span class="text-white font-bold ml-2">Absen Ronda</span>
         </div>
         <div class="relative">
@@ -79,20 +77,15 @@
         <br/>
         <center>@2024 oleh YOUSHE</center>
     </main>
-    <!-- Footer -->
-    <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
-        <div class="flex flex-col items-center" onclick="generatePDF()">
-            <i class="fas fa-file-pdf text-red-600 text-2xl"></i>
-            <span class="text-gray-600 text-sm">PDF</span>
-        </div>
-        <div class="flex flex-col items-center" onclick="printContent()">
-            <i class="fas fa-print text-yellow-600 text-2xl"></i>
-            <span class="text-gray-600 text-sm">Print</span>
-        </div>
-    </footer>
+
     <!-- Floating Plus Button -->
     <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-plus" onclick="toggleDatePopup()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
         <i class="fas fa-plus text-lg"></i>
+    </div>
+
+    <!-- Floating Print Button -->
+    <div class="draggable bg-green-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-print" onclick="printContent()" style="right: 10px; bottom: 40%; transform: translateY(50%);">
+        <i class="fas fa-print text-lg"></i>
     </div>
     <!-- Date Popup Form -->
     <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="datePopupForm">
@@ -100,8 +93,12 @@
             <h2 class="text-xl font-bold mb-4">Pilih Bulan</h2>
             <form id="datePopupDataForm">
                 <div class="mb-4">
-                    <label class="block text-gray-700" for="startDate">Mulai Taggal:</label>
+                    <label class="block text-gray-700" for="startDate">Mulai Tanggal:</label>
                     <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="startDate" type="date"/>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700" for="endDate">Berhenti Tanggal:</label>
+                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="endDate" type="date"/>
                 </div>
                 <div class="flex justify-end">
                     <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule()" type="button">Buat Jadwal</button>
@@ -245,16 +242,21 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
 
         function generateSchedule() {
             const startDate = document.getElementById('startDate').value;
-            if (!startDate) {
-                alert('Pilih tanggal dulu guest (wajib tanggal 1, yang penting bulan dan tahunnya harus tepat) .');
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert('Pilih tanggal mulai dan tanggal berhenti.');
                 return;
             }
 
-            const date = new Date(startDate);
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (start > end) {
+                alert('Tanggal mulai harus sebelum tanggal berhenti.');
+                return;
+            }
 
+            const year = start.getFullYear();
+            const month = start.getMonth();
             const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -265,9 +267,9 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
 
             const settingsData = JSON.parse(localStorage.getItem('settingsData'));
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const currentDate = new Date(year, month, day);
-                const dayName = dayNames[currentDate.getDay()];
+            for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
+                const day = date.getDate();
+                const dayName = dayNames[date.getDay()];
 
                 let headerData = ['', '', '', '', '', '', '', ''];
                 if (settingsData) {
@@ -325,7 +327,7 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                                     <td class="px-4 py-2 border h-24" id="name3Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name4Cell" colspan="2"></td>
                                 </tr>
-                            </tbody>
+                                                       </tbody>
                         </table>
                     </div>
                 `;
@@ -341,42 +343,7 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
             document.body.innerHTML = originalContents;
             window.location.reload();
         }
-
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const tablesContainer = document.getElementById('tablesContainer');
-            const tables = tablesContainer.querySelectorAll('table');
-            const title = document.getElementById('scheduleTitle').innerText;
-
-            let y = 10;
-            for (let i = 0; i < tables.length; i++) {
-                const table = tables[i];
-                const tableHTML = table.outerHTML;
-
-                // Add title to each page
-                if (i === 0 || y > 270) {
-                    if (i !== 0) {
-                        doc.addPage();
-                        y = 10;
-                    }
-                    doc.setFontSize(16);
-                    doc.text(title, 10, y);
-                    y += 10;
-                }
-
-                doc.fromHTML(tableHTML, 10, y, {
-                    'width': 180
-                });
-                y += 60; // Adjust this value based on the height of your table
-                if (y > 270) { // If the content exceeds the page height, add a new page
-                    doc.addPage();
-                    y = 10;
-                }
-            }
-
-            doc.save('absen_ronda.pdf');
-        }
+		
 
         window.onload = loadSettingsData;
     </script>
