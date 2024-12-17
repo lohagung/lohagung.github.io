@@ -200,7 +200,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-black flex flex-col min-h-screen">
+<body class="bg-black flex flex-col min-h-screen" onclick="handleClick()">
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 no-print">
         <div class="flex items-center">
@@ -284,5 +284,21 @@
             <i class="fas fa-plus text-lg"></i>
         </div>
     </div>
+    <script>
+   let clickCount = 0;
+        function handleClick() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
+                }
+            }
+        }
+  </script>
 </body>
 </html>
