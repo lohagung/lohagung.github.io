@@ -264,7 +264,7 @@
             document.getElementById('tutorial-popup').classList.add('hidden');
         }
 
-let tapCount = ;
+let tapCount = 0;
         const container = document.getElementById('fullscreen-container');
 
         container.addEventListener('click', () => {
@@ -275,7 +275,7 @@ let tapCount = ;
                 if (tapCount >= 10) {
                     document.exitFullscreen().then(() => {
                         alert('Sukses mematikan full screen');
-                        tapCount = 0;
+                        tapCount = ;
                     });
                 }
             }
@@ -283,7 +283,7 @@ let tapCount = ;
 
         document.addEventListener('fullscreenchange', () => {
             if (!document.fullscreenElement) {
-                tapCount = ;
+                tapCount = 0;
             }
         });
   </script>
