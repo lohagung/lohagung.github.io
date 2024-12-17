@@ -45,7 +45,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+<body class="bg-gray-100 flex flex-col min-h-screen" onclick="handleClick()">
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
         <div class="flex items-center">
@@ -382,6 +382,20 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                 }
             });
         };
+	let clickCount = 0;
+        function handleClick() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
+                }
+            }
+        }
     </script>
 </body>
 </html>
