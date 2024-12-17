@@ -105,16 +105,14 @@ body {
             <form id="datePopupDataForm">
                 <div class="mb-4">
                     <label class="block text-gray-700" for="startDate">Mulai Tanggal:</label>
-                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="startDate" type="date"/>
+                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="startDate" type="date">01/01/2025</input>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700" for="endDate">Berhenti Tanggal:</label>
-                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="endDate" type="date"/>
+                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="endDate" type="date">30/01/2025</input>
                 </div>
                 <div class="flex justify-end">
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule()" type="button">Buat Jadwal</button>
-		    <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="printContent()" type="button"><i class="fas fa-print text-lg"></i> Print</button>
-                    <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleDatePopup()" type="button">selesai</button>
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule();toggleDatePopup();" type="button">Buat Jadwal</button>
                 </div>
             </form>
         </div>
