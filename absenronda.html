@@ -11,7 +11,7 @@
             body {
                 zoom: 75%;
             }
-	#tutorialPopup{display:none;}
+	#tutorialPopup,header,#cen{display:none;}
         }    
         .draggable {
             position: fixed;
@@ -81,7 +81,7 @@
         <br/>
         <br/>
         <br/>
-        <center>@2024 oleh YOUSHE</center>
+        <center id="cen">@2024 oleh YOUSHE</center>
     </main>
 
     <!-- Floating Plus Button -->
@@ -108,7 +108,7 @@
                 </div>
                 <div class="flex justify-end">
                     <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule()" type="button">Buat Jadwal</button>
-                    <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleDatePopup()" type="button">Batal</button>
+                    <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleDatePopup()" type="button">selesai</button>
                 </div>
             </form>
         </div>
