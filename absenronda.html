@@ -49,7 +49,7 @@
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/ZYeewI9Sc5rgBEKzfZYGtuc2xf0ZPu4YwRiDDMyeHiEE9gcfE.jpg" width="40"/>
+            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="././logo.png" width="40"/>
             <span class="text-white font-bold ml-2">Absen Ronda</span>
         </div>
         <div class="relative">
@@ -163,14 +163,31 @@ Nama3,Blok3
 Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this)"></textarea>
                     </div>
                 </div>
-                <div class="flex justify-end">
+                
+            </form>
+			<div class="flex justify-end">
                     <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="saveSettingsData()" type="button">Save</button>
                     <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleSettingsPopup()" type="button">Cancel</button>
                 </div>
-            </form>
+        </div>
+    </div>
+    <!-- Tutorial Popup -->
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center" id="tutorialPopup">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-xl font-bold mb-4">Tutorial membuat absen ronda</h2>
+            <div id="tutorialContent">
+                <p class="mb-4">1. Pilih menu lalu masuk ke setting, dibagian setting ada nama nama hari masukkan nama dan blok di pisah dengan tanda "," misal: Agus, B11. Untuk menambah nama lain tekan enter dan ulangi langkah tadi. kemudian Simpan.</p>
+                <p class="mb-4 hidden">2. Klik icon plus lalu akan muncul popup settingan bulan. Mulai tanggal artinya absen ronda dimulai dari tanggal (bebas). Berhenti tanggal artinya kita dapat menentukan sampai tanggal berapun yang kita mau. Klik Buat jadwal.</p>
+                <p class="mb-4 hidden">3. Klik icon Print untuk mencetaknya, jika ingin menyimpan ke PDF bagian destination pilih Save as PDF lalu klik Save.</p>
+            </div>
+            <div class="flex justify-end">
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="nextTutorialStep()">Next</button>
+            </div>
         </div>
     </div>
     <script>
+        let tutorialStep = 0;
+
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
             menu.classList.toggle('hidden');
@@ -321,13 +338,13 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                                     <td class="px-4 py-2 border h-24">
                                         <div class="text-lg font-bold">${dayName}</div>
                                         <div class="text-3xl font-bold">${day}</div>
-                                    </td>
+                                                                        </td>
                                     <td class="px-4 py-2 border h-24" id="name1Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name2Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name3Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name4Cell" colspan="2"></td>
                                 </tr>
-                                                       </tbody>
+                            </tbody>
                         </table>
                     </div>
                 `;
@@ -343,9 +360,28 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
             document.body.innerHTML = originalContents;
             window.location.reload();
         }
-		
 
-        window.onload = loadSettingsData;
+        function nextTutorialStep() {
+            const tutorialContent = document.getElementById('tutorialContent');
+            const steps = tutorialContent.querySelectorAll('p');
+            if (tutorialStep < steps.length - 1) {
+                steps[tutorialStep].classList.add('hidden');
+                tutorialStep++;
+                steps[tutorialStep].classList.remove('hidden');
+            } else {
+                document.getElementById('tutorialPopup').classList.add('hidden');
+            }
+        }
+
+        window.onload = function() {
+            loadSettingsData();
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('dropdownMenu');
+                if (!menu.contains(event.target) && !event.target.closest('.fa-bars')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        };
     </script>
 </body>
 </html>
