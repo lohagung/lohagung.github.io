@@ -87,7 +87,7 @@
 }
     </style>
 </head>
-<body class="bg-gray-100 p-3">
+<body class="bg-gray-100 p-3" onclick="handleClick()">
     <div class="fixed top-0 left-0 right-0 gradient-bg p-4 flex justify-between items-center shadow-md z-50">
         <div class="flex items-center">
             <img src="/logo.png" alt="Logo of a community management system with a circular border" class="w-10 h-10 rounded-full mr-3">
@@ -562,6 +562,20 @@
         }
 
         window.onload = loadDataFromLocalStorage;
+	    let clickCount = 0;
+        function handleClick() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
+                }
+            }
+        }
     </script>
 </body>
 </html>
