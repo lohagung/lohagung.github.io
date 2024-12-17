@@ -164,8 +164,8 @@
         }
   </style>
  </head>
- <body class="flex flex-col items-center justify-center min-h-screen">
-  <div id="fullscreen-container" class="container mx-auto p-4">
+ <body class="flex flex-col items-center justify-center min-h-screen" onclick="handleClick()">
+  <div class="container mx-auto p-4">
    <div class="flex flex-col items-center mb-8 text-center">
     <img alt="Logo of the application" class="w-24 h-24 rounded-full" height="96" src="/logo.png" width="96"/>
     <h1 class="text-3xl font-bold text-white mt-4">
@@ -270,28 +270,20 @@
             document.getElementById('tutorial-popup').classList.add('hidden');
         }
 
-let tapCount = 0;
-        const container = document.getElementById('fullscreen-container');
-
-        container.addEventListener('click', () => {
+let clickCount = 0;
+        function handleClick() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
             } else {
-                tapCount++;
-                if (tapCount >= 10) {
-                    document.exitFullscreen().then(() => {
-                        alert('Sukses mematikan full screen');
-                        tapCount = 0;
-                    });
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
                 }
             }
-        });
-
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                tapCount = 0;
-            }
-        });
+        }
   </script>
  </body>
 </html>
