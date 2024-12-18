@@ -3,25 +3,39 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Aben Ronda</title>
-    <link href="https://placehold.co/40x40" rel="icon" type="image/jpeg"/>
+    <link href="/logo.png" rel="icon" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <style>
-	@media print {
-body {
+        @media print {
+            body {
                 zoom: 61%;
             }
-	#tutorialPopup,header,#cen{
-		display:none;
-	}
-		body,main {
-    background: #fff;
-}
-		.blok{background:#000}
-		
-        }   
-
-	    
+            #tutorialPopup, header, #cen {
+                display: none;
+            }
+            body, main {
+                background: #fff;
+            }
+            .blok {
+                background: #000;
+            }
+            .print-container {
+                width: 100%;
+                overflow: hidden;
+                page-break-inside: avoid;
+            }
+            .print-table {
+                width: 100%;
+                table-layout: fixed;
+                border-collapse: collapse;
+            }
+            .print-table th, .print-table td {
+                word-wrap: break-word;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
         .draggable {
             position: fixed;
         }
@@ -53,21 +67,21 @@ body {
             width: 0px;
             background: transparent; /* make scrollbar transparent */
         }
-iframe {
-    width: 100%;
-    height: 230px;
-}
-table { page-break-inside:auto }
-    tr    { page-break-inside:avoid; page-break-after:auto }
-    thead { display:table-header-group }
-    tfoot { display:table-footer-group }
+        iframe {
+            width: 100%;
+            height: 230px;
+        }
+        table { page-break-inside:auto }
+        tr    { page-break-inside:avoid; page-break-after:auto }
+        thead { display:table-header-group }
+        tfoot { display:table-footer-group }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen" /*onclick="handleClick()"*/>
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="././logo.png" width="40"/>
+            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="/logo.png" width="40"/>
             <span class="text-white font-bold ml-2">Absen Ronda</span>
         </div>
         <div class="relative">
@@ -182,31 +196,13 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                 </div>
                 
             </form>
-			<div class="flex justify-end">
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="saveSettingsData()" type="button">Save</button>
-                    <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleSettingsPopup()" type="button">Cancel</button>
-                </div>
-        </div>
-    </div>
-    <!-- Tutorial Popup -->
-    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center" id="tutorialPopup">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
-            <h2 class="text-xl font-bold mb-4">Tutorial membuat absen ronda</h2>
-            <div id="tutorialContent">
-		<p class="mb-4"><iframe src="/video/Absen.mp4" allow="autoplay"></iframe></p>
-                <p class="mb-4 hidden">1. Pilih menu lalu masuk ke setting, dibagian setting ada nama nama hari masukkan nama dan blok di pisah dengan tanda "," misal: Agus, B11. Untuk menambah nama lain tekan enter dan ulangi langkah tadi. kemudian Simpan.</p>
-                <p class="mb-4 hidden">2. Klik icon plus lalu akan muncul popup settingan bulan. Mulai tanggal artinya absen ronda dimulai dari tanggal (bebas). Berhenti tanggal artinya kita dapat menentukan sampai tanggal berapun yang kita mau. Klik Buat jadwal.</p>
-                <p class="mb-4 hidden">3. Klik icon Print untuk mencetaknya, jika ingin menyimpan ke PDF bagian destination pilih Save as PDF lalu klik Save.  <button class="bg-yellow-500 text-white px-4 py-2 rounded-md" onclick="toggleDatePopup();nextTutorialStep()">Buat Undangan</button> </p> 
-		   
-            </div>
             <div class="flex justify-end">
-               <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="nextTutorialStep()">Next</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="saveSettingsData()" type="button">Save</button>
+                <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleSettingsPopup()" type="button">Cancel</button>
             </div>
         </div>
     </div>
     <script>
-        let tutorialStep = 0;
-
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
             menu.classList.toggle('hidden');
@@ -335,10 +331,10 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                 }
 
                 const table = document.createElement('div');
-                table.classList.add('mb-2');
+                table.classList.add('mb-2', 'print-container');
                 table.innerHTML = `
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white border border-gray-200 text-center">
+                        <table class="min-w-full bg-white border border-gray-200 text-center print-table">
                             <thead>
                                 <tr>
                                     <th class="py-2 border h-12 hari">Hari/Tgl</th>
@@ -357,7 +353,7 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                                     <td class="px-4 py-2 border h-24">
                                         <div class="text-lg font-bold">${dayName}</div>
                                         <div class="text-3xl font-bold">${day}</div>
-                                                                        </td>
+                                    </td>
                                     <td class="px-4 py-2 border h-24" id="name1Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name2Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name3Cell" colspan="2"></td>
@@ -380,18 +376,6 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
             window.location.reload();
         }
 
-        function nextTutorialStep() {
-            const tutorialContent = document.getElementById('tutorialContent');
-            const steps = tutorialContent.querySelectorAll('p');
-            if (tutorialStep < steps.length - 1) {
-                steps[tutorialStep].classList.add('hidden');
-                tutorialStep++;
-                steps[tutorialStep].classList.remove('hidden');
-            } else {
-                document.getElementById('tutorialPopup').classList.add('hidden');
-            }
-        }
-
         window.onload = function() {
             loadSettingsData();
             document.addEventListener('click', function(event) {
@@ -401,20 +385,8 @@ Nama4,Blok4" required="" rows="4" maxlength="100" oninput="validateTextarea(this
                 }
             });
         };
-	let clickCount = 0;
-        function handleClick() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                clickCount++;
-                if (clickCount >= 10) {
-                    document.exitFullscreen();
-                    clickCount = 0;
-                }
-            }
-        }
+
+
     </script>
 </body>
 </html>
