@@ -1,0 +1,377 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Ronda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+            }
+            header, .no-print {
+                display: none;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid black;
+            }
+            #no-print {
+                display: none;
+            }
+        }
+        main {
+            padding: 1rem;
+            max-width: 210mm;
+            margin: auto;
+            overflow: scroll;
+        }
+        .print-table th, .print-table td {
+            border: 1px solid black;
+        }
+        #tablesContainer { zoom: 65%; }
+        .print-table th:nth-child(1) { min-width: 100px; }
+        .print-table th:nth-child(2), 
+        .print-table th:nth-child(4), 
+        .print-table th:nth-child(6), 
+        .print-table th:nth-child(8) { 
+            min-width: 150px; 
+        }
+        .print-table th:nth-child(3), 
+        .print-table th:nth-child(5), 
+        .print-table th:nth-child(7), 
+        .print-table th:nth-child(9) { 
+            background: #000;
+            color: #fff;
+            min-width: 40px;
+        }
+        html {
+            overflow: scroll;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; /* make scrollbar transparent */
+        }
+		#settingsForm{
+			max-height: 500px;
+			overflow: scroll;
+		}
+		.gradient-header {
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d);
+        }
+    </style>
+</head>
+<body onload="loadSettingsData()">
+    <header id="no-print" class="gradient-header bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h1 class="no-print text-xl font-bold">Absensi</h1>
+        <div class="flex items-center space-x-4">
+            <a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="togglePopup()">Buat Absen</a>
+            <a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="printContent()">Print</a>
+            <div class="no-print relative">
+                <i class="fas fa-bars text-2xl cursor-pointer" onclick="toggleMenu()"></i>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Pengaturan</a>
+					<a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="exportSettings()">Backup Pengaturan</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="document.getElementById('importSettingsInput').click()">Import Pengaturan</a>
+                    <input type="file" id="importSettingsInput" class="hidden" accept=".json" onchange="importSettings(event)">
+					<a href="/file/contoh_absen.json" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" download>Contoh Settingan</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <div id="tablesContainer"></div>
+        <br>
+        <center>@2024 oleh YOUSHE</center>
+    </main>
+
+    <div id="popupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Buat Absen</h2>
+            <label for="startDate" class="block mb-2">Tanggal Mulai:</label>
+            <input type="date" id="startDate" class="w-full mb-4 p-2 border rounded-md">
+            <label for="endDate" class="block mb-2">Tanggal Berakhir:</label>
+            <input type="date" id="endDate" class="w-full mb-4 p-2 border rounded-md">
+            <div class="flex justify-end">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule();togglePopup();">Buat Absen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsPopupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Pengaturan</h2>
+            <div id="settingsForm">
+                <div id="groupSettingsContainer">
+                    <div id="group1Settings" class="group-settings">
+                        <label for="group1TextArea" class="block mb-2">Kelompok 1:</label>
+                        <textarea id="group1TextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+                    </div>
+                </div>
+
+            </div>
+					<button class="bg-green-600 text-white px-4 py-2 rounded-md mr-2" onclick="addGroup()"><i class="fas fa-plus"></i></button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-md" onclick="removeGroup()"><i class="fas fa-minus"></i></button>
+					<button id="saveButton" class="bg-yellow-600 text-white px-4 py-2 rounded-md" onclick="saveSettingsData()">Save</button>
+        </div>
+    </div>
+
+<script>
+        let groupCount = 1;
+
+        // Fungsi untuk menampilkan atau menyembunyikan menu dropdown
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Fungsi untuk menampilkan atau menyembunyikan popup form untuk membuat absen
+        function togglePopup() {
+            const popup = document.getElementById('popupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        // Fungsi untuk menampilkan atau menyembunyikan popup form untuk pengaturan
+        function toggleSettingsPopup() {
+            const popup = document.getElementById('settingsPopupForm');
+            popup.classList.toggle('hidden');
+        }
+
+        // Fungsi untuk memvalidasi textarea agar tidak lebih dari 4 baris
+        function validateTextarea(textarea) {
+            const lines = textarea.value.split('\n');
+            if (lines.length > 4) {
+                textarea.value = lines.slice(0, 4).join('\n');
+            }
+        }
+
+        // Fungsi untuk menambahkan kelompok baru
+        function addGroup() {
+            const lastGroupTextArea = document.getElementById(`group${groupCount}TextArea`);
+            if (!lastGroupTextArea.value.trim()) {
+                alert('Isi textarea kelompok terakhir sebelum menambahkan kelompok baru.');
+                return;
+            }
+
+            groupCount++;
+            const groupSettingsContainer = document.getElementById('groupSettingsContainer');
+            const newGroupDiv = document.createElement('div');
+            newGroupDiv.id = `group${groupCount}Settings`;
+            newGroupDiv.classList.add('group-settings');
+            newGroupDiv.innerHTML = `
+                <label for="group${groupCount}TextArea" class="block mb-2">Kelompok ${groupCount}:</label>
+                <textarea id="group${groupCount}TextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            `;
+            groupSettingsContainer.appendChild(newGroupDiv);
+        }
+
+        // Fungsi untuk menghapus kelompok terakhir
+        function removeGroup() {
+            if (groupCount > 1) {
+                const lastGroupDiv = document.getElementById(`group${groupCount}Settings`);
+                lastGroupDiv.remove();
+                groupCount--;
+            }
+        }
+
+        // Fungsi untuk menyimpan data pengaturan ke localStorage
+        function saveSettingsData() {
+            const settingsData = {};
+            for (let i = 1; i <= groupCount; i++) {
+                settingsData[`group${i}`] = document.getElementById(`group${i}TextArea`).value.trim();
+            }
+
+            if (Object.values(settingsData).some(value => !value)) {
+                alert('Semua textarea wajib diisi.');
+                return;
+            }
+
+            localStorage.setItem('settingsData', JSON.stringify(settingsData));
+            alert('Settings saved!');
+            toggleSettingsPopup();
+        }
+
+        // Fungsi untuk memuat data pengaturan dari localStorage
+        function loadSettingsData() {
+            const settingsData = JSON.parse(localStorage.getItem('settingsData'));
+            if (settingsData) {
+                Object.keys(settingsData).forEach((key, index) => {
+                    if (index > 0) {
+                        addGroup();
+                    }
+                    document.getElementById(`${key}TextArea`).value = settingsData[key];
+                });
+            }
+        }
+
+        // Fungsi untuk menghasilkan jadwal berdasarkan tanggal mulai dan berakhir
+        function generateSchedule() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert('Pilih tanggal mulai dan tanggal berhenti.');
+                return;
+            }
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (start > end) {
+                alert('Tanggal mulai harus sebelum tanggal berhenti.');
+                return;
+            }
+
+            const year = start.getFullYear();
+            const month = start.getMonth();
+            const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+            const tablesContainer = document.getElementById('tablesContainer');
+            tablesContainer.innerHTML = '';
+
+            const settingsData = JSON.parse(localStorage.getItem('settingsData'));
+
+            for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
+                const day = date.getDate();
+                const dayName = dayNames[date.getDay()];
+                const groupIndex = (day - 1) % groupCount + 1;
+
+                let headerData = ['', '', '', '', '', '', '', ''];
+                if (settingsData) {
+                    headerData = settingsData[`group${groupIndex}`].split('\n').map(line => line.split(',')).flat();
+                }
+
+                const table = document.createElement('div');
+                table.classList.add('mb-2', 'print-container');
+                table.innerHTML = `
+                    <div>
+                        <table class="min-w-full bg-white border border-gray-200 text-center print-table">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 border h-12 hari">${dayName}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[0] || ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[1] || ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[2] || ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[3] || ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[4] || ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[5] || ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[6] || ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[7] || ''}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="px-4 py-2 border h-24">                                        
+                                        <div class="text-3xl font-bold">${day}</div>
+                                        <div class="text-lg font-bold">${monthNames[month]}</div>
+                                    </td>
+                                    <td class="px-4 py-2 border h-24" id="name1Cell" colspan="2"></td>
+                                    <td class="px-4 py-2 border h-24" id="name2Cell" colspan="2"></td>
+                                    <td class="px-4 py-2 border h-24" id="name3Cell" colspan="2"></td>
+                                    <td class="px-4 py-2 border h-24" id="name4Cell" colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                tablesContainer.appendChild(table);
+            }
+
+            // Simpan jadwal yang dihasilkan ke localStorage
+            localStorage.setItem('generatedSchedule', tablesContainer.innerHTML);
+        }
+
+        // Fungsi untuk mencetak konten
+        function printContent() {
+            window.print();
+        }
+
+        // Fungsi untuk mengunduh PDF dari konten
+        function downloadPDF() {
+            const tablesContainer = document.getElementById('tablesContainer');
+            html2canvas(tablesContainer).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('schedule.pdf');
+            });
+        }
+
+        // Fungsi untuk mengekspor pengaturan ke file JSON
+        function exportSettings() {
+            const settingsData = localStorage.getItem('settingsData');
+            if (!settingsData) {
+                alert('Tidak ada pengaturan yang disimpan.');
+                return;
+            }
+
+            const blob = new Blob([settingsData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'settings_backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Fungsi untuk mengimpor pengaturan dari file JSON
+        function importSettings(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const settingsData = e.target.result;
+                try {
+                    const parsedData = JSON.parse(settingsData);
+                    localStorage.setItem('settingsData', JSON.stringify(parsedData));
+                    alert('Pengaturan berhasil diimpor.');
+                    loadSettingsData();
+                } catch (error) {
+                    alert('File tidak valid.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Fungsi yang dijalankan saat halaman dimuat
+        window.onload = function() {
+            loadSettingsData();
+            const savedSchedule = localStorage.getItem('generatedSchedule');
+            if (savedSchedule) {
+                document.getElementById('tablesContainer').innerHTML = savedSchedule;
+            }
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('dropdownMenu');
+                if (!menu.contains(event.target) && !event.target.closest('.fa-bars')) {
+                   menu.classList.add('hidden');
+                }
+            });
+        };
+
+        // Fungsi untuk menangani klik untuk masuk atau keluar dari mode layar penuh
+        let clickCount = 0;
+        function handleClick() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
