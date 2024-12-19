@@ -2,23 +2,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schedule App</title>
+    <title>Absensi Ronda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <style>
         @media print {
             header, .no-print {
                 display: none;
             }
             .print-table th, .print-table td {
-                width: 12.5%;
+                
                 border: 1px solid black;
             }
-            .print-table th:nth-child(3), .print-table th:nth-child(5), .print-table th:nth-child(7), .print-table th:nth-child(9), .print-table td:nth-child(3), .print-table td:nth-child(5), .print-table td:nth-child(7), .print-table td:nth-child(9) {
+.print-table td:nth-child(3), 
+.print-table td:nth-child(5), 
+.print-table td:nth-child(7), 
+.print-table td:nth-child(9) {
                 color: #000;
+width: 70px;
             }
         }
 
@@ -31,15 +34,15 @@
 </head>
 <body onload="loadSettingsData()">
     <header class="no-print bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 class="no-print text-xl font-bold">Schedule App</h1>
+        <h1 class="no-print text-xl font-bold">Absensi</h1>
         <div class="flex items-center space-x-4">
             <a href="#" class="no-print text-white" onclick="printContent()"><i class="fas fa-print"></i></a>
             <a href="#" class="no-print text-white" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i></a>
             <div class="no-print relative">
                 <i class="fas fa-bars text-2xl cursor-pointer" onclick="toggleMenu()"></i>
                 <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="togglePopup()">Generate Schedule</a>
-                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Settings</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="togglePopup()">Buat Absen</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Pengaturan</a>
                 </div>
             </div>
         </div>
@@ -65,7 +68,7 @@
 
     <div id="settingsPopupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 class="text-xl font-bold mb-4">Settings</h2>
+            <h2 class="text-xl font-bold mb-4">Pengaturan</h2>
             <div id="settingsForm">
                 <div id="mondaySettings" class="day-settings">
                     <label for="mondayTextArea" class="block mb-2">Senin:</label>
@@ -99,7 +102,7 @@
             <div class="flex justify-between">
                 <button id="backButton" class="bg-gray-600 text-white px-4 py-2 rounded-md hidden" onclick="navigateSettings('back')">Back</button>
                 <button id="nextButton" class="bg-blue-600 text-white px-4 py-2 rounded-md" onclick="navigateSettings('next')">Next</button>
-                <button id="saveButton" class="bg-blue-600 text-white px-4 py-2 rounded-md hidden" onclick="saveSettingsData()">Save</button>
+                <button id="saveButton" class="bg-yellow-600 text-white px-4 py-2 rounded-md hidden" onclick="saveSettingsData()">Save</button>
             </div>
         </div>
     </div>
