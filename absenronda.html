@@ -1,211 +1,96 @@
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Aben Ronda</title>
-    <link href="https://placehold.co/40x40" rel="icon" type="image/jpeg"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <style>
         @media print {
-		  .page {
-    margin: 0;
-    border: initial;
-    border-radius: initial;
-    width: initial;
-    min-height: initial;
-    box-shadow: initial;
-    background: initial;
-  }
-            body {
-                zoom: 61%;
-                background: white;
-            }
-            #noPrint {
+            header, .no-print {
                 display: none;
             }
-main {
-    padding-left: 100px;
-    padding-right: 20px;
-	background: white;
-    width: 100%;
-}
-	
+            .print-table th, .print-table td {
+                width: 12.5%;
+                border: 1px solid black;
+            }
+            .print-table th:nth-child(3), .print-table th:nth-child(5), .print-table th:nth-child(7), .print-table 
+th:nth-child(9), .print-table td:nth-child(3), .print-table td:nth-child(5), .print-table td:nth-child(7), .print-table 
+td:nth-child(9) {
+                
+                color: #000;
+            }
         }
-main {
-    margin: auto;
-}
-		@page {
-  size: A4;
-  margin-top:1cm;
-  margin-bottom:1cm;
 
-}
-.tablesContainer {
-  width: 21cm;
-  min-height: 29.7cm;
-  padding: 2cm;
-  margin: 1cm auto;
-  border: 1px #D3D3D3 solid;
-  border-radius: 5px;
-  background: white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-
-}
-        .draggable {
-            position: fixed;
-        }
-        .my-5 {
-            margin-top: 0rem;
-            margin-bottom: -1rem;
-        }
-        .hari {
-            width: 100px;
-        }
-        .blok {
-            min-width: 40px;
-            max-width: 50px;
-            background: black;
-            color: #fff;
-        }
-        .nama {
-            min-width: 165px;
-            max-width: 165px;
-        }
-        form#settingsDataForm {
-            max-height: 500px;
-            overflow: auto;
-        }
-        html {
-            overflow: scroll;
-        }
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent; /* make scrollbar transparent */
-        }
+ .print-table th, .print-table td {
+               
+                border: 1px solid black;
+            }
+#tablesContainer{zoom:65%}
+.print-table th:nth-child(1){width:90px}
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center" id="noPrint">
-        <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="/logo.png" width="40"/>
-            <span class="text-white font-bold ml-2">Absen Ronda</span>
-        </div>
-        <div class="relative">
-            <div class="flex items-center space-x-4">
-                <i class="fas fa-bars text-white cursor-pointer" onclick="toggleMenu()"></i>
-            </div>
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 hidden" id="dropdownMenu">
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer" onclick="toggleSettingsPopup()">Setting</a>
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Bendahara</a>
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="#">Jimpitan</a>
+<body onload="loadSettingsData()">
+    <header class="no-print bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h1 class="no-print text-xl font-bold">Schedule App</h1>
+        <div class="flex items-center space-x-4">
+            <a href="#" class="no-print text-white" onclick="printContent()"><i class="fas fa-print"></i></a>
+            <a href="#" class="no-print text-white" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i></a>
+            <div class="no-print relative">
+                <i class="fas fa-bars text-2xl cursor-pointer" onclick="toggleMenu()"></i>
+                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="togglePopup()">Generate Schedule</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Settings</a>
+                </div>
             </div>
         </div>
     </header>
-    <!-- Main Content -->
-    <main>
 
-            <div id="tablesContainer">
-                <!-- Tables will be dynamically generated -->
-            </div>
-
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <center id="cen">@2024 oleh YOUSHE</center>
+    <main class="p-4">
+        <div id="tablesContainer"></div>
     </main>
-    <!-- Floating Plus Button -->
-    <div id="noPrint" class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-plus" onclick="toggleDatePopup()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
-        <i class="fas fa-plus text-lg"></i>
-    </div>
-    <!-- Floating Print Button -->
-    <div id="noPrint" class="draggable bg-green-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable-print" onclick="printContent()" style="right: 10px; bottom: 40%; transform: translateY(50%);">
-        <i class="fas fa-print text-lg"></i>
-    </div>
-    <!-- Date Popup Form -->
-    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="datePopupForm">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
-            <h2 class="text-xl font-bold mb-4">Pilih Bulan</h2>
-            <form id="datePopupDataForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700" for="startDate">Mulai Tanggal:</label>
-                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="startDate" type="date"/>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700" for="endDate">Berhenti Tanggal:</label>
-                    <input class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="endDate" type="date"/>
-                </div>
-                <div class="flex justify-end">
-                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule();toggleDatePopup();" type="button">Buat Jadwal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Settings Popup Form -->
-    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="settingsPopupForm">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
-            <h2 class="text-xl font-bold mb-4">Settings</h2>
-            <form id="settingsDataForm">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="mondayTextArea">Senin:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="mondayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="tuesdayTextArea">Selasa:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="tuesdayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="wednesdayTextArea">Rabu:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="wednesdayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="thursdayTextArea">Kamis:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="thursdayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="fridayTextArea">Jumat:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="fridayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700" for="saturdayTextArea">Sabtu:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="saturdayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                    <div class="mb-4 col-span-2">
-                        <label class="block text-gray-700" for="sundayTextArea">Minggu:</label>
-                        <textarea class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="sundayTextArea" maxlength="100" oninput="validateTextarea(this)" placeholder="Nama1,Blok1
-Nama2,Blok2
-Nama3,Blok3
-Nama4,Blok4" required="" rows="4"></textarea>
-                    </div>
-                </div>
-            </form>
+
+    <div id="popupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Generate Schedule</h2>
+            <label for="startDate" class="block mb-2">Start Date:</label>
+            <input type="date" id="startDate" class="w-full mb-4 p-2 border rounded-md">
+            <label for="endDate" class="block mb-2">End Date:</label>
+            <input type="date" id="endDate" class="w-full mb-4 p-2 border rounded-md">
             <div class="flex justify-end">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2" onclick="saveSettingsData()" type="button">Save</button>
-                <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="toggleSettingsPopup()" type="button">Cancel</button>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule()">Generate</button>
+                <button class="bg-gray-600 text-white px-4 py-2 rounded-md" onclick="togglePopup()">Cancel</button>
             </div>
         </div>
     </div>
+
+    <div id="settingsPopupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 class="text-xl font-bold mb-4">Settings</h2>
+            <label for="mondayTextArea" class="block mb-2">Monday:</label>
+            <textarea id="mondayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="tuesdayTextArea" class="block mb-2">Tuesday:</label>
+            <textarea id="tuesdayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="wednesdayTextArea" class="block mb-2">Wednesday:</label>
+            <textarea id="wednesdayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="thursdayTextArea" class="block mb-2">Thursday:</label>
+            <textarea id="thursdayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="fridayTextArea" class="block mb-2">Friday:</label>
+            <textarea id="fridayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="saturdayTextArea" class="block mb-2">Saturday:</label>
+            <textarea id="saturdayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <label for="sundayTextArea" class="block mb-2">Sunday:</label>
+            <textarea id="sundayTextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
+            <div class="flex justify-end">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="saveSettingsData()">Save</button>
+                <button class="bg-gray-600 text-white px-4 py-2 rounded-md" onclick="toggleSettingsPopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
@@ -214,11 +99,6 @@ Nama4,Blok4" required="" rows="4"></textarea>
 
         function togglePopup() {
             const popup = document.getElementById('popupForm');
-            popup.classList.toggle('hidden');
-        }
-
-        function toggleDatePopup() {
-            const popup = document.getElementById('datePopupForm');
             popup.classList.toggle('hidden');
         }
 
@@ -293,8 +173,8 @@ Nama4,Blok4" required="" rows="4"></textarea>
 
             const year = start.getFullYear();
             const month = start.getMonth();
-            const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const dayNames = ["Ming", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const monthNames = ["Jan", "Febru", "Maret", "April", "Mei", "Juni", "Juli", "Agust", "Sept", "Okt", "Nov", "Des"];
 
             const tablesContainer = document.getElementById('tablesContainer');
             tablesContainer.innerHTML = '';
@@ -376,6 +256,20 @@ Nama4,Blok4" required="" rows="4"></textarea>
             window.print();
         }
 
+        function downloadPDF() {
+            const tablesContainer = document.getElementById('tablesContainer');
+            html2canvas(tablesContainer).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('schedule.pdf');
+            });
+        }
+
         window.onload = function() {
             loadSettingsData();
             const savedSchedule = localStorage.getItem('generatedSchedule');
@@ -390,5 +284,5 @@ Nama4,Blok4" required="" rows="4"></textarea>
             });
         };
     </script>
-	</body>
-	</html>
+</body>
+</html>
