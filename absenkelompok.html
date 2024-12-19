@@ -24,19 +24,38 @@
             #scheduleContainer {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-			.page-break  { 
-				display:block; 
-				page-break-before:always; 
-				}
+            .page-break  { 
+                display:block; 
+                page-break-before:always; 
+            }
         }
 		
+		.shadow-md {
+    border: 1px solid #cfcfcf;
+}
+		h2 {
+    border-bottom: 1px solid #999999;
+    text-align: center;
+    text-transform: uppercase;
+}
+.list-disc {
+    list-style-type: none;
+    background: #f3f3f3;
+    padding-left: 10px;
+    border: 1px solid #afafaf;
+    border-radius: 7px;
+}
+p li {
+    list-style: none;
+    border-bottom: 1px dashed #9b9b9b;
+}        
         main {
             padding: 1rem;
             max-width: 210mm;
             margin: auto;
             overflow: scroll;
         }
-		.two-columns {
+        .two-columns {
             column-count: 2; /* Mengatur jumlah kolom */
             column-gap: 20px; /* Jarak antar kolom */
         }
@@ -70,11 +89,11 @@
             width: 0px;
             background: transparent; /* make scrollbar transparent */
         }
-		#settingsForm{
-			max-height: 500px;
-			overflow: scroll;
-		}
-		.gradient-header {
+        #settingsForm{
+            max-height: 500px;
+            overflow: scroll;
+        }
+        .gradient-header {
             background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d);
         }
     </style>
@@ -89,17 +108,16 @@
                 <i class="fas fa-bars text-2xl cursor-pointer" onclick="toggleMenu()"></i>
                 <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Pengaturan</a>
-					<a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="exportSettings()">Backup Pengaturan</a>
+                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="exportSettings()">Backup Pengaturan</a>
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="document.getElementById('importSettingsInput').click()">Import Pengaturan</a>
                     <input type="file" id="importSettingsInput" class="hidden" accept=".json" onchange="importSettings(event)">
-					<a href="/file/contoh_absen.json" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" download>Contoh Settingan</a>
+                    <a href="/file/contoh_absen.json" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" download>Contoh Settingan</a>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="p-4">
-
         <div id="scheduleContainer" class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8 page-break"></div>
         <div id="tablesContainer" class="page-break"></div>
         <br>
@@ -129,15 +147,14 @@
                         <textarea id="group1TextArea" class="w-full mb-4 p-2 border rounded-md" rows="4" oninput="validateTextarea(this)"></textarea>
                     </div>
                 </div>
-
             </div>
-					<button class="bg-green-600 text-white px-4 py-2 rounded-md mr-2" onclick="addGroup()"><i class="fas fa-plus"></i></button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded-md" onclick="removeGroup()"><i class="fas fa-minus"></i></button>
-					<button id="saveButton" class="bg-yellow-600 text-white px-4 py-2 rounded-md" onclick="saveSettingsData()">Save</button>
+            <button class="bg-green-600 text-white px-4 py-2 rounded-md mr-2" onclick="addGroup()"><i class="fas fa-plus"></i></button>
+            <button class="bg-red-600 text-white px-4 py-2 rounded-md" onclick="removeGroup()"><i class="fas fa-minus"></i></button>
+            <button id="saveButton" class="bg-yellow-600 text-white px-4 py-2 rounded-md" onclick="saveSettingsData()">Save</button>
         </div>
     </div>
 
-<script>
+    <script>
         let groupCount = 1;
 
         // Fungsi untuk menampilkan atau menyembunyikan menu dropdown
@@ -279,14 +296,14 @@
                             <thead>
                                 <tr>
                                     <th class="py-2 border h-12 hari">${dayName}</th>
-                                    <th class="py-2 border h-12 nama">${headerData[0] || ''}</th>
-                                    <th class="py-2 border h-12 blok">${headerData[1] || ''}</th>
-                                    <th class="py-2 border h-12 nama">${headerData[2] || ''}</th>
-                                    <th class="py-2 border h-12 blok">${headerData[3] || ''}</th>
-                                    <th class="py-2 border h-12 nama">${headerData[4] || ''}</th>
-                                    <th class="py-2 border h-12 blok">${headerData[5] || ''}</th>
-                                    <th class="py-2 border h-12 nama">${headerData[6] || ''}</th>
-                                    <th class="py-2 border h-12 blok">${headerData[7] || ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[0] ? headerData[0].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[1] ? headerData[1].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[2] ? headerData[2].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[3] ? headerData[3].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[4] ? headerData[4].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[5] ? headerData[5].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 nama">${headerData[6] ? headerData[6].replace(/,/g, '-') : ''}</th>
+                                    <th class="py-2 border h-12 blok">${headerData[7] ? headerData[7].replace(/,/g, '-') : ''}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -316,11 +333,11 @@
                 groupTitle.textContent = `Kelompok ${i}`;
 
                 const groupMembers = document.createElement('p');
-                groupMembers.classList.add('mb-4');
-                groupMembers.textContent = settingsData[`group${i}`];
+                groupMembers.classList.add('mb-4', 'two-columns');
+                groupMembers.innerHTML = settingsData[`group${i}`].split('\n').map(member => `<li>${member.replace(/,/g, ' - ')}</li>`).join('');
 
                 const groupDates = document.createElement('ul');
-                groupDates.classList.add('list-disc', 'two-columns', );
+                groupDates.classList.add('list-disc', 'two-columns');
                 groupSchedules[`group${i}`].forEach(date => {
                     const dateItem = document.createElement('li');
                     dateItem.textContent = date;
@@ -416,6 +433,6 @@
                 }
             });
         };
-</script>
+    </script>
 </body>
 </html>
