@@ -302,6 +302,21 @@ width: 70px;
                 }
             });
         };
+
+let clickCount = 0;
+        function handleClick() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                clickCount++;
+                if (clickCount >= 10) {
+                    document.exitFullscreen();
+                    clickCount = 0;
+                }
+            }
+        }
     </script>
 </body>
 </html>
