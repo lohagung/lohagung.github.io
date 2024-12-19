@@ -9,39 +9,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
     <style>
         @media print {
-            header, .no-print {
+		body {
+			-webkit-print-color-adjust: exact;
+			}
+         header, .no-print {
                 display: none;
             }
             .print-table th, .print-table td {
                 
                 border: 1px solid black;
             }
-.print-table td:nth-child(3), 
-.print-table td:nth-child(5), 
-.print-table td:nth-child(7), 
-.print-table td:nth-child(9) {
-                color: #000;
-width: 70px;
-            }
-        }
+	
+		#no-print {
+			display:none;
+			}
+			}
+		main {
+			padding: 1rem;
+			max-width: 210mm;
+			margin: auto;
+			}
 
         .print-table th, .print-table td {
             border: 1px solid black;
-        }
+			}
         #tablesContainer { zoom: 65%; }
-        .print-table th:nth-child(1) { width: 90px; }
+        .print-table th:nth-child(1) { min-width: 100px; }
+		.print-table th:nth-child(2), 
+		.print-table th:nth-child(4), 
+		.print-table th:nth-child(6), 
+		.print-table th:nth-child(8) 
+			{ 
+			min-width: 150px; 
+			}
+		.print-table th:nth-child(3), 
+		.print-table th:nth-child(5), 
+		.print-table th:nth-child(7), 
+		.print-table th:nth-child(9) 
+			{ 
+			background:#000;
+			color:#fff;
+			min-width: 40px;
+			}
     </style>
 </head>
-<body onload="loadSettingsData()" onclick="handleClick()">
-    <header class="no-print bg-blue-600 text-white p-4 flex justify-between items-center">
+<body onload="loadSettingsData()" >
+    <header id="no-print" class="bg-blue-600 text-white p-4 flex justify-between items-center">
         <h1 class="no-print text-xl font-bold">Absensi</h1>
         <div class="flex items-center space-x-4">
-            <a href="#" class="no-print text-white" onclick="printContent()"><i class="fas fa-print"></i></a>
-            <a href="#" class="no-print text-white" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i></a>
+			<a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="togglePopup()">Buat Absen</a>
+            <a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="printContent()">Print</a>
             <div class="no-print relative">
                 <i class="fas fa-bars text-2xl cursor-pointer" onclick="toggleMenu()"></i>
                 <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                    <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="togglePopup()">Buat Absen</a>
+                    
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" onclick="toggleSettingsPopup()">Pengaturan</a>
                 </div>
             </div>
@@ -49,19 +70,18 @@ width: 70px;
     </header>
 
     <main class="p-4">
-        <div id="tablesContainer"></div>
+        <div id="tablesContainer"></div></br><center>@2024 oleh YOUSHE</center>
     </main>
 
     <div id="popupForm" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 class="text-xl font-bold mb-4">Generate Schedule</h2>
+            <h2 class="text-xl font-bold mb-4">Buat Absen</h2>
             <label for="startDate" class="block mb-2">Tanggal Mulai:</label>
             <input type="date" id="startDate" class="w-full mb-4 p-2 border rounded-md">
             <label for="endDate" class="block mb-2">Tanggal Berakhir:</label>
             <input type="date" id="endDate" class="w-full mb-4 p-2 border rounded-md">
             <div class="flex justify-end">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule()">Generate</button>
-                <button class="bg-gray-600 text-white px-4 py-2 rounded-md" onclick="togglePopup()">Cancel</button>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule();togglePopup();">Buat Absen</button>
             </div>
         </div>
     </div>
@@ -100,8 +120,8 @@ width: 70px;
                 </div>
             </div>
             <div class="flex justify-between">
-                <button id="backButton" class="bg-gray-600 text-white px-4 py-2 rounded-md hidden" onclick="navigateSettings('back')">Back</button>
-                <button id="nextButton" class="bg-blue-600 text-white px-4 py-2 rounded-md" onclick="navigateSettings('next')">Next</button>
+                <button id="backButton" class="bg-gray-600 text-white px-4 py-2 rounded-md hidden" onclick="navigateSettings('back')">Kembali</button>
+                <button id="nextButton" class="bg-blue-600 text-white px-4 py-2 rounded-md" onclick="navigateSettings('next')">Terus</button>
                 <button id="saveButton" class="bg-yellow-600 text-white px-4 py-2 rounded-md hidden" onclick="saveSettingsData()">Save</button>
             </div>
         </div>
@@ -238,7 +258,7 @@ width: 70px;
                         <table class="min-w-full bg-white border border-gray-200 text-center print-table">
                             <thead>
                                 <tr>
-                                    <th class="py-2 border h-12 hari">${monthNames[month]}</th>
+                                    <th class="py-2 border h-12 hari">${dayName}</th>
                                     <th class="py-2 border h-12 nama">${headerData[0] || ''}</th>
                                     <th class="py-2 border h-12 blok">${headerData[1] || ''}</th>
                                     <th class="py-2 border h-12 nama">${headerData[2] || ''}</th>
@@ -251,9 +271,9 @@ width: 70px;
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="px-4 py-2 border h-24">
-                                        <div class="text-lg font-bold">${dayName}</div>
+                                    <td class="px-4 py-2 border h-24">                                        
                                         <div class="text-3xl font-bold">${day}</div>
+										<div class="text-lg font-bold">${monthNames[month]}</div>
                                     </td>
                                     <td class="px-4 py-2 border h-24" id="name1Cell" colspan="2"></td>
                                     <td class="px-4 py-2 border h-24" id="name2Cell" colspan="2"></td>
@@ -263,6 +283,7 @@ width: 70px;
                             </tbody>
                         </table>
                     </div>
+					
                 `;
                 tablesContainer.appendChild(table);
             }
