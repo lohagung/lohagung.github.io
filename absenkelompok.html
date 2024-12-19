@@ -21,6 +21,10 @@
             #no-print {
                 display: none;
             }
+            #scheduleContainer {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+			
         }
         main {
             padding: 1rem;
@@ -83,6 +87,9 @@
     </header>
 
     <main class="p-4">
+        <h2 class="text-center text-2xl font-bold mb-4">JADWAL RONDA</h2>
+        <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
+        <h2 class="text-center text-2xl font-bold mb-4">ABSEN RONDA</h2>
         <div id="tablesContainer"></div>
         <br>
         <center>@2024 oleh YOUSHE</center>
@@ -228,15 +235,25 @@
             const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
 
+            const scheduleContainer = document.getElementById('scheduleContainer');
+            scheduleContainer.innerHTML = '';
+
             const tablesContainer = document.getElementById('tablesContainer');
             tablesContainer.innerHTML = '';
 
             const settingsData = JSON.parse(localStorage.getItem('settingsData'));
+            const groupSchedules = {};
 
             for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
                 const day = date.getDate();
                 const dayName = dayNames[date.getDay()];
                 const groupIndex = (day - 1) % groupCount + 1;
+
+                if (!groupSchedules[`group${groupIndex}`]) {
+                    groupSchedules[`group${groupIndex}`] = [];
+                }
+
+                groupSchedules[`group${groupIndex}`].push(`${dayName}, ${day} ${monthNames[month]}`);
 
                 let headerData = ['', '', '', '', '', '', '', ''];
                 if (settingsData) {
@@ -279,8 +296,36 @@
                 tablesContainer.appendChild(table);
             }
 
+            for (let i = 1; i <= groupCount; i++) {
+                const groupDiv = document.createElement('div');
+                groupDiv.classList.add('bg-white', 'p-4', 'rounded-md', 'shadow-md');
+
+                const groupTitle = document.createElement('h2');
+                groupTitle.classList.add('text-xl', 'font-bold', 'mb-2');
+                groupTitle.textContent = `Kelompok ${i}`;
+
+                const groupMembers = document.createElement('p');
+                groupMembers.classList.add('mb-4');
+                groupMembers.textContent = settingsData[`group${i}`];
+
+                const groupDates = document.createElement('ul');
+                groupDates.classList.add('list-disc', 'pl-5');
+                groupSchedules[`group${i}`].forEach(date => {
+                    const dateItem = document.createElement('li');
+                    dateItem.textContent = date;
+                    groupDates.appendChild(dateItem);
+                });
+
+                groupDiv.appendChild(groupTitle);
+                groupDiv.appendChild(groupMembers);
+                groupDiv.appendChild(groupDates);
+
+                scheduleContainer.appendChild(groupDiv);
+            }
+
             // Simpan jadwal yang dihasilkan ke localStorage
-            localStorage.setItem('generatedSchedule', tablesContainer.innerHTML);
+            localStorage.setItem('generatedSchedule', scheduleContainer.innerHTML);
+            localStorage.setItem('generatedTables', tablesContainer.innerHTML);
         }
 
         // Fungsi untuk mencetak konten
@@ -290,8 +335,8 @@
 
         // Fungsi untuk mengunduh PDF dari konten
         function downloadPDF() {
-            const tablesContainer = document.getElementById('tablesContainer');
-            html2canvas(tablesContainer).then(canvas => {
+            const scheduleContainer = document.getElementById('scheduleContainer');
+            html2canvas(scheduleContainer).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
@@ -346,8 +391,12 @@
         window.onload = function() {
             loadSettingsData();
             const savedSchedule = localStorage.getItem('generatedSchedule');
+            const savedTables = localStorage.getItem('generatedTables');
             if (savedSchedule) {
-                document.getElementById('tablesContainer').innerHTML = savedSchedule;
+                document.getElementById('scheduleContainer').innerHTML = savedSchedule;
+            }
+            if (savedTables) {
+                document.getElementById('tablesContainer').innerHTML = savedTables;
             }
             document.addEventListener('click', function(event) {
                 const menu = document.getElementById('dropdownMenu');
@@ -356,22 +405,6 @@
                 }
             });
         };
-
-        // Fungsi untuk menangani klik untuk masuk atau keluar dari mode layar penuh
-        let clickCount = 0;
-        function handleClick() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                clickCount++;
-                if (clickCount >= 10) {
-                    document.exitFullscreen();
-                    clickCount = 0;
-                }
-            }
-        }
-    </script>
+</script>
 </body>
 </html>
