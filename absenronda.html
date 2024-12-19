@@ -23,11 +23,13 @@
 		#no-print {
 			display:none;
 			}
+
 			}
 		main {
 			padding: 1rem;
 			max-width: 210mm;
 			margin: auto;
+			overflow: scroll;
 			}
 
         .print-table th, .print-table td {
@@ -51,6 +53,13 @@
 			color:#fff;
 			min-width: 40px;
 			}
+		html {
+            overflow: scroll;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent; /* make scrollbar transparent */
+        }
     </style>
 </head>
 <body onload="loadSettingsData()" >
