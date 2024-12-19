@@ -24,13 +24,25 @@
             #scheduleContainer {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-			
+			.page-break  { 
+				display:block; 
+				page-break-before:always; 
+				}
         }
+		
         main {
             padding: 1rem;
             max-width: 210mm;
             margin: auto;
             overflow: scroll;
+        }
+		.two-columns {
+            column-count: 2; /* Mengatur jumlah kolom */
+            column-gap: 20px; /* Jarak antar kolom */
+        }
+        .list-disc {
+            list-style-type: disc; /* Tipe daftar */
+            padding-left: 20px; /* Menghilangkan padding default */
         }
         .print-table th, .print-table td {
             border: 1px solid black;
@@ -87,10 +99,9 @@
     </header>
 
     <main class="p-4">
-        <h2 class="text-center text-2xl font-bold mb-4">JADWAL RONDA</h2>
-        <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
-        <h2 class="text-center text-2xl font-bold mb-4">ABSEN RONDA</h2>
-        <div id="tablesContainer"></div>
+
+        <div id="scheduleContainer" class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8 page-break"></div>
+        <div id="tablesContainer" class="page-break"></div>
         <br>
         <center>@2024 oleh YOUSHE</center>
     </main>
@@ -309,7 +320,7 @@
                 groupMembers.textContent = settingsData[`group${i}`];
 
                 const groupDates = document.createElement('ul');
-                groupDates.classList.add('list-disc', 'pl-5');
+                groupDates.classList.add('list-disc', 'two-columns', );
                 groupSchedules[`group${i}`].forEach(date => {
                     const dateItem = document.createElement('li');
                     dateItem.textContent = date;
