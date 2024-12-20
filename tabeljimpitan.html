@@ -195,6 +195,7 @@
             <button onclick="backupSettings()" class="bg-green-500 text-white px-4 py-2 rounded ml-2">Backup</button>
             <input type="file" id="import-file" class="hidden" onchange="importSettings(event)">
             <label for="import-file" class="bg-yellow-500 text-white px-4 py-2 rounded ml-2 cursor-pointer">Import</label>
+	    <a href="/file/contoh_jimpitan.json" class="block bg-blue-500 text-white px-4 py-2 rounded hover:bg-gray-200" download="">Contoh Settingan</a>
         </div>
         <div id="table-container" class="hidden">
             <h2 id="table-title" class="text-xl font-bold mb-4"></h2>
@@ -209,7 +210,7 @@
                 <div>
                     <button onclick="window.print()" class="bg-gray-500 text-white px-4 py-2 rounded mr-2"><i class="fa fa-print"></i></button>
                     <button onclick="downloadPDF()" class="bg-gray-500 text-white px-4 py-2 rounded"><i class="fa fa-file-pdf"></i></button>
-				<a href="/file/contoh_jimpitan.json" class="block px-4 py-2 text-gray-800 hover:bg-gray-200" download="">Contoh Settingan</a>
+				
                 </div>
             </div>
         </div>
