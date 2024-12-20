@@ -29,7 +29,7 @@
                 page-break-before:always; 
             }
         }
-		
+		        #tablesContainer { overflow:scroll; }
 		.shadow-md {
     border: 1px solid #cfcfcf;
 }
@@ -96,11 +96,15 @@ p li {
         .gradient-header {
             background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d);
         }
+
     </style>
 </head>
 <body onload="loadSettingsData()">
     <header id="no-print" class="gradient-header bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 class="no-print text-xl font-bold">Absensi</h1>
+        <div class="flex items-center">
+            <img src="/logo.png" alt="Company logo with a simple design" class="h-8 w-8 mr-2">
+            <h1 class="no-print text-xl font-bold">Absensi</h1>
+        </div>
         <div class="flex items-center space-x-4">
             <a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="togglePopup()">Buat Absen</a>
             <a href="#" class="block px-4 py-2 text-white hover:bg-gray-200" onclick="printContent()">Print</a>
@@ -118,7 +122,7 @@ p li {
     </header>
 
     <main class="p-4">
-        <div id="scheduleContainer" class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-8 page-break"></div>
+        <div id="scheduleContainer" class="grid grid-cols-2 md:grid-cols-2 gap-4 page-break"></div>
         <div id="tablesContainer" class="page-break"></div>
         <br>
         <center>@2024 oleh YOUSHE</center>
@@ -132,7 +136,7 @@ p li {
             <label for="endDate" class="block mb-2">Tanggal Berakhir:</label>
             <input type="date" id="endDate" class="w-full mb-4 p-2 border rounded-md">
             <div class="flex justify-end">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="generateSchedule();togglePopup();">Buat Absen</button>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md mr-2" onclick="handleCreateSchedule()">Buat Absen</button>
             </div>
         </div>
     </div>
@@ -333,8 +337,8 @@ p li {
                 groupTitle.textContent = `Team ${i}`;
 
                 const groupMembers = document.createElement('p');
-                groupMembers.classList.add('mb-4', 'two-columns');
-                groupMembers.innerHTML = settingsData[`group${i}`].split('\n').map(member => `<li>${member.replace(/,/g, ' - ')}</li>`).join('');
+                groupMembers.classList.add('mb-4');
+                groupMembers.innerHTML = settingsData[`group${i}`].split('\n').map(member => `${member.replace(/,/g, ' ')}, `).join('');
 
                 const groupDates = document.createElement('ul');
                 groupDates.classList.add('list-disc', 'two-columns');
@@ -385,7 +389,8 @@ p li {
             }
 
             const blob = new Blob([settingsData], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+           
+const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'settings_backup.json';
@@ -413,6 +418,19 @@ p li {
                 }
             };
             reader.readAsText(file);
+        }
+
+        // Fungsi untuk menangani pembuatan jadwal
+        function handleCreateSchedule() {
+            const settingsData = JSON.parse(localStorage.getItem('settingsData'));
+            if (!settingsData || Object.keys(settingsData).length === 0 || Object.values(settingsData).some(value => !value)) {
+                alert('Pengaturan belum diisi lengkap. Silakan isi pengaturan terlebih dahulu.');
+                togglePopup();
+                toggleSettingsPopup();
+            } else {
+                generateSchedule();
+                togglePopup();
+            }
         }
 
         // Fungsi yang dijalankan saat halaman dimuat
