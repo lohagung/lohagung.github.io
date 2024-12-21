@@ -32,7 +32,6 @@
             #dataTable, #dataTable * {
                 visibility: visible;
                 -webkit-print-color-adjust: exact;
-				
             }
             footer, .draggable, .relative {
                 display: none;
@@ -76,7 +75,7 @@
     </header>
     <!-- Main Content -->
     <main class="flex-grow p-4">
-        <div id="initialView" class="flex flex-col items-center justify-center h-full">
+        <div id="initialView" class="flex flex-col items-center justify-center h-full hidden">
             <textarea id="dataInput" class="w-full h-64 p-4 border rounded-md" placeholder="Enter data in the format: Nama,Blok,Kurang,M1,M2,M3,M4\n"></textarea>
             <div class="flex space-x-4 mt-4">
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="generateTable()">Generate</button>
@@ -115,7 +114,6 @@
                     </tfoot>
                 </table>
             </div>
-            <button class="bg-red-500 text-white px-4 py-2 rounded-md mt-4" onclick="goBack()">Back</button>
         </div>
     </main>
     <!-- Footer -->
@@ -131,6 +129,10 @@
         <div class="flex flex-col items-center" onclick="printTable()">
             <i class="fas fa-print text-yellow-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Print</span>
+        </div>
+        <div class="flex flex-col items-center" onclick="goBack()">
+            <i class="fas fa-tools text-blue-600 text-2xl"></i>
+            <span class="text-gray-600 text-sm">Back</span>
         </div>
     </footer>
     <!-- Floating Plus Button -->
@@ -705,7 +707,6 @@
                 li.className = 'cursor-pointer hover:bg-gray-200 p-2 rounded flex justify-between items-center';
                 li.innerHTML = `
                     <span>${row.children[1].textContent}</span>
-                   
                     <span class="font-bold text-red-600">${formatCurrency(row.children[8].textContent)}</span>
                 `;
                 li.onclick = () => {
@@ -895,7 +896,15 @@
         }
 
         // Muat data tabel saat halaman dimuat
-        window.onload = loadTableData;
+        window.onload = function() {
+            loadTableData();
+            const tableData = JSON.parse(localStorage.getItem('tableData')) || [];
+            if (tableData.length > 0) {
+                previewTable();
+            } else {
+                document.getElementById('initialView').classList.remove('hidden');
+            }
+        };
 
         // Inisialisasi SortableJS untuk drag-and-drop
         new Sortable(document.getElementById('tableBody'), {
