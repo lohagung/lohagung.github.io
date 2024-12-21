@@ -33,7 +33,7 @@
                 visibility: visible;
                 -webkit-print-color-adjust: exact;
             }
-            footer, .draggable, .relative {
+            #footer, #draggable, #header {
                 display: none;
             }
             body {
@@ -50,7 +50,7 @@
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
+    <header id="header" class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
         <div class="flex items-center">
             <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="/logo.png" width="40"/>
             <span class="text-white font-bold ml-2">Denda Ronda</span>
@@ -117,7 +117,7 @@
         </div>
     </main>
     <!-- Footer -->
-    <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
+    <footer id="footer" class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
         <div class="flex flex-col items-center" onclick="exportTableToExcel()">
             <i class="fas fa-file-export text-green-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Export</span>
@@ -136,7 +136,7 @@
         </div>
     </footer>
     <!-- Floating Plus Button -->
-    <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" onclick="openAddData()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
+    <div id="draggable" class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" onclick="openAddData()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
         <i class="fas fa-plus text-lg"></i>
     </div>
     <!-- Settings Popup -->
