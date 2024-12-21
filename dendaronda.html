@@ -1,9 +1,9 @@
-<html lang="en">
+ <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Denda Ronda</title>
-    <link rel="icon" href="/logo.png" type="image/jpeg"/>
+    <link href="https://placehold.co/40x40" rel="icon" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
@@ -50,15 +50,15 @@
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <!-- Header -->
-    <header id="header" class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md">
+    <header class="bg-gradient-to-r from-orange-400 to-orange-300 p-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 shadow-md" id="header">
         <div class="flex items-center">
-            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="/logo.png" width="40"/>
+            <img alt="Logo of Admin Jimpitan, a circular logo with a placeholder design" class="h-10 w-10 rounded-full" height="40" src="https://storage.googleapis.com/a1aa/image/yV7VR6eV3k2yaiuEYkYUTIk5dgpXO0Jo3A5CdQALwAdOGjeTA.jpg" width="40"/>
             <span class="text-white font-bold ml-2">Denda Ronda</span>
         </div>
         <div class="relative">
             <div class="flex items-center space-x-4">
                 <i class="fas fa-search text-white cursor-pointer" onclick="openSearchPopup()"></i>
-                <a href="/denda-ronda.xlsx" download>
+                <a download="" href="/denda-ronda.xlsx">
                     <i class="fas fa-download text-white"></i>
                 </a>
                 <i class="fas fa-file-import text-white cursor-pointer" onclick="document.getElementById('fileInput').click()"></i>
@@ -69,23 +69,23 @@
                 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer" onclick="openSettings()">Setting</a>
                 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/bendahara.html">Bendahara</a>
                 <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/jimpitan.html">Jimpitan</a>
-                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/dendaronda.html">Denda Ronda</a>    
+                <a class="block px-4 py-2 text-gray-800 hover:bg-gray-200" href="/dendaronda.html">Denda Ronda</a>
             </div>
         </div>
     </header>
     <!-- Main Content -->
     <main class="flex-grow p-4">
-        <div id="initialView" class="flex flex-col items-center justify-center h-full hidden">
-            <textarea id="dataInput" class="w-full h-64 p-4 border rounded-md" placeholder="Enter data in the format: Nama,Blok,Kurang,M1,M2,M3,M4\n"></textarea>
+        <div class="flex flex-col items-center justify-center h-full hidden" id="initialView">
+            <textarea class="w-full h-64 p-4 border rounded-md" id="dataInput" placeholder="Enter data in the format: Nama,Blok,Kurang,M1,M2,M3,M4\n"></textarea>
             <div class="flex space-x-4 mt-4">
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-md" onclick="generateTable()">Generate</button>
                 <button class="bg-green-500 text-white px-4 py-2 rounded-md" onclick="backupData()">Backup</button>
-                <input type="file" id="backupInput" class="hidden" accept=".json" onchange="importBackup(event)"/>
+                <input accept=".json" class="hidden" id="backupInput" onchange="importBackup(event)" type="file"/>
                 <button class="bg-yellow-500 text-white px-4 py-2 rounded-md" onclick="document.getElementById('backupInput').click()">Import</button>
                 <button class="bg-purple-500 text-white px-4 py-2 rounded-md" onclick="previewTable()">Preview</button>
             </div>
         </div>
-        <div id="tableView" class="hidden">
+        <div class="hidden" id="tableView">
             <div class="overflow-x-auto">
                 <table class="min-w-full bg-white" id="dataTable">
                     <thead>
@@ -93,13 +93,13 @@
                             <th class="bg-purple-500 text-white py-2 px-4 border-b">No</th>
                             <th class="bg-purple-500 text-white py-2 px-4 border-b">Nama</th>
                             <th class="bg-purple-500 text-white py-2 px-4 border-b">Blok</th>
-                            <th class="bg-red-500 text-white py-2 px-4 border-b">Tunggakan</th>
-                            <th class="bg-green-500 text-white py-2 px-4 border-b">Ronda1</th>
-                            <th class="bg-green-500 text-white py-2 px-4 border-b">Ronda2</th>
-                            <th class="bg-green-500 text-white py-2 px-4 border-b">Ronda3</th>
-                            <th class="bg-green-500 text-white py-2 px-4 border-b">Ronda4</th>
-                            <th class="bg-red-500 text-white py-2 px-4 border-b">Jumlah</th>
-                            <th class="bg-yellow-500 text-white py-2 px-4 border-b cursor-pointer" onclick="openNotaPopup(this)">Bayar</th>
+                            <th class="bg-red-500 text-white py-2 px-4 border-b text-left">Tunggakan</th>
+                            <th class="bg-green-500 text-white py-2 px-4 border-b text-left">Ronda1</th>
+                            <th class="bg-green-500 text-white py-2 px-4 border-b text-left">Ronda2</th>
+                            <th class="bg-green-500 text-white py-2 px-4 border-b text-left">Ronda3</th>
+                            <th class="bg-green-500 text-white py-2 px-4 border-b text-left">Ronda4</th>
+                            <th class="bg-red-500 text-white py-2 px-4 border-b text-left">Jumlah</th>
+                            <th class="bg-yellow-500 text-white py-2 px-4 border-b cursor-pointer text-left" onclick="openNotaPopup(this)">Bayar</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -107,9 +107,9 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="8" class="py-2 px-4 border-b text-right font-bold">TOTAL</td>
-                            <td id="totalJumlah" class="py-2 px-4 border-b font-bold text-red-600"></td>
-                            <td id="totalBayar" class="py-2 px-4 border-b font-bold text-red-600"></td>
+                            <td class="py-2 px-4 border-b text-right font-bold" colspan="8">TOTAL</td>
+                            <td class="py-2 px-4 border-b font-bold text-red-600" id="totalJumlah"></td>
+                            <td class="py-2 px-4 border-b font-bold text-red-600" id="totalBayar"></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -117,7 +117,7 @@
         </div>
     </main>
     <!-- Footer -->
-    <footer id="footer" class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md">
+    <footer class="bg-white p-4 fixed bottom-0 w-full flex justify-around items-center shadow-md" id="footer">
         <div class="flex flex-col items-center" onclick="exportTableToExcel()">
             <i class="fas fa-file-export text-green-600 text-2xl"></i>
             <span class="text-gray-600 text-sm">Export</span>
@@ -136,20 +136,20 @@
         </div>
     </footer>
     <!-- Floating Plus Button -->
-    <div id="draggable" class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" onclick="openAddData()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
+    <div class="draggable bg-yellow-500 text-white h-12 w-12 flex items-center justify-center rounded-full shadow-lg" id="draggable" onclick="openAddData()" style="right: 10px; bottom: 50%; transform: translateY(50%);">
         <i class="fas fa-plus text-lg"></i>
     </div>
     <!-- Settings Popup -->
-    <div id="settingsPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="settingsPopup">
         <div class="bg-white rounded-lg p-6 w-80">
             <h2 class="text-xl font-bold mb-4">Settings</h2>
             <div class="mb-4">
-                <label for="harian" class="block text-gray-700">Harian</label>
-                <input type="text" id="harian" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="harian">Harian</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="harian" type="text"/>
             </div>
             <div class="mb-4">
-                <label for="bulanan" class="block text-gray-700">Bulanan</label>
-                <input type="text" id="bulanan" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="bulanan">Bulanan</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="bulanan" type="text"/>
             </div>
             <div class="flex justify-end space-x-4">
                 <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeSettings()">Batal</button>
@@ -158,33 +158,33 @@
         </div>
     </div>
     <!-- Edit Data Popup -->
-    <div id="editDataPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="editDataPopup">
         <div class="bg-white rounded-lg p-6 w-80">
             <h2 class="text-xl font-bold mb-4">Edit Data</h2>
             <div class="grid grid-cols-2 gap-4 mb-4">
-                <input type="text" id="editNama" class="w-full px-3 py-2 border rounded-md"/>
-                <input type="text" id="editBlok" class="w-full px-3 py-2 border rounded-md"/>
+                <input class="w-full px-3 py-2 border rounded-md" id="editNama" type="text"/>
+                <input class="w-full px-3 py-2 border rounded-md" id="editBlok" type="text"/>
             </div>
             <div class="mb-4">
-                <label for="editKurang" class="block text-gray-700">Kurang</label>
-                <input type="text" id="editKurang" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="editKurang">Kurang</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="editKurang" type="text"/>
             </div>
-            <label for="enableToggle" class="block text-gray-700 mr-2">Jenis Denda Ronda</label>
+            <label class="block text-gray-700 mr-2" for="enableToggle">Jenis Denda Ronda</label>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="enableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleInputs()"/>
-                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
-                <input type="checkbox" id="editM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM1" class="block text-gray-700 mr-2">&nbsp;M1</label>
-                <input type="checkbox" id="editM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM2" class="block text-gray-700 mr-2">&nbsp;M2</label>
-                <input type="checkbox" id="editM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM3" class="block text-gray-700 mr-2">&nbsp;M3</label>
-                <input type="checkbox" id="editM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="editM4" class="block text-gray-700 mr-2">&nbsp;M4</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" id="enableToggle" onchange="toggleInputs()" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="editM1">&nbsp;Bulanan</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="editM1" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="editM1">&nbsp;M1</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="editM2" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="editM2">&nbsp;M2</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="editM3" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="editM3">&nbsp;M3</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="editM4" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="editM4">&nbsp;M4</label>
             </div>
             <div class="mb-4">
-                <label for="editBayar" class="block text-gray-700">Bayar</label>
-                <input type="text" id="editBayar" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="editBayar">Bayar</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="editBayar" type="text"/>
             </div>
             <div class="flex justify-end space-x-4">
                 <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeEditData()">Batal</button>
@@ -194,44 +194,44 @@
         </div>
     </div>
     <!-- Add Data Popup -->
-    <div id="addDataPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="addDataPopup">
         <div class="bg-white rounded-lg p-6 w-80">
             <h2 class="text-xl font-bold mb-4">Tambah Data</h2>
             <div class="mb-4">
-                <label for="addNama" class="block text-gray-700">Nama</label>
-                <input type="text" id="addNama" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="addNama">Nama</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="addNama" type="text"/>
             </div>
             <div class="mb-4">
-                <label for="addBlok" class="block text-gray-700">Blok</label>
-                <input type="text" id="addBlok" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="addBlok">Blok</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="addBlok" type="text"/>
             </div>
             <div class="mb-4">
-                <label for="addKurang" class="block text-gray-700">Kurang</label>
-                <input type="text" id="addKurang" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="addKurang">Kurang</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="addKurang" type="text"/>
             </div>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addEnableToggle" class="form-checkbox h-5 w-5 text-blue-600" onchange="toggleAddInputs()"/>
-                <label for="addEnableToggle" class="block text-gray-700 mr-2">&nbsp;Bulanan</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" id="addEnableToggle" onchange="toggleAddInputs()" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="addEnableToggle">Bulanan</label>
             </div>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM1" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM1" class="block text-gray-700 mr-2">&nbsp;Minggu 1</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="addM1" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="addM1">Minggu 1</label>
             </div>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM2" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM2" class="block text-gray-700 mr-2">&nbsp;Minggu 2</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="addM2" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="addM2">Minggu 2</label>
             </div>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM3" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM3" class="block text-gray-700 mr-2">&nbsp;Minggu 3</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="addM3" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="addM3">Minggu 3</label>
             </div>
             <div class="mb-4 flex items-center">
-                <input type="checkbox" id="addM4" class="form-checkbox h-5 w-5 text-blue-600" disabled/>
-                <label for="addM4" class="block text-gray-700 mr-2">&nbsp;Minggu 4</label>
+                <input class="form-checkbox h-5 w-5 text-blue-600" disabled="" id="addM4" type="checkbox"/>
+                <label class="block text-gray-700 mr-2" for="addM4">Minggu 4</label>
             </div>
             <div class="mb-4">
-                <label for="addBayar" class="block text-gray-700">&nbsp;Bayar</label>
-                <input type="text" id="addBayar" class="w-full px-3 py-2 border rounded-md"/>
+                <label class="block text-gray-700" for="addBayar">Bayar</label>
+                <input class="w-full px-3 py-2 border rounded-md" id="addBayar" type="text"/>
             </div>
             <div class="flex justify-end space-x-4">
                 <button class="bg-gray-500 text-white px-4 py-2 rounded-md" onclick="closeAddData()">Batal</button>
@@ -240,25 +240,25 @@
         </div>
     </div>
     <!-- Search Popup -->
-    <div id="searchPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="searchPopup">
         <div class="bg-white rounded-lg p-6 w-80 relative">
             <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center" onclick="closeSearchPopup()">X</button>
             <h2 class="text-xl font-bold mb-4"></h2>
             <div class="mb-4">
-                <input type="text" id="searchNama" placeholder="Cari Nama Warga" class="w-full px-3 py-2 border rounded-md" oninput="searchUser()"/>
+                <input class="w-full px-3 py-2 border rounded-md" id="searchNama" oninput="searchUser()" placeholder="Cari Nama Warga" type="text"/>
             </div>
-            <ul id="searchResults" class="list-disc pl-5">
+            <ul class="list-disc pl-5" id="searchResults">
                 <!-- Search results will be dynamically inserted here -->
             </ul>
         </div>
     </div>
     <!-- Nota Popup -->
-    <div id="notaPopup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden" id="notaPopup">
         <div class="bg-white rounded-lg p-6 w-80">
             <div class="flex justify-end space-x-4">
-                <button class="bg-red-500 text-white px-4 py-2 nota" onclick="closeNotaPopup()">X</button>
+ <button class="bg-red-500 text-white px-4 py-2 nota" onclick="closeNotaPopup()">X</button>
             </div>
-            <h2 id="notaTitle" class="text-xl font-bold mb-4">NOTA</h2>
+            <h2 class="text-xl font-bold mb-4" id="notaTitle">NOTA</h2>
             <div class="mb-4">
                 <div class="flex justify-between">
                     <span>Minggu 1:</span>
@@ -424,7 +424,7 @@
             const m4 = parseFloat(cells[7].textContent) || 0;
             const bayar = parseFloat(cells[9].textContent) || 0;
             const enable = document.getElementById('enableToggle').checked ? parseFloat(bulananSetting) : 0;
-            cells[8].textContent = kurang + m1 + m2 + m3 + m4 + enable - bayar;
+            cells[8].textContent = formatCurrency(kurang + m1 + m2 + m3 + m4 + enable - bayar);
 
             // Simpan data ke localStorage
             saveTableData();
@@ -496,45 +496,45 @@
             tr.appendChild(tdBlok);
 
             const tdKurang = document.createElement('td');
-            tdKurang.className = 'py-2 px-4 border-b';
-            tdKurang.textContent = document.getElementById('addKurang').value;
+            tdKurang.className = 'py-2 px-4 border-b text-left';
+            tdKurang.textContent = formatCurrency(document.getElementById('addKurang').value);
             tr.appendChild(tdKurang);
 
             const tdM1 = document.createElement('td');
-            tdM1.className = 'py-2 px-4 border-b';
-            tdM1.textContent = document.getElementById('addM1').checked ? harianSetting : 0;
+            tdM1.className = 'py-2 px-4 border-b text-left';
+            tdM1.textContent = formatCurrency(document.getElementById('addM1').checked ? harianSetting : 0);
             tr.appendChild(tdM1);
 
             const tdM2 = document.createElement('td');
-            tdM2.className = 'py-2 px-4 border-b';
-            tdM2.textContent = document.getElementById('addM2').checked ? harianSetting : 0;
+            tdM2.className = 'py-2 px-4 border-b text-left';
+            tdM2.textContent = formatCurrency(document.getElementById('addM2').checked ? harianSetting : 0);
             tr.appendChild(tdM2);
 
             const tdM3 = document.createElement('td');
-            tdM3.className = 'py-2 px-4 border-b';
-            tdM3.textContent = document.getElementById('addM3').checked ? harianSetting : 0;
+            tdM3.className = 'py-2 px-4 border-b text-left';
+            tdM3.textContent = formatCurrency(document.getElementById('addM3').checked ? harianSetting : 0);
             tr.appendChild(tdM3);
 
             const tdM4 = document.createElement('td');
-            tdM4.className = 'py-2 px-4 border-b';
-            tdM4.textContent = document.getElementById('addM4').checked ? harianSetting : 0;
+            tdM4.className = 'py-2 px-4 border-b text-left';
+            tdM4.textContent = formatCurrency(document.getElementById('addM4').checked ? harianSetting : 0);
             tr.appendChild(tdM4);
 
             const tdJumlah = document.createElement('td');
-            tdJumlah.className = 'py-2 px-4 border-b';
-            const kurang = parseFloat(tdKurang.textContent) || 0;
-            const m1 = parseFloat(tdM1.textContent) || 0;
-            const m2 = parseFloat(tdM2.textContent) || 0;
-            const m3 = parseFloat(tdM3.textContent) || 0;
-            const m4 = parseFloat(tdM4.textContent) || 0;
-            const bayar = parseFloat(document.getElementById('addBayar').value) || 0;
+            tdJumlah.className = 'py-2 px-4 border-b text-left';
+            const kurang = parseFloat(tdKurang.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+            const m1 = parseFloat(tdM1.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+            const m2 = parseFloat(tdM2.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+            const m3 = parseFloat(tdM3.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+            const m4 = parseFloat(tdM4.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+            const bayar = parseFloat(document.getElementById('addBayar').value.replace(/[^0-9.-]+/g,"")) || 0;
             const enable = document.getElementById('addEnableToggle').checked ? parseFloat(bulananSetting) : 0;
-            tdJumlah.textContent = kurang + m1 + m2 + m3 + m4 + enable - bayar;
+            tdJumlah.textContent = formatCurrency(kurang + m1 + m2 + m3 + m4 + enable - bayar);
             tr.appendChild(tdJumlah);
 
             const tdBayar = document.createElement('td');
-            tdBayar.className = 'py-2 px-4 border-b cursor-pointer';
-            tdBayar.textContent = document.getElementById('addBayar').value;
+            tdBayar.className = 'py-2 px-4 border-b cursor-pointer text-left';
+            tdBayar.textContent = formatCurrency(document.getElementById('addBayar').value);
             tdBayar.onclick = () => openNotaPopup(tdBayar);
             tr.appendChild(tdBayar);
 
@@ -585,6 +585,10 @@
                     if (cellIndex === 9) {
                         td.classList.add('cursor-pointer');
                         td.onclick = () => openNotaPopup(td);
+                    }
+                    if (cellIndex >= 3 && cellIndex <= 9) {
+                        td.classList.add('text-left');
+                        td.textContent = formatCurrency(cell.replace(/[^0-9.-]+/g,""));
                     }
                     tr.appendChild(td);
                 });
@@ -670,7 +674,7 @@
         }
 
         // Fungsi untuk mengaktifkan mode layar penuh
-        function toggleFullScreen() {
+ function toggleFullScreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
             } else {
@@ -707,7 +711,7 @@
                 li.className = 'cursor-pointer hover:bg-gray-200 p-2 rounded flex justify-between items-center';
                 li.innerHTML = `
                     <span>${row.children[1].textContent}</span>
-                    <span class="font-bold text-red-600">${formatCurrency(row.children[8].textContent)}</span>
+                    <span class="font-bold text-red-600">${formatCurrency(row.children[8].textContent.replace(/[^0-9.-]+/g,""))}</span>
                 `;
                 li.onclick = () => {
                     openEditData(row);
@@ -717,9 +721,9 @@
             });
         }
 
-        // Fungsi untuk memformat angka menjadi mata uang Indonesia
+        // Fungsi untuk memformat angka menjadi mata uang Indonesia tanpa ,00
         function formatCurrency(value) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
         }
 
         // Fungsi untuk memperbarui total jumlah dan bayar
@@ -730,8 +734,8 @@
             let totalBayar = 0;
 
             rows.forEach(row => {
-                totalJumlah += parseFloat(row.children[8].textContent) || 0;
-                totalBayar += parseFloat(row.children[9].textContent) || 0;
+                totalJumlah += parseFloat(row.children[8].textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                totalBayar += parseFloat(row.children[9].textContent.replace(/[^0-9.-]+/g,"")) || 0;
             });
 
             document.getElementById('totalJumlah').textContent = formatCurrency(totalJumlah);
@@ -744,12 +748,12 @@
             const cells = row.children;
 
             document.getElementById('notaTitle').textContent = `Rincian ${cells[1].textContent}`;
-            document.getElementById('notaM1').textContent = formatCurrency(cells[4].textContent);
-            document.getElementById('notaM2').textContent = formatCurrency(cells[5].textContent);
-            document.getElementById('notaM3').textContent = formatCurrency(cells[6].textContent);
-            document.getElementById('notaM4').textContent = formatCurrency(cells[7].textContent);
-            document.getElementById('notaKurang').textContent = formatCurrency(cells[3].textContent);
-            document.getElementById('notaJumlah').textContent = formatCurrency(cells[8].textContent);
+            document.getElementById('notaM1').textContent = formatCurrency(cells[4].textContent.replace(/[^0-9.-]+/g,""));
+            document.getElementById('notaM2').textContent = formatCurrency(cells[5].textContent.replace(/[^0-9.-]+/g,""));
+            document.getElementById('notaM3').textContent = formatCurrency(cells[6].textContent.replace(/[^0-9.-]+/g,""));
+            document.getElementById('notaM4').textContent = formatCurrency(cells[7].textContent.replace(/[^0-9.-]+/g,""));
+            document.getElementById('notaKurang').textContent = formatCurrency(cells[3].textContent.replace(/[^0-9.-]+/g,""));
+            document.getElementById('notaJumlah').textContent = formatCurrency(cells[8].textContent.replace(/[^0-9.-]+/g,""));
 
             const popup = document.getElementById('notaPopup');
             popup.classList.remove('hidden');
@@ -801,43 +805,43 @@
                 tr.appendChild(tdBlok);
 
                 const tdKurang = document.createElement('td');
-                tdKurang.className = 'py-2 px-4 border-b';
-                tdKurang.textContent = columns[2];
+                tdKurang.className = 'py-2 px-4 border-b text-left';
+                tdKurang.textContent = formatCurrency(columns[2]);
                 tr.appendChild(tdKurang);
 
                 const tdM1 = document.createElement('td');
-                tdM1.className = 'py-2 px-4 border-b';
-                tdM1.textContent = columns[3];
+                tdM1.className = 'py-2 px-4 border-b text-left';
+                tdM1.textContent = formatCurrency(columns[3]);
                 tr.appendChild(tdM1);
 
                 const tdM2 = document.createElement('td');
-                tdM2.className = 'py-2 px-4 border-b';
-                tdM2.textContent = columns[4];
+                tdM2.className = 'py-2 px-4 border-b text-left';
+                tdM2.textContent = formatCurrency(columns[4]);
                 tr.appendChild(tdM2);
 
                 const tdM3 = document.createElement('td');
-                tdM3.className = 'py-2 px-4 border-b';
-                tdM3.textContent = columns[5];
+                tdM3.className = 'py-2 px-4 border-b text-left';
+                tdM3.textContent = formatCurrency(columns[5]);
                 tr.appendChild(tdM3);
 
                 const tdM4 = document.createElement('td');
-                tdM4.className = 'py-2 px-4 border-b';
-                tdM4.textContent = columns[6];
+                tdM4.className = 'py-2 px-4 border-b text-left';
+                tdM4.textContent = formatCurrency(columns[6]);
                 tr.appendChild(tdM4);
 
                 const tdJumlah = document.createElement('td');
-                tdJumlah.className = 'py-2 px-4 border-b';
-                const kurang = parseFloat(tdKurang.textContent) || 0;
-                const m1 = parseFloat(tdM1.textContent) || 0;
-                const m2 = parseFloat(tdM2.textContent) || 0;
-                const m3 = parseFloat(tdM3.textContent) || 0;
-                const m4 = parseFloat(tdM4.textContent) || 0;
-                tdJumlah.textContent = kurang + m1 + m2 + m3 + m4;
+                tdJumlah.className = 'py-2 px-4 border-b text-left';
+                const kurang = parseFloat(tdKurang.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                const m1 = parseFloat(tdM1.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                const m2 = parseFloat(tdM2.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                const m3 = parseFloat(tdM3.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                const m4 = parseFloat(tdM4.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                tdJumlah.textContent = formatCurrency(kurang + m1 + m2 + m3 + m4);
                 tr.appendChild(tdJumlah);
 
                 const tdBayar = document.createElement('td');
-                tdBayar.className = 'py-2 px-4 border-b cursor-pointer';
-                tdBayar.textContent = 0;
+                tdBayar.className = 'py-2 px-4 border-b cursor-pointer text-left';
+                tdBayar.textContent = formatCurrency(0);
                 tdBayar.onclick = () => openNotaPopup(tdBayar);
                 tr.appendChild(tdBayar);
 
