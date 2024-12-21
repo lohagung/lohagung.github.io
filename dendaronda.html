@@ -29,6 +29,11 @@
             margin-bottom: 90px;
         }
         @media print {
+            #table-container, #table-container * {
+                visibility: visible;
+                -webkit-print-color-adjust: exact;
+				
+            }
             footer, .draggable, .relative {
                 display: none;
             }
