@@ -1,9 +1,9 @@
 <html>
 <head>
-    <title>Denda Ronda - Keamanan</title>
+    <title>Data Tunggakan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" href="/logo.png" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/logo.png" type="image/jpeg"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
 </head>
 <body class="bg-gray-100 p-6">
@@ -98,23 +98,31 @@
                 const container = document.getElementById('posts-container');
                 container.innerHTML = '';
                 data.forEach((item, index) => {
-                    const totalAmount = parseInt(item.Tunggakan) + parseInt(item.Ronda1) + parseInt(item.Ronda2) + parseInt(item.Ronda3) + parseInt(item.Ronda4);
+                    const tunggakan = isNaN(parseInt(item.Tunggakan)) ? 0 : parseInt(item.Tunggakan);
+                    const ronda1 = isNaN(parseInt(item.Ronda1)) ? 0 : parseInt(item.Ronda1);
+                    const ronda2 = isNaN(parseInt(item.Ronda2)) ? 0 : parseInt(item.Ronda2);
+                    const ronda3 = isNaN(parseInt(item.Ronda3)) ? 0 : parseInt(item.Ronda3);
+                    const ronda4 = isNaN(parseInt(item.Ronda4)) ? 0 : parseInt(item.Ronda4);
+                    const bayar = isNaN(parseInt(item.Bayar)) ? 0 : parseInt(item.Bayar);
+                    const totalAmount = tunggakan + ronda1 + ronda2 + ronda3 + ronda4;
+                    const jumlah = isNaN(parseInt(item.Jumlah)) ? 0 : parseInt(item.Jumlah);
+
                     const post = document.createElement('div');
                     post.className = 'bg-white p-4 rounded shadow-md';
                     post.innerHTML = `
                         <div class="flex justify-between items-center mb-2">
                             <h2 class="text-xl font-bold">${item.Nama} ${item.Blok}</h2>
-                            <h3 class="text-lg font-semibold text-red-500">Rp ${parseInt(item.Jumlah).toLocaleString('id-ID')}</h3>
+                            <h3 class="text-lg font-semibold text-red-500">Rp ${jumlah.toLocaleString('id-ID')}</h3>
                         </div>
                         <div class="border-t border-gray-200 pt-2">
-                            <p class="flex justify-between"><strong>Tunggakan</strong> <span>Rp ${parseInt(item.Tunggakan).toLocaleString('id-ID')}</span></p>
-                            <p class="flex justify-between"><strong>Ronda1</strong> <span>Rp ${parseInt(item.Ronda1).toLocaleString('id-ID')}</span></p>
-                            <p class="flex justify-between"><strong>Ronda2</strong> <span>Rp ${parseInt(item.Ronda2).toLocaleString('id-ID')}</span></p>
-                            <p class="flex justify-between"><strong>Ronda3</strong> <span>Rp ${parseInt(item.Ronda3).toLocaleString('id-ID')}</span></p>
-                            <p class="flex justify-between"><strong>Ronda4</strong> <span>Rp ${parseInt(item.Ronda4).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Tunggakan</strong> <span>Rp ${tunggakan.toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda1</strong> <span>Rp ${ronda1.toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda2</strong> <span>Rp ${ronda2.toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda3</strong> <span>Rp ${ronda3.toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda4</strong> <span>Rp ${ronda4.toLocaleString('id-ID')}</span></p>
                             <hr class="my-2">
                             <p class="flex justify-between"><strong>Jumlah</strong> <span>Rp ${totalAmount.toLocaleString('id-ID')}</span></p>
-                            <p class="flex justify-between"><strong>Bayar</strong> <span>Rp ${parseInt(item.Bayar).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Bayar</strong> <span>Rp ${bayar.toLocaleString('id-ID')}</span></p>
                         </div>
                     `;
                     container.appendChild(post);
