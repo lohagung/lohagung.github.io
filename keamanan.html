@@ -1,0 +1,147 @@
+<html>
+<head>
+    <title>Data Tunggakan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="bg-teal-600 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0">
+        <div class="flex items-center">
+            <i id="menu-icon" class="fas fa-home text-white text-xl mr-4 cursor-pointer" onclick="goHome()"></i>
+            <span id="header-title" class="text-white text-lg font-semibold">Denda Ronda</span>
+        </div>
+        <div class="flex items-center">
+            <i class="fas fa-save text-white text-xl mr-4"></i>
+            <i class="fas fa-sync-alt text-white text-xl"></i>
+        </div>
+    </div>
+    <div id="main-container" class="container mx-auto mt-20">
+        <div class="mb-4">
+            <input type="text" id="search-input" class="w-full p-2 border border-gray-300 rounded" placeholder="Cari berdasarkan nama atau blok...">
+        </div>
+        <div id="list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- List items will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <div id="detail-container" class="container mx-auto mt-20 hidden">
+        <div id="posts-container" class="grid grid-cols-1 gap-4">
+            <!-- Posts will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allData = [];
+
+            fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
+                .then(response => response.json())
+                .then(data => {
+                    allData = data;
+                    renderList(data);
+                    checkUrlForDetail();
+                })
+                .catch(error => console.error('Error fetching data:', error));
+
+            document.getElementById('search-input').addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const filteredData = allData.filter(item => 
+                    item.Nama.toLowerCase().includes(query) || 
+                    item.Blok.toLowerCase().includes(query)
+                );
+                renderList(filteredData);
+            });
+
+            function renderList(data) {
+                const container = document.getElementById('list-container');
+                container.innerHTML = '';
+                data.forEach((item, index) => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'bg-white p-4 rounded shadow-md flex justify-between items-center';
+                    listItem.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-user-circle text-gray-500 text-3xl mr-4"></i>
+                            <div>
+                                <h2 class="text-xl font-bold">${item.Nama}</h2>
+                                <p class="text-gray-600">${item.Blok}</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-500 text-xl cursor-pointer" onclick="showDetail('${item.Nama}', '${item.Blok}')"></i>
+                    `;
+                    container.appendChild(listItem);
+                });
+            }
+
+            window.showDetail = function(name, block) {
+                const filteredData = allData.filter(item => item.Nama === name && item.Blok === block);
+                renderPosts(filteredData);
+                document.getElementById('main-container').classList.add('hidden');
+                document.getElementById('detail-container').classList.remove('hidden');
+                document.getElementById('menu-icon').classList.replace('fa-home', 'fa-arrow-left');
+                document.getElementById('header-title').textContent = 'Rincian Denda';
+                history.pushState(null, null, `/${block.toLowerCase()}`);
+            }
+
+            window.goHome = function() {
+                document.getElementById('main-container').classList.remove('hidden');
+                document.getElementById('detail-container').classList.add('hidden');
+                document.getElementById('menu-icon').classList.replace('fa-arrow-left', 'fa-home');
+                document.getElementById('header-title').textContent = 'Denda Ronda';
+                history.pushState(null, null, '/');
+            }
+
+            function renderPosts(data) {
+                const container = document.getElementById('posts-container');
+                container.innerHTML = '';
+                data.forEach((item, index) => {
+                    const totalAmount = parseInt(item.Tunggakan) + parseInt(item.Ronda1) + parseInt(item.Ronda2) + parseInt(item.Ronda3) + parseInt(item.Ronda4);
+                    const post = document.createElement('div');
+                    post.className = 'bg-white p-4 rounded shadow-md';
+                    post.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-xl font-bold">${item.Nama} ${item.Blok}</h2>
+                            <h3 class="text-lg font-semibold text-red-500">Rp ${parseInt(item.Jumlah).toLocaleString('id-ID')}</h3>
+                        </div>
+                        <div class="border-t border-gray-200 pt-2">
+                            <p class="flex justify-between"><strong>Tunggakan</strong> <span>Rp ${parseInt(item.Tunggakan).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda1</strong> <span>Rp ${parseInt(item.Ronda1).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda2</strong> <span>Rp ${parseInt(item.Ronda2).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda3</strong> <span>Rp ${parseInt(item.Ronda3).toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Ronda4</strong> <span>Rp ${parseInt(item.Ronda4).toLocaleString('id-ID')}</span></p>
+                            <hr class="my-2">
+                            <p class="flex justify-between"><strong>Jumlah</strong> <span>Rp ${totalAmount.toLocaleString('id-ID')}</span></p>
+                            <p class="flex justify-between"><strong>Bayar</strong> <span>Rp ${parseInt(item.Bayar).toLocaleString('id-ID')}</span></p>
+                        </div>
+                    `;
+                    container.appendChild(post);
+                });
+            }
+
+            function checkUrlForDetail() {
+                const path = window.location.pathname.substring(1).toLowerCase();
+                if (path) {
+                    fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
+                        .then(response => response.json())
+                        .then(data => {
+                            allData = data;
+                            const filteredData = allData.filter(item => item.Blok.toLowerCase() === path);
+                            if (filteredData.length > 0) {
+                                renderPosts(filteredData);
+                                document.getElementById('main-container').classList.add('hidden');
+                                document.getElementById('detail-container').classList.remove('hidden');
+                                document.getElementById('menu-icon').classList.replace('fa-home', 'fa-arrow-left');
+                                document.getElementById('header-title').textContent = 'Rincian Denda';
+                            }
+                        })
+                        .catch(error => console.error('Error fetching data:', error));
+                }
+            }
+
+            window.addEventListener('popstate', function() {
+                checkUrlForDetail();
+            });
+        });
+    </script>
+</body>
+</html>
