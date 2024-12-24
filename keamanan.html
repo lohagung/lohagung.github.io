@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Data Tunggakan</title>
+    <title>Denda Ronda - Keamanan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
@@ -80,7 +80,9 @@
                 document.getElementById('detail-container').classList.remove('hidden');
                 document.getElementById('menu-icon').classList.replace('fa-home', 'fa-arrow-left');
                 document.getElementById('header-title').textContent = 'Rincian Denda';
-                history.pushState(null, null, `/${block.toLowerCase()}`);
+                const sanitizedBlock = block.toLowerCase().replace(/[\s.]/g, '');
+                const sanitizedName = name.toLowerCase().replace(/[\s.]/g, '');
+                history.pushState(null, null, `${window.location.pathname}?nama=${sanitizedName}&blok=${sanitizedBlock}`);
             }
 
             window.goHome = function() {
@@ -88,7 +90,7 @@
                 document.getElementById('detail-container').classList.add('hidden');
                 document.getElementById('menu-icon').classList.replace('fa-arrow-left', 'fa-home');
                 document.getElementById('header-title').textContent = 'Denda Ronda';
-                history.pushState(null, null, '/');
+                history.pushState(null, null, window.location.pathname);
             }
 
             function renderPosts(data) {
@@ -119,13 +121,18 @@
             }
 
             function checkUrlForDetail() {
-                const path = window.location.pathname.substring(1).toLowerCase();
-                if (path) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const name = urlParams.get('nama');
+                const block = urlParams.get('blok');
+                if (name && block) {
                     fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
                         .then(response => response.json())
                         .then(data => {
                             allData = data;
-                            const filteredData = allData.filter(item => item.Blok.toLowerCase() === path);
+                            const filteredData = allData.filter(item => 
+                                item.Nama.toLowerCase().replace(/[\s.]/g, '') === name && 
+                                item.Blok.toLowerCase().replace(/[\s.]/g, '') === block
+                            );
                             if (filteredData.length > 0) {
                                 renderPosts(filteredData);
                                 document.getElementById('main-container').classList.add('hidden');
