@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Denda Ronda - Keamanan</title>
+    <title>Denda Ronda</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="/logo.png" type="image/jpeg"/>
@@ -62,7 +62,7 @@
                     listItem.className = 'bg-white p-4 rounded shadow-md flex justify-between items-center';
                     listItem.innerHTML = `
                         <div class="flex items-center">
-                            ${item.profil ? `<img src="/file/${item.profil}" alt="Profile picture of ${item.Nama}" class="w-12 h-12 rounded-full mr-4">` : `<i class="fas fa-user-circle text-gray-500 text-3xl mr-4"></i>`}
+                            ${item.profil ? `<img src="https://placehold.co/50x50" alt="Profile picture of ${item.Nama}" class="w-12 h-12 rounded-full mr-4">` : `<i class="fas fa-user-circle text-gray-500 text-3xl mr-4"></i>`}
                             <div>
                                 <h2 class="text-xl font-bold">${item.Nama}</h2>
                                 <p class="text-gray-600">Rumah Blok ${item.Blok}</p>
@@ -81,6 +81,7 @@
                 document.getElementById('detail-container').classList.remove('hidden');
                 document.getElementById('menu-icon').classList.replace('fa-home', 'fa-arrow-left');
                 document.getElementById('header-title').textContent = 'Rincian Denda';
+                document.title = `Tagihan Denda Ronda (${name} ${block})`;
                 const sanitizedBlock = block.toLowerCase().replace(/[\s.]/g, '');
                 const sanitizedName = name.toLowerCase().replace(/[\s.]/g, '');
                 history.pushState(null, null, `${window.location.pathname}?nama=${sanitizedName}&blok=${sanitizedBlock}`);
@@ -91,6 +92,7 @@
                 document.getElementById('detail-container').classList.add('hidden');
                 document.getElementById('menu-icon').classList.replace('fa-arrow-left', 'fa-home');
                 document.getElementById('header-title').textContent = 'Denda Ronda';
+                document.title = 'Denda Ronda';
                 history.pushState(null, null, window.location.pathname);
             }
 
@@ -110,6 +112,9 @@
                     const post = document.createElement('div');
                     post.className = 'bg-white p-4 rounded shadow-md';
                     post.innerHTML = `
+                        <div class="flex justify-center mb-4">
+                            ${item.profil ? `<img src="https://placehold.co/100x100" alt="Profile picture of ${item.Nama}" class="w-24 h-24 rounded-full">` : `<i class="fas fa-user-circle text-gray-500 text-6xl"></i>`}
+                        </div>
                         <div class="flex justify-between items-center mb-2">
                             <h2 class="text-xl font-bold">${item.Nama} ${item.Blok}</h2>
                             <h3 class="text-lg font-semibold text-red-500">Rp ${jumlah.toLocaleString('id-ID')}</h3>
@@ -123,6 +128,11 @@
                             <hr class="my-2">
                             <p class="flex justify-between"><strong>Jumlah</strong> <span>Rp ${totalAmount.toLocaleString('id-ID')}</span></p>
                             <p class="flex justify-between"><strong>Bayar</strong> <span>Rp ${bayar.toLocaleString('id-ID')}</span></p>
+                        </div>
+                        <div class="mt-4 flex justify-center">
+                            <a href="https://wa.me/?text=Tagihan%20Denda%20Ronda%20(${item.Nama}%20${item.Blok})%20-%20Rp%20${jumlah.toLocaleString('id-ID')}" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-full flex items-center">
+                                <i class="fab fa-whatsapp mr-2"></i> Bagikan ke WhatsApp
+                            </a>
                         </div>
                     `;
                     container.appendChild(post);
@@ -148,6 +158,7 @@
                                 document.getElementById('detail-container').classList.remove('hidden');
                                 document.getElementById('menu-icon').classList.replace('fa-home', 'fa-arrow-left');
                                 document.getElementById('header-title').textContent = 'Rincian Denda';
+                                document.title = `Tagihan Denda Ronda (${filteredData[0].Nama} ${filteredData[0].Blok})`;
                             }
                         })
                         .catch(error => console.error('Error fetching data:', error));
