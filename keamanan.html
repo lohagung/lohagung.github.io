@@ -113,7 +113,7 @@
                     post.className = 'bg-white p-4 rounded shadow-md';
                     post.innerHTML = `
                         <div class="flex justify-center mb-4">
-                            ${item.profil ? `<img src="https://placehold.co/100x100" alt="Profile picture of ${item.Nama}" class="w-24 h-24 rounded-full">` : `<i class="fas fa-user-circle text-gray-500 text-6xl"></i>`}
+                            ${item.profil ? `<img src="/file/${item.profil}" alt="Profile picture of ${item.Nama}" class="w-24 h-24 rounded-full">` : `<img src="https://placehold.co/100x100" alt="Profile picture of ${item.Nama}" class="w-24 h-24 rounded-full">`}
                         </div>
                         <div class="flex justify-between items-center mb-2">
                             <h2 class="text-xl font-bold">${item.Nama} ${item.Blok}</h2>
