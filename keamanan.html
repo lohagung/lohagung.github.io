@@ -36,7 +36,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             let allData = [];
 
-            fetch('https://api.sheety.co/84c094ad2d3592e949cb7670d1ebd55e/dendaRonda/2025')
+            fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
                 .then(response => response.json())
                 .then(data => {
                     allData = data;
@@ -144,7 +144,7 @@
                 const name = urlParams.get('nama');
                 const block = urlParams.get('blok');
                 if (name && block) {
-                    fetch('https://api.sheety.co/84c094ad2d3592e949cb7670d1ebd55e/dendaRonda/2025')
+                    fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
                         .then(response => response.json())
                         .then(data => {
                             allData = data;
