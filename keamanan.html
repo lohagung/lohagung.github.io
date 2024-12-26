@@ -36,7 +36,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             let allData = [];
 
-            fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
+            fetch('https://sheets.googleapis.com/v4/spreadsheets/1QU511f8t8u4LY8Hb0dUnuPhpUM6GfW0tj_pjvpchT4g/values/2025?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4')
                 .then(response => response.json())
                 .then(data => {
                     allData = data;
@@ -144,7 +144,7 @@
                 const name = urlParams.get('nama');
                 const block = urlParams.get('blok');
                 if (name && block) {
-                    fetch('https://api.sheetbest.com/sheets/d8067d73-3d3e-4626-99ab-98af2d21efdd')
+                    fetch('https://sheets.googleapis.com/v4/spreadsheets/1QU511f8t8u4LY8Hb0dUnuPhpUM6GfW0tj_pjvpchT4g/values/2025?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4')
                         .then(response => response.json())
                         .then(data => {
                             allData = data;
