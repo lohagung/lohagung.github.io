@@ -147,7 +147,15 @@
                     } else { // Center align other columns
                         td.classList.add('text-center');
                     }
-                    td.textContent = cell;
+
+                    if (cellIndex === 8 && !cell.trim()) { // If "Bulanan" is empty
+                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                    } else if (cellIndex >= 4 && cellIndex <= 7 && row[8].trim()) { // If "Bulanan" is not empty
+                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                    } else {
+                        td.textContent = cell;
+                    }
+
                     tr.appendChild(td);
                 });
                 tableBody.appendChild(tr);
