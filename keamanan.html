@@ -12,7 +12,6 @@
         }
         table {
             -webkit-print-color-adjust: exact;
-            border: 1px solid #000;
         }
         th, td {
             white-space: nowrap;
@@ -22,6 +21,12 @@
         }
         table tr:hover {
             background-color: #fbbf24;
+        }
+        *, ::after, ::before {
+            box-sizing: 0;
+            border-width: 1;
+            border-style: solid;
+            border-color: 0;
         }
     </style>
 </head>
