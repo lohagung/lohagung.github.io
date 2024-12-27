@@ -12,9 +12,11 @@
         }
         table {
             -webkit-print-color-adjust: exact;
+            border-collapse: collapse;
         }
         th, td {
             white-space: nowrap;
+            border: 1px solid gray;
         }
         table tr:nth-child(even) {
             background-color: #0f766e3b;
@@ -185,6 +187,7 @@
                     row.classList.add('hidden');
                 }
             });
+            updateRowColors();
         });
 
         // Toggle rows functionality
@@ -213,6 +216,18 @@
                 document.getElementById('toggle-rows').textContent = 'Show All';
             }
             showAll = !showAll;
+            updateRowColors();
+        }
+
+        function updateRowColors() {
+            const rows = document.querySelectorAll('#data-table-body tr:not(.hidden)');
+            rows.forEach((row, index) => {
+                if (index % 2 === 0) {
+                    row.style.backgroundColor = '#0f766e3b';
+                } else {
+                    row.style.backgroundColor = 'transparent';
+                }
+            });
         }
 
         // Print functionality
