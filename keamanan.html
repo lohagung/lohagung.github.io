@@ -16,6 +16,12 @@
         th, td {
             white-space: nowrap;
         }
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .hover-highlight:hover {
+            background-color: #fbbf24;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -144,6 +150,9 @@
                 });
                 tableBody.appendChild(tr);
             });
+
+            // Hide empty rows by default
+            toggleRows();
         }
 
         document.getElementById('month-select').addEventListener('change', (event) => {
@@ -179,10 +188,20 @@
         });
 
         // Toggle rows functionality
-        let showAll = true;
+        let showAll = false;
         document.getElementById('toggle-rows').addEventListener('click', () => {
+            toggleRows();
+        });
+
+        function toggleRows() {
             const rows = document.querySelectorAll('#data-table-body tr');
             if (showAll) {
+                rows.forEach((row, index) => {
+                    row.classList.remove('hidden');
+                    row.children[0].textContent = index + 1;
+                });
+                document.getElementById('toggle-rows').textContent = 'Hide Empty';
+            } else {
                 let counter = 1;
                 rows.forEach(row => {
                     if (!row.children[1].textContent.trim()) {
@@ -192,15 +211,9 @@
                     }
                 });
                 document.getElementById('toggle-rows').textContent = 'Show All';
-            } else {
-                rows.forEach((row, index) => {
-                    row.classList.remove('hidden');
-                    row.children[0].textContent = index + 1;
-                });
-                document.getElementById('toggle-rows').textContent = 'Hide Empty';
             }
             showAll = !showAll;
-        });
+        }
 
         // Print functionality
         document.getElementById('print-button').addEventListener('click', () => {
