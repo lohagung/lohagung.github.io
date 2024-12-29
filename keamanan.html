@@ -24,6 +24,7 @@
         table tr:hover {
             background-color: #fbbf24;
         }
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -75,7 +76,7 @@
             <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                     <tr>
-
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Tunggakan</th>
@@ -137,20 +138,25 @@
                 if (index === 0) return; // Skip header row
 
                 const tr = document.createElement('tr');
-                row.slice(0, 12).forEach((cell, cellIndex) => {
+                const tdNo = document.createElement('td');
+                tdNo.className = 'px-4 py-2 border text-center';
+                tdNo.textContent = index; // Row number
+                tr.appendChild(tdNo);
+
+                row.forEach((cell, cellIndex) => {
                     const td = document.createElement('td');
                     td.className = 'px-4 py-2 border';
-                    if (cellIndex === 1) { // Left align "Nama"
+                    if (cellIndex === 0) { // Left align "Nama"
                         td.classList.add('text-left');
-                    } else if (cellIndex === 3 || cellIndex >= 4) { // Right align specific columns
+                    } else if (cellIndex === 2 || cellIndex >= 3) { // Right align specific columns
                         td.classList.add('text-right');
                     } else { // Center align other columns
                         td.classList.add('text-center');
                     }
 
-                    if (cellIndex === 8 && !cell.trim()) { // If "Bulanan" is empty
+                    if (cellIndex === 7 && !cell.trim()) { // If "Bulanan" is empty
                         td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
-                    } else if (cellIndex >= 4 && cellIndex <= 7 && row[8].trim()) { // If "Bulanan" is not empty
+                    } else if (cellIndex >= 3 && cellIndex <= 6 && row[7].trim()) { // If "Bulanan" is not empty
                         td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
                     } else {
                         td.textContent = cell;
@@ -252,32 +258,7 @@
             window.location.reload();
         };
 
-        // Fetch and display data for LAPORAN PEMASUKAN
-        const months = [
-            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-        ];
 
-        async function fetchPemasukanData() {
-            const container = document.getElementById('bayar-container');
-            for (let i = 0; i < months.length; i++) {
-                const month = months[i];
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
-                const data = await response.json();
-                const lastRow = data.values[data.values.length - 1]; // Get the last row
-                const lastBayar = lastRow[10]; // Get the "Bayar" value from the last row
-                displayPemasukanData(i + 1, month, lastBayar);
-            }
-        }
-
-        function displayPemasukanData(no, month, lastBayar) {
-            const container = document.getElementById('bayar-container');
-            const row = document.createElement('tr');
-            row.innerHTML = `<td class="px-4 py-2 border text-center">${no}</td><td class="px-4 py-2 border">${month}</td><td class="px-4 py-2 border text-center">${lastBayar}</td>`;
-            container.appendChild(row);
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchPemasukanData);
     </script>
 </body>
 </html>
