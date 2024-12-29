@@ -127,7 +127,7 @@
     </footer>
     <script>
         async function fetchData(month) {
-            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1QU511f8t8u4LY8Hb0dUnuPhpUM6GfW0tj_pjvpchT4g/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
+            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
             const data = await response.json();
             const rows = data.values;
             const tableBody = document.getElementById('data-table-body');
@@ -262,7 +262,7 @@
             const container = document.getElementById('bayar-container');
             for (let i = 0; i < months.length; i++) {
                 const month = months[i];
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1QU511f8t8u4LY8Hb0dUnuPhpUM6GfW0tj_pjvpchT4g/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
+                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
                 const data = await response.json();
                 const lastRow = data.values[data.values.length - 1]; // Get the last row
                 const lastBayar = lastRow[10]; // Get the "Bayar" value from the last row
