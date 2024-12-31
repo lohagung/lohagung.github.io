@@ -1,4 +1,548 @@
-view').addEventListener('click', () => {
+      <html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>RT 09</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+        table {
+            -webkit-print-color-adjust: exact;
+            border-collapse: collapse;
+        }
+        th, td {
+            white-space: nowrap;
+            border: 1px solid gray;
+        }
+        table tr:nth-child(even) {
+            background-color: #0f766e3b;
+        }
+        table tr:hover {
+            background-color: #fbbf24;
+        }
+        @media (max-width: 640px) {
+            #search-input {
+                width: 100% !important;
+            }
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            z-index: 1000;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 90%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="bg-teal-700 p-4 flex items-center justify-between relative">
+        <div class="flex items-center">
+            <i class="fas fa-bars text-white text-2xl"></i>
+            <h1 class="text-white text-xl ml-4">RT 09</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-bell text-white text-xl"></i>
+            <i id="search-icon" class="fas fa-search text-white text-xl cursor-pointer"></i>
+        </div>
+        <div id="search-bar" class="absolute inset-0 bg-teal-700 p-4 flex items-center justify-center hidden">
+            <input id="search-input" type="text" placeholder="Search by name or block" class="w-1/2 p-2 rounded">
+            <i id="close-search" class="fas fa-times text-white text-2xl ml-4 cursor-pointer"></i>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <main class="container mx-auto p-4">
+        <h1 id="report-title" class="text-2xl font-bold mb-4 text-center uppercase">LAPORAN DENDA RONDA 2025</h1>
+        <div class="mb-4 flex items-center space-x-4">
+            <div>
+                <select id="month-select" class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="Januari">Januari</option>
+                    <option value="Februari">Februari</option>
+                    <option value="Maret">Maret</option>
+                    <option value="April">April</option>
+                    <option value="Mei">Mei</option>
+                    <option value="Juni">Juni</option>
+                    <option value="Juli">Juli</option>
+                    <option value="Agustus">Agustus</option>
+                    <option value="September">September</option>
+                    <option value="Oktober">Oktober</option>
+                    <option value="November">November</option>
+                    <option value="Desember">Desember</option>
+                </select>
+            </div>
+            <div>
+                <button id="toggle-rows" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">Show All</button>
+            </div>
+            <div>
+                <button id="print-button" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-print"></i>
+                </button>
+            </div>
+            <div>
+                <button id="toggle-view" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+        </div>
+        <div id="table-view" class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Tunggakan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 1</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 2</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 3</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 4</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bulanan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bayar</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Data will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div id="grid-view" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- Grid items will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Search Results Page -->
+    <main id="search-results-page" class="container mx-auto p-4 hidden">
+        <h1 class="text-2xl font-bold mb-4 text-center uppercase">PENCARIAN DATA</h1>      
+        <div id="search-results" class="bg-white shadow-lg rounded mt-2 p-4"></div>
+		<button id="back-button" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4">
+            Kembali
+        </button>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-teal-700 text-white py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <p>© 2025 Youshe. All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <a class="text-white" href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a class="text-white" href="#"><i class="fab fa-twitter"></i></a>
+                    <a class="text-white" href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="tooltip" class="tooltip"></div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div id="content-to-capture" class="modal-content">
+            <span class="close">&times;</span>
+            <h1 class="text-center text-xl font-bold">TAGIHAN DENDA RONDA</h1>
+            <p class="text-center text-xs">Perum Loh Agung 6 & Kavling RT 09 RW 23 Jaten Karanganyar</p>
+            <div class="flex justify-between mt-4">
+                <p id="modal-no" class="text-left"></p>
+                <p id="modal-name-block" class="text-right"></p>
+            </div>
+            <hr class="my-2">
+            <div class="flex justify-between">
+                <p>Tunggakan</p>
+                <p id="modal-tunggakan" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 1</p>
+                <p id="modal-ronda1" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 2</p>
+                <p id="modal-ronda2" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 3</p>
+                <p id="modal-ronda3" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 4</p>
+                <p id="modal-ronda4" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bulanan</p>
+                <p id="modal-bulanan" class="text-right"></p>
+            </div>
+            <hr class="my-2">
+            <div class="flex justify-between">
+                <p>TOTAL</p>
+                <p id="modal-total" class="text-right text-red-500 font-bold"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Kurang</p>
+                <p id="modal-jumlah" class="text-right"></p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bayar</p>
+                <p id="modal-bayar" class="text-right"></p>
+            </div></br>
+            <p class="text-center mt-4">Seksi Keamanan</p></br>
+            <p class="text-center">Wahyudi</p></br></br>
+            <button class="text-center" id="download-button">Simpan</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch data from Google Sheets API
+        async function fetchData(month) {
+            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
+            const data = await response.json();
+            const rows = data.values;
+            const tableBody = document.getElementById('data-table-body');
+            const gridView = document.getElementById('grid-view');
+            tableBody.innerHTML = ''; // Clear existing data
+            gridView.innerHTML = ''; // Clear existing data
+
+            // Get today's date in the desired format
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('id-ID', options);
+
+            rows.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+
+                // Table Row
+                const tr = document.createElement('tr');
+                const tdNo = document.createElement('td');
+                tdNo.className = 'px-4 py-2 border text-center';
+                tdNo.textContent = `No.0${index}${month}${today.getFullYear()}${today.getDate()}`; // Row number
+                tr.appendChild(tdNo);
+
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    td.className = 'px-4 py-2 border';
+                    if (cellIndex === 0) { // Left align "Nama"
+                        td.classList.add('text-left');
+                        td.classList.add('cursor-pointer');
+                        td.addEventListener('click', () => showModal(index, row));
+                    } else if (cellIndex === 2 || cellIndex >= 3) { // Right align specific columns
+                        td.classList.add('text-right');
+                    } else { // Center align other columns
+                        td.classList.add('text-center');
+                    }
+
+                    if (cellIndex === 7 && !cell.trim()) { // If "Bulanan" is empty
+                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                    } else if (cellIndex >= 3 && cellIndex <= 6 && row[7].trim()) { // If "Bulanan" is not empty
+                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                    } else {
+                        td.textContent = cell;
+                    }
+
+                    tr.appendChild(td);
+                });
+
+                // Check if "Jumlah" column has "Rp0" and set "Bayar" column accordingly
+                const jumlahCell = tr.children[9];
+                const bayarCell = tr.children[10];
+                if (jumlahCell.textContent.trim() === 'Rp0') {
+                    bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                    bayarCell.addEventListener('click', () => {
+                        const originalValue = row[9];
+                        bayarCell.innerHTML = originalValue;
+                        setTimeout(() => {
+                            bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                        }, 5000);
+                    });
+                } else if (jumlahCell.textContent.trim() !== 'Rp0' && bayarCell.textContent.trim() === 'Rp0') {
+                    bayarCell.innerHTML = '<span class="text-red-500 font-bold">Belum Bayar</span>';
+                }
+
+                // Add event listener for showing tooltip on "Jumlah" column
+                jumlahCell.addEventListener('click', (event) => {
+                    const tooltip = document.getElementById('tooltip');
+                    const nama = row[0];
+                    const blok = row[1];
+                    tooltip.textContent = `${nama} - ${blok}`;
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = `${event.pageX}px`;
+                    tooltip.style.top = `${event.pageY}px`;
+                    setTimeout(() => {
+                        tooltip.style.display = 'none';
+                    }, 5000);
+                });
+
+                tableBody.appendChild(tr);
+
+                // Grid Item
+                const gridItem = document.createElement('div');
+                gridItem.className = 'bg-white p-4 rounded shadow flex flex-col items-center';
+                const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
+                    const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
+                    return acc + num;
+                }, 0);
+                const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
+                gridItem.innerHTML = `
+                    <img src="/file/${imageName}.jpg" alt="Profile picture of ${row[0]}" class="w-24 h-24 rounded-full mb-4">
+                    <p class="text-lg font-bold text-center">${row[0]}</p>
+                    <p class="text-sm text-gray-600 text-center">${row[1]}</p>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">No.0${today.getFullYear()}${today.getDate()}${index}</p>
+                        <p class="text-sm text-gray-600">${formattedDate}</p>
+                    </div>
+                    <hr class="my-2 w-full">
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Tunggakan</p>
+                        <p class="text-sm text-gray-600">${row[2]}</p>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Ronda 1</p>
+                        <p class="text-sm text-gray-600">${row[3]}</p>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Ronda 2</p>
+                        <p class="text-sm text-gray-600">${row[4]}</p>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Ronda 3</p>
+                        <p class="text-sm text-gray-600">${row[5]}</p>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Ronda 4</p>
+                        <p class="text-sm text-gray-600">${row[6]}</p>
+                  </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Bulanan</p>
+                        <p class="text-sm text-gray-600">${row[7]}</p>
+                    </div>
+                    <hr class="my-2 w-full">
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">TOTAL</p>
+                        <p class="text-sm text-gray-600">Rp${total.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Bayar</p>
+                        <p class="text-sm text-gray-600">${row[9]}</p>
+                    </div>
+                    <hr class="my-2 w-full">
+                    <div class="flex justify-between w-full">
+                        <p class="text-sm text-gray-600">Jumlah</p>
+                        <p class="text-sm text-gray-600">${row[8]}</p>
+                    </div>
+                    <hr class="my-2 w-full">
+                    <p class="text-center text-sm text-gray-600">Seksi Keamanan</p>
+                    <p class="text-center text-sm text-gray-600">Wahyudi</p>
+                `;
+                gridView.appendChild(gridItem);
+            });
+
+            // Hide empty rows by default
+            toggleRows();
+        }
+
+        // Event listener for month selection change
+        document.getElementById('month-select').addEventListener('change', (event) => {
+            const selectedMonth = event.target.value;
+            document.getElementById('report-title').textContent = `LAPORAN DENDA RONDA ${selectedMonth.toUpperCase()}`;
+            fetchData(selectedMonth);
+        });
+
+        // Initial fetch for default month
+        fetchData('Januari');
+
+        // Search functionality
+        document.getElementById('search-icon').addEventListener('click', () => {
+            document.getElementById('search-bar').classList.remove('hidden');
+        });
+
+        document.getElementById('close-search').addEventListener('click', () => {
+            document.getElementById('search-bar').classList.add('hidden');
+        });
+
+        document.getElementById('search-input').addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#data-table-body tr');
+            const searchResults = document.getElementById('search-results');
+            searchResults.innerHTML = ''; // Clear previous search results
+            searchResults.classList.add('hidden'); // Hide search results container
+
+            rows.forEach(row => {
+                const name = row.children[1].textContent.toLowerCase();
+                const block = row.children[2].textContent.toLowerCase();
+                if (name.includes(searchTerm) || block.includes(searchTerm)) {
+                    row.classList.remove('hidden');
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'p-2 cursor-pointer hover:bg-gray-200';
+                    resultItem.textContent = `${row.children[1].textContent} - ${row.children[2].textContent}`;
+                    resultItem.addEventListener('click', () => {
+                        showModal(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent));
+                        searchResults.classList.add('hidden');
+                    });
+                    searchResults.appendChild(resultItem);
+                    searchResults.classList.remove('hidden'); // Show search results container
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            updateRowColors();
+
+            // Show search results page
+            document.getElementById('search-results-page').classList.remove('hidden');
+            document.querySelector('main.container').classList.add('hidden');
+        });
+
+        // Back button functionality
+        document.getElementById('back-button').addEventListener('click', () => {
+            document.getElementById('search-results-page').classList.add('hidden');
+            document.querySelector('main.container').classList.remove('hidden');
+        });
+
+        // Toggle rows functionality
+        let showAll = false;
+        document.getElementById('toggle-rows').addEventListener('click', () => {
+            toggleRows();
+        });
+
+        function toggleRows() {
+            const rows = document.querySelectorAll('#data-table-body tr');
+            if (showAll) {
+                rows.forEach((row, index) => {
+                    row.classList.remove('hidden');
+                    row.children[0].textContent = index + 1;
+                });
+                document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                let counter = 1;
+                rows.forEach(row => {
+                    if (!row.children[1].textContent.trim()) {
+                        row.classList.add('hidden');
+                    } else {
+                        row.children[0].textContent = counter++;
+                    }
+                });
+                document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye"></i>';
+            }
+            showAll = !showAll;
+            updateRowColors();
+        }
+
+        function updateRowColors() {
+            const rows = document.querySelectorAll('#data-table-body tr:not(.hidden)');
+            rows.forEach((row, index) => {
+                if (index % 2 === 0) {
+                    row.style.backgroundColor = '#0f766e3b';
+                } else {
+                    row.style.backgroundColor = 'transparent';
+                }
+            });
+        }
+
+        // Print functionality
+        document.getElementById('print-button').addEventListener('click', () => {
+            const printContent = document.getElementById('report-title').outerHTML + document.querySelector('table').outerHTML;
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload();
+        });
+
+        window.onafterprint = () => {
+            window.location.reload();
+        };
+
+        // Modal functionality
+        const modal = document.getElementById('modal');
+        const span = document.getElementsByClassName('close')[0];
+
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function showModal(index, row) {
+            document.getElementById('modal-no').textContent = `NO. ${index}`;
+            document.getElementById('modal-name-block').textContent = `${row[0]} - ${row[1]}`;
+            document.getElementById('modal-tunggakan').textContent = row[2];
+            document.getElementById('modal-ronda1').textContent = row[3];
+            document.getElementById('modal-ronda2').textContent = row[4];
+            document.getElementById('modal-ronda3').textContent = row[5];
+            document.getElementById('modal-ronda4').textContent = row[6];
+            document.getElementById('modal-bulanan').textContent = row[7];
+            
+            // Calculate total
+            const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
+                const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
+                return acc + num;
+            }, 0);
+            document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
+            
+            document.getElementById('modal-jumlah').textContent = row[8];
+            document.getElementById('modal-bayar').textContent = row[9];
+            modal.style.display = 'flex';
+        }
+
+        document.getElementById('download-button').addEventListener('click', function () {
+            const content = document.getElementById('content-to-capture');
+            html2canvas(content).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'tagihan-denda-ronda.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+
+        // Toggle view functionality
+        let isGridView = false;
+        document.getElementById('toggle-view').addEventListener('click', () => {
             isGridView = !isGridView;
             document.getElementById('table-view').classList.toggle('hidden', isGridView);
             document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
@@ -7,3 +551,4 @@ view').addEventListener('click', () => {
     </script>
 </body>
 </html>
+            const block = row.children[2].textContent.toLowe
