@@ -1,0 +1,138 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Text Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.css"></link>
+    <style>
+        #editorPopup {
+            cursor: move;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="editorPopup" class="fixed top-4 left-1/2 transform -translate-x-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Edit HTML</h2>
+            <div class="flex space-x-2">
+                <button id="saveEditor" class="text-gray-600 text-2xl">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button id="desktopView" class="text-gray-600 text-2xl">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button id="mobileView" class="text-gray-600 text-2xl">
+                    <i class="fas fa-mobile-alt"></i>
+                </button>
+                <button id="minimizeEditor" class="text-gray-600 text-2xl">
+                    <i class="fas fa-window-minimize"></i>
+                </button>
+            </div>
+        </div>
+        <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
+    </div>
+
+    <div id="minimizedIcon" class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50">
+        <i class="fas fa-pencil-alt"></i>
+    </div>
+
+    <div id="preview" class="w-full h-full p-0 m-0">
+        <!-- Preview content will be injected here -->
+    </div>
+
+    <script>
+        const editorPopup = document.getElementById('editorPopup');
+        const minimizeEditorButton = document.getElementById('minimizeEditor');
+        const minimizedIcon = document.getElementById('minimizedIcon');
+        const saveEditorButton = document.getElementById('saveEditor');
+        const htmlEditor = document.getElementById('htmlEditor');
+        const preview = document.getElementById('preview');
+        const desktopViewButton = document.getElementById('desktopView');
+        const mobileViewButton = document.getElementById('mobileView');
+
+        let saveCount = 0;
+
+        // Load saved content from localStorage
+        window.addEventListener('load', () => {
+            const savedContent = localStorage.getItem('htmlEditorContent');
+            if (savedContent) {
+                htmlEditor.value = savedContent;
+                updatePreview();
+            }
+        });
+
+        minimizeEditorButton.addEventListener('click', () => {
+            editorPopup.classList.add('hidden');
+            minimizedIcon.classList.remove('hidden');
+        });
+
+        minimizedIcon.addEventListener('click', () => {
+            editorPopup.classList.remove('hidden');
+            minimizedIcon.classList.add('hidden');
+        });
+
+        saveEditorButton.addEventListener('click', () => {
+            saveCount++;
+            const blob = new Blob([htmlEditor.value], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `index-v${saveCount}.html`;
+            a.click();
+        });
+
+        htmlEditor.addEventListener('input', () => {
+            localStorage.setItem('htmlEditorContent', htmlEditor.value);
+            updatePreview();
+        });
+
+        desktopViewButton.addEventListener('click', () => {
+            preview.style.width = '100%';
+            preview.style.height = '100%';
+            updatePreview();
+        });
+
+        mobileViewButton.addEventListener('click', () => {
+            preview.style.width = '375px';
+            preview.style.height = '667px';
+            updatePreview();
+        });
+
+        function updatePreview() {
+            const iframe = document.createElement('iframe');
+            iframe.classList.add('w-full', 'h-full', 'border-0');
+            preview.innerHTML = '';
+            preview.appendChild(iframe);
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(htmlEditor.value);
+            doc.close();
+        }
+
+        // Drag and Drop functionality
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        editorPopup.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - editorPopup.getBoundingClientRect().left;
+            offsetY = e.clientY - editorPopup.getBoundingClientRect().top;
+            editorPopup.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                editorPopup.style.left = `${e.clientX - offsetX}px`;
+                editorPopup.style.top = `${e.clientY - offsetY}px`;
+                editorPopup.style.transform = 'none';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            editorPopup.style.cursor = 'move';
+        });
+    </script>
+</body>
+</html>
