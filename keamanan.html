@@ -1,4 +1,4 @@
-      <html lang="en">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -117,7 +117,14 @@
                 </select>
             </div>
             <div>
-                <button id="toggle-rows" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">Show All</button>
+                <button id="toggle-rows" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div>
+                <button id="toggle-details" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-info-circle"></i>
+                </button>
             </div>
             <div>
                 <button id="print-button" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
@@ -172,9 +179,7 @@
             <div class="flex justify-between items-center">
                 <p>© 2025 Youshe. All rights reserved.</p>
                 <div class="flex space-x-4">
-                    <a class="text-white" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="text-white" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="text-white" href="#"><i class="fab fa-instagram"></i></a>
+                    <a class="text-white" href="#"><i class="fas fa-download"></i> Unduh Aplikasi</a>
                 </div>
             </div>
         </div>
@@ -351,12 +356,12 @@
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 3</p>
-                        <p class="text-sm text-gray-600">${row[5]}</p>
+<p class="text-sm text-gray-600">${row[5]}</p>
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 4</p>
                         <p class="text-sm text-gray-600">${row[6]}</p>
-                  </div>
+                    </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Bulanan</p>
                         <p class="text-sm text-gray-600">${row[7]}</p>
@@ -370,14 +375,6 @@
                         <p class="text-sm text-gray-600">Bayar</p>
                         <p class="text-sm text-gray-600">${row[9]}</p>
                     </div>
-                    <hr class="my-2 w-full">
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Kekurangan</p>
-                        <p class="text-sm text-gray-600">${row[8]}</p>
-                    </div>
-                    <hr class="my-2 w-full">
-                    <p class="text-center text-sm text-gray-600">Seksi Keamanan</p>
-                    <p class="text-center text-sm text-gray-600">Wahyudi</p>
                 `;
                 gridView.appendChild(gridItem);
             });
@@ -451,10 +448,14 @@
 
         function toggleRows() {
             const rows = document.querySelectorAll('#data-table-body tr');
+            const gridItems = document.querySelectorAll('#grid-view > div');
             if (showAll) {
                 rows.forEach((row, index) => {
                     row.classList.remove('hidden');
                     row.children[0].textContent = index + 1;
+                });
+                gridItems.forEach((item, index) => {
+                    item.classList.remove('hidden');
                 });
                 document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye-slash"></i>';
             } else {
@@ -464,6 +465,12 @@
                         row.classList.add('hidden');
                     } else {
                         row.children[0].textContent = counter++;
+                    }
+                });
+                gridItems.forEach(item => {
+                    const name = item.querySelector('p.text-lg').textContent.trim();
+                    if (!name) {
+                        item.classList.add('hidden');
                     }
                 });
                 document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye"></i>';
@@ -550,6 +557,16 @@
             document.getElementById('table-view').classList.toggle('hidden', isGridView);
             document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
             document.getElementById('toggle-view').innerHTML = isGridView ? '<i class="fas fa-th-list"></i>' : '<i class="fas fa-th-large"></i>';
+        });
+
+        // Toggle details functionality
+        let showDetails = true;
+        document.getElementById('toggle-details').addEventListener('click', () => {
+            showDetails = !showDetails;
+            const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
+            detailColumns.forEach(column => {
+                column.classList.toggle('hidden', !showDetails);
+            });
         });
     </script>
 </body>
