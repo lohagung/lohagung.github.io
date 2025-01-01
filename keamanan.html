@@ -326,10 +326,10 @@
                 }, 0);
                 const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
                 gridItem.innerHTML = `
-                    <img src="/file/${imageName}.jpeg" 
+                    <img src="/file/${imageName}.jpg" 
          alt="Profile picture of ${row[0]}" 
          class="w-24 h-24 rounded-full mb-4"
-         onerror="this.onerror=null; this.src='/file/no-profil.jpg';">
+         onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <p class="text-lg font-bold text-center">${row[0]}</p>
                     <p class="text-sm text-gray-600 text-center">${row[1]}</p>
                     <div class="flex justify-between w-full">
