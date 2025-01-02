@@ -1,4 +1,4 @@
-<html lang="en">
+  <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -141,7 +141,8 @@
             <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                     <tr>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
+                        <th id="no-header" class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
+                        <th id="jumlah-header" class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Tunggakan</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Tunggakan</th>
@@ -150,7 +151,7 @@
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 3</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 4</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bulanan</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
+                        <th id="jumlah-header-original" class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bayar</th>
                     </tr>
                 </thead>
@@ -179,7 +180,7 @@
             <div class="flex justify-between items-center">
                 <p>© 2025 Youshe. All rights reserved.</p>
                 <div class="flex space-x-4">
-                    <a class="text-white" href="#"><i class="fas fa-download"></i> Unduh Aplikasi</a>
+                    <a class="text-white" href="/la6.apk"><i class="fas fa-download"></i> Unduh Aplikasi</a>
                 </div>
             </div>
         </div>
@@ -266,6 +267,11 @@
                 tdNo.textContent = `No.0${index}${month}${today.getFullYear()}${today.getDate()}`; // Row number
                 tr.appendChild(tdNo);
 
+                const tdJumlah = document.createElement('td');
+                tdJumlah.className = 'px-4 py-2 border text-right hidden';
+                tdJumlah.textContent = row[9];
+                tr.appendChild(tdJumlah);
+
                 row.forEach((cell, cellIndex) => {
                     const td = document.createElement('td');
                     td.className = 'px-4 py-2 border';
@@ -291,8 +297,8 @@
                 });
 
                 // Check if "Jumlah" column has "Rp0" and set "Bayar" column accordingly
-                const jumlahCell = tr.children[9];
-                const bayarCell = tr.children[10];
+                const jumlahCell = tr.children[10];
+                const bayarCell = tr.children[11];
                 if (jumlahCell.textContent.trim() === 'Rp0') {
                     bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
                     bayarCell.addEventListener('click', () => {
@@ -331,10 +337,10 @@
                 }, 0);
                 const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
                 gridItem.innerHTML = `
-                    <img src="/file/${imageName}.jpg" 
+                    <img src="https://placehold.co/100x100" 
          alt="Profile picture of ${row[0]}" 
          class="w-24 h-24 rounded-full mb-4"
-         onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
+         onerror="this.onerror=null; this.src='https://placehold.co/100x100';">
                     <p class="text-lg font-bold text-center">${row[0]}</p>
                     <p class="text-sm text-gray-600 text-center">${row[1]}</p>
                     <div class="flex justify-between w-full">
@@ -346,7 +352,7 @@
                         <p class="text-sm text-gray-600">Tunggakan</p>
                         <p class="text-sm text-gray-600">${row[2]}</p>
                     </div>
-                    <div class="flex justify-between w-full">
+                  <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 1</p>
                         <p class="text-sm text-gray-600">${row[3]}</p>
                     </div>
@@ -356,7 +362,7 @@
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 3</p>
-<p class="text-sm text-gray-600">${row[5]}</p>
+                        <p class="text-sm text-gray-600">${row[5]}</p>
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 4</p>
@@ -410,13 +416,13 @@
             searchResults.classList.add('hidden'); // Hide search results container
 
             rows.forEach(row => {
-                const name = row.children[1].textContent.toLowerCase();
-                const block = row.children[2].textContent.toLowerCase();
+                const name = row.children[2].textContent.toLowerCase();
+                const block = row.children[3].textContent.toLowerCase();
                 if (name.includes(searchTerm) || block.includes(searchTerm)) {
                     row.classList.remove('hidden');
                     const resultItem = document.createElement('div');
                     resultItem.className = 'p-2 cursor-pointer hover:bg-gray-200';
-                    resultItem.textContent = `${row.children[1].textContent} - ${row.children[2].textContent}`;
+                    resultItem.textContent = `${row.children[2].textContent} - ${row.children[3].textContent}`;
                     resultItem.addEventListener('click', () => {
                         showModal(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent));
                         searchResults.classList.add('hidden');
@@ -461,7 +467,7 @@
             } else {
                 let counter = 1;
                 rows.forEach(row => {
-                    if (!row.children[1].textContent.trim()) {
+                    if (!row.children[2].textContent.trim()) {
                         row.classList.add('hidden');
                     } else {
                         row.children[0].textContent = counter++;
@@ -520,23 +526,23 @@
 
         function showModal(index, row) {
             document.getElementById('modal-no').textContent = `NO. ${index}`;
-            document.getElementById('modal-name-block').textContent = `${row[0]} - ${row[1]}`;
-            document.getElementById('modal-tunggakan').textContent = row[2];
-            document.getElementById('modal-ronda1').textContent = row[3];
-            document.getElementById('modal-ronda2').textContent = row[4];
-            document.getElementById('modal-ronda3').textContent = row[5];
-            document.getElementById('modal-ronda4').textContent = row[6];
-            document.getElementById('modal-bulanan').textContent = row[7];
+            document.getElementById('modal-name-block').textContent = `${row[2]} - ${row[3]}`;
+            document.getElementById('modal-tunggakan').textContent = row[4];
+            document.getElementById('modal-ronda1').textContent = row[5];
+            document.getElementById('modal-ronda2').textContent = row[6];
+            document.getElementById('modal-ronda3').textContent = row[7];
+            document.getElementById('modal-ronda4').textContent = row[8];
+            document.getElementById('modal-bulanan').textContent = row[9];
             
             // Calculate total
-            const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
+            const total = [row[4], row[5], row[6], row[7], row[8], row[9]].reduce((acc, val) => {
                 const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
                 return acc + num;
             }, 0);
             document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
             
-            document.getElementById('modal-jumlah').textContent = row[8];
-            document.getElementById('modal-bayar').textContent = row[9];
+            document.getElementById('modal-jumlah').textContent = row[10];
+            document.getElementById('modal-bayar').textContent = row[11];
             modal.style.display = 'flex';
         }
 
@@ -563,10 +569,34 @@
         let showDetails = true;
         document.getElementById('toggle-details').addEventListener('click', () => {
             showDetails = !showDetails;
-            const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
+            const detailColumns = document.querySelectorAll('th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), th:nth-child(10), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10)');
             detailColumns.forEach(column => {
                 column.classList.toggle('hidden', !showDetails);
             });
+
+            // Move "Jumlah" column to the right of "No" column
+            const jumlahHeader = document.getElementById('jumlah-header');
+            const jumlahHeaderOriginal = document.getElementById('jumlah-header-original');
+            const noHeader = document.getElementById('no-header');
+            if (showDetails) {
+                jumlahHeader.classList.add('hidden');
+                jumlahHeaderOriginal.classList.remove('hidden');
+                noHeader.classList.remove('hidden');
+                document.querySelectorAll('#data-table-body tr').forEach(row => {
+                    row.children[1].classList.add('hidden');
+                    row.children[10].classList.remove('hidden');
+                    row.children[0].classList.remove('hidden');
+                });
+            } else {
+                jumlahHeader.classList.remove('hidden');
+                jumlahHeaderOriginal.classList.add('hidden');
+                noHeader.classList.add('hidden');
+                document.querySelectorAll('#data-table-body tr').forEach(row => {
+                    row.children[1].classList.remove('hidden');
+                    row.children[10].classList.add('hidden');
+                    row.children[0].classList.add('hidden');
+                });
+            }
         });
     </script>
 </body>
