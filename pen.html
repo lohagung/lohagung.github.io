@@ -9,14 +9,71 @@
         #editorPopup {
             cursor: move;
         }
+        .history-item {
+            white-space: nowrap;
+            font-size: xx-small;
+        }
+        #historyMenu {
+            scrollbar-width: thin;
+            scrollbar-color: #a0aec0 #edf2f7;
+        }
+        #historyMenu::-webkit-scrollbar {
+            width: 8px;
+        }
+        #historyMenu::-webkit-scrollbar-track {
+            background: #edf2f7;
+        }
+        #historyMenu::-webkit-scrollbar-thumb {
+            background-color: #a0aec0;
+            border-radius: 10px;
+            border: 2px solid #edf2f7;
+        }
+        #clearHistory {
+            font-size: xx-small;
+        }
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #38a169;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-    <div id="editorPopup" class="fixed top-4 left-1/2 transform -translate-x-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50">
+    <div id="editorPopup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-semibold">Edit HTML</h2>
-            <div class="flex space-x-2">
+            <div class="flex space-x-2 relative">
+                <input id="searchInput" type="text" placeholder="Search..." class="border border-gray-300 rounded-lg p-1 text-sm">
+                <button id="prevSearch" class="text-gray-600 text-2xl hidden">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="nextSearch" class="text-gray-600 text-2xl hidden">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <button id="saveContent" class="text-gray-600 text-2xl">
+                    <i class="fas fa-save"></i>
+                </button>
+                <button id="historyButton" class="text-gray-600 text-2xl">
+                    <i class="fas fa-history"></i>
+                </button>
+                <div id="historyMenu" class="absolute top-10 right-0 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-64 overflow-y-auto">
+                    <ul id="historyList" class="p-2">
+                        <!-- History items will be injected here -->
+                    </ul>
+                    <button id="clearHistory" class="w-full text-left p-2 border-t border-gray-300 text-red-600 hover:bg-gray-100">Clear</button>
+                    <div id="endOfHistory" class="w-full text-center p-2 text-gray-600 hidden">Ini history terakhir</div>
+                </div>
                 <button id="saveEditor" class="text-gray-600 text-2xl">
                     <i class="fas fa-download"></i>
                 </button>
@@ -34,7 +91,7 @@
         <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
     </div>
 
-    <div id="minimizedIcon" class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50">
+    <div id="minimizedIcon" class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50 hidden">
         <i class="fas fa-pencil-alt"></i>
     </div>
 
@@ -42,17 +99,33 @@
         <!-- Preview content will be injected here -->
     </div>
 
+    <div id="notification">Sukses</div>
+
     <script>
         const editorPopup = document.getElementById('editorPopup');
         const minimizeEditorButton = document.getElementById('minimizeEditor');
         const minimizedIcon = document.getElementById('minimizedIcon');
         const saveEditorButton = document.getElementById('saveEditor');
+        const saveContentButton = document.getElementById('saveContent');
         const htmlEditor = document.getElementById('htmlEditor');
         const preview = document.getElementById('preview');
         const desktopViewButton = document.getElementById('desktopView');
         const mobileViewButton = document.getElementById('mobileView');
+        const historyButton = document.getElementById('historyButton');
+        const historyMenu = document.getElementById('historyMenu');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryButton = document.getElementById('clearHistory');
+        const endOfHistory = document.getElementById('endOfHistory');
+        const notification = document.getElementById('notification');
+        const searchInput = document.getElementById('searchInput');
+        const prevSearchButton = document.getElementById('prevSearch');
+        const nextSearchButton = document.getElementById('nextSearch');
 
         let saveCount = 0;
+        let history = [];
+        let historyDisplayCount = 7;
+        let searchResults = [];
+        let currentSearchIndex = 0;
 
         // Load saved content from localStorage
         window.addEventListener('load', () => {
@@ -60,6 +133,11 @@
             if (savedContent) {
                 htmlEditor.value = savedContent;
                 updatePreview();
+            }
+            const savedHistory = JSON.parse(localStorage.getItem('htmlEditorHistory'));
+            if (savedHistory) {
+                history = savedHistory;
+                updateHistoryMenu();
             }
         });
 
@@ -82,9 +160,9 @@
             a.click();
         });
 
-        htmlEditor.addEventListener('input', () => {
-            localStorage.setItem('htmlEditorContent', htmlEditor.value);
-            updatePreview();
+        saveContentButton.addEventListener('click', () => {
+            addToHistory(htmlEditor.value);
+            showNotification('Sukses');
         });
 
         desktopViewButton.addEventListener('click', () => {
@@ -99,6 +177,51 @@
             updatePreview();
         });
 
+        historyButton.addEventListener('click', () => {
+            historyMenu.classList.toggle('hidden');
+        });
+
+        clearHistoryButton.addEventListener('click', () => {
+            history = [];
+            localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
+            updateHistoryMenu();
+        });
+
+        historyMenu.addEventListener('scroll', () => {
+            if (historyMenu.scrollTop + historyMenu.clientHeight >= historyMenu.scrollHeight) {
+                loadMoreHistory();
+            }
+        });
+
+        htmlEditor.addEventListener('input', () => {
+            localStorage.setItem('htmlEditorContent', htmlEditor.value);
+            updatePreview();
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!historyMenu.contains(event.target) && !historyButton.contains(event.target)) {
+                historyMenu.classList.add('hidden');
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            highlightSearchResults();
+        });
+
+        prevSearchButton.addEventListener('click', () => {
+            if (searchResults.length > 0) {
+                currentSearchIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+                scrollToSearchResult();
+            }
+        });
+
+        nextSearchButton.addEventListener('click', () => {
+            if (searchResults.length > 0) {
+                currentSearchIndex = (currentSearchIndex + 1) % searchResults.length;
+                scrollToSearchResult();
+            }
+        });
+
         function updatePreview() {
             const iframe = document.createElement('iframe');
             iframe.classList.add('w-full', 'h-full', 'border-0');
@@ -108,6 +231,102 @@
             doc.open();
             doc.write(htmlEditor.value);
             doc.close();
+        }
+
+        function addToHistory(content) {
+            const timestamp = new Date();
+            const formattedTimestamp = `${timestamp.toLocaleDateString('en-GB')} ${timestamp.toLocaleTimeString('en-GB')}`;
+            history.unshift({ content, timestamp: formattedTimestamp, name: `Version ${history.length + 1}` });
+            localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
+            updateHistoryMenu();
+        }
+
+        function updateHistoryMenu() {
+            historyList.innerHTML = '';
+            const displayHistory = history.slice(0, historyDisplayCount);
+            displayHistory.forEach((item, index) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('p-2', 'border-b', 'border-gray-300', 'cursor-pointer', 'hover:bg-gray-100', 'history-item');
+                listItem.textContent = `${item.name} ${item.timestamp}`;
+                listItem.addEventListener('click', () => {
+                    htmlEditor.value = item.content;
+                    updatePreview();
+                });
+                listItem.addEventListener('dblclick', () => {
+                    const newName = prompt('Rename this version:', item.name);
+                    if (newName) {
+                        item.name = newName;
+                        localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
+                        updateHistoryMenu();
+                    }
+                });
+                historyList.appendChild(listItem);
+            });
+
+            if (historyDisplayCount >= history.length) {
+                endOfHistory.classList.remove('hidden');
+            } else {
+                endOfHistory.classList.add('hidden');
+            }
+        }
+
+        function loadMoreHistory() {
+            if (historyDisplayCount < history.length) {
+                historyDisplayCount += 7;
+                updateHistoryMenu();
+            }
+        }
+
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        }
+
+        function highlightSearchResults() {
+            const searchValue = searchInput.value;
+            const content = htmlEditor.value;
+            const regex = new RegExp(searchValue, 'gi');
+            searchResults = [];
+            let match;
+            while ((match = regex.exec(content)) !== null) {
+                searchResults.push(match.index);
+            }
+            updateSearchButtons();
+            updatePreview();
+            highlightInPreview(searchValue);
+            scrollToSearchResult();
+        }
+
+        function updateSearchButtons() {
+            if (searchResults.length > 1) {
+                prevSearchButton.classList.remove('hidden');
+                nextSearchButton.classList.remove('hidden');
+            } else {
+                prevSearchButton.classList.add('hidden');
+                nextSearchButton.classList.add('hidden');
+            }
+        }
+
+        function scrollToSearchResult() {
+            if (searchResults.length > 0) {
+                const iframe = preview.querySelector('iframe');
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const elements = doc.querySelectorAll('.highlight');
+                if (elements.length > 0) {
+                    elements[currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        function highlightInPreview(searchValue) {
+            const iframe = preview.querySelector('iframe');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            const content = doc.body.innerHTML;
+            const highlightedContent = content.replace(new RegExp(searchValue, 'gi'), (match) => `<span class="highlight">${match}</span>`);
+            doc.body.innerHTML = highlightedContent;
         }
 
         // Drag and Drop functionality
