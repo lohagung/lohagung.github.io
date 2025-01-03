@@ -181,7 +181,11 @@
         clearHistoryButton.addEventListener('click', () => {
             history = [];
             localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
+            htmlEditor.value = '';
+            localStorage.setItem('htmlEditorContent', '');
             updateHistoryMenu();
+            updatePreview();
+            document.body.classList.add('bg-gradient');
         });
 
         historyMenu.addEventListener('scroll', () => {
