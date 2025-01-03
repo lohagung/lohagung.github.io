@@ -35,6 +35,9 @@
             #search-input {
                 width: 100% !important;
             }
+            .hide-on-mobile {
+                display: none;
+            }
             #print-button {
                 display: none;
             }
@@ -147,12 +150,12 @@
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Tunggakan</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 1</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 2</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 3</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 4</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bulanan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Tunggakan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Ronda 1</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Ronda 2</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Ronda 3</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Ronda 4</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hide-on-mobile">Bulanan</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bayar</th>
                     </tr>
@@ -360,7 +363,7 @@
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 3</p>
-<p class="text-sm text-gray-600">${row[5]}</p>
+                        <p class="text-sm text-gray-600">${row[5]}</p>
                     </div>
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-600">Ronda 4</p>
