@@ -35,6 +35,9 @@
             #search-input {
                 width: 100% !important;
             }
+            #print-button {
+                display: none;
+            }
         }
         .tooltip {
             position: absolute;
@@ -382,10 +385,6 @@
 
             // Hide empty rows by default
             toggleRows();
-            // Apply hidden columns if details are toggled off
-            if (!showDetails) {
-                toggleDetails();
-            }
         }
 
         // Event listener for month selection change
@@ -562,24 +561,18 @@
             document.getElementById('table-view').classList.toggle('hidden', isGridView);
             document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
             document.getElementById('toggle-view').innerHTML = isGridView ? '<i class="fas fa-th-list"></i>' : '<i class="fas fa-th-large"></i>';
+            document.getElementById('print-button').classList.toggle('hidden', isGridView);
+            document.getElementById('toggle-details').classList.toggle('hidden', isGridView);
         });
 
         // Toggle details functionality
         document.getElementById('toggle-details').addEventListener('click', () => {
-            toggleDetails();
-        });
-
-        function toggleDetails() {
             showDetails = !showDetails;
             const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
-            const noColumn = document.querySelectorAll('th:nth-child(1), td:nth-child(1)');
             detailColumns.forEach(column => {
                 column.classList.toggle('hidden', !showDetails);
             });
-            noColumn.forEach(column => {
-                column.classList.toggle('hidden', !showDetails);
-            });
-        }
+        });
     </script>
 </body>
 </html>
