@@ -582,6 +582,22 @@
                 column.classList.toggle('hidden', showDetails);
             });
         }
+
+// full screen
+document.addEventListener('DOMContentLoaded', function () {
+    var elem = document.documentElement; // This targets the entire webpage
+
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { // Firefox
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE/Edge
+        elem.msRequestFullscreen();
+    }
+});
+
     </script>
 </body>
 </html>
