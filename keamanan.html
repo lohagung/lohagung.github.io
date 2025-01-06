@@ -144,12 +144,12 @@
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Tunggakan</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 1</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 2</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 3</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Ronda 4</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bulanan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Tunggakan</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 1</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 2</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 3</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 4</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Bulanan</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bayar</th>
                     </tr>
@@ -241,7 +241,7 @@
     </div>
 
     <script>
-        let showDetails = true;
+        let showDetails = false;
 
         // Function to fetch data from Google Sheets API
         async function fetchData(month) {
@@ -393,6 +393,8 @@
             const selectedMonth = event.target.value;
             document.getElementById('report-title').textContent = `LAPORAN DENDA RONDA ${selectedMonth.toUpperCase()}`;
             fetchData(selectedMonth);
+            showDetails = true;
+            toggleDetails();
         });
 
         // Initial fetch for default month
@@ -574,10 +576,10 @@
             const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
             const noColumn = document.querySelectorAll('th:nth-child(1), td:nth-child(1)');
             detailColumns.forEach(column => {
-                column.classList.toggle('hidden', !showDetails);
+                column.classList.toggle('hidden', showDetails);
             });
             noColumn.forEach(column => {
-                column.classList.toggle('hidden', !showDetails);
+                column.classList.toggle('hidden', showDetails);
             });
         }
     </script>
