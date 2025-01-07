@@ -83,7 +83,7 @@
     <!-- Data Table -->
     <div class="container mx-auto p-4">
         <h1 id="report-title" class="text-2xl font-bold mb-4 text-center uppercase">LAPORAN DENDA RONDA 2025</h1>
-        <div class="mb-4">
+        <div class="flex items-center justify-between mb-4">
             <select id="sheet-select" class="w-full p-2 border border-gray-300 rounded mt-1" onchange="getDatas()">
                 <option value="Januari">Januari</option>
                 <option value="Februari">Februari</option>
@@ -98,22 +98,23 @@
                 <option value="November">November</option>
                 <option value="Desember">Desember</option>
             </select>
+            <i id="detail-icon" class="fas fa-eye text-teal-700 text-xl cursor-pointer ml-4" onclick="toggleDetails()"></i>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                     <tr>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
+                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden detail-column">No</th>
                         <th class="px-4 py-2 border text-left bg-teal-700 text-white">Nama</th>
                         <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Tunggakan</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Ronda 1</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Ronda 2</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Ronda 3</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Ronda 4</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Bulanan</th>
                         <th class="px-4 py-2 border text-right bg-teal-700 text-white">Jumlah</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Bayar</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Tunggakan</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 1</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 2</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 3</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 4</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Bulanan</th>
+                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Bayar</th>
                     </tr>
                 </thead>
                 <tbody id="data-table-body">
@@ -160,6 +161,7 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbzfdo3CVpQY501W56AZVHAa-ui3Uek-q3sZiww84Yagb7V7MoYpvi-uyW1oT9_jAzJQFQ/exec";
         let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
         let currentNotificationPage = 0;
+        let showDetails = false;
 
         async function getDatas() {
             const sheet = document.getElementById("sheet-select").value;
@@ -173,32 +175,32 @@
                     if (data.nama === "TOTAL") {
                         tableBody.innerHTML += `
                             <tr class="border-b">
-                                <td class="px-4 py-2 text-right"></td>
+                                <td class="px-4 py-2 text-right hidden detail-column"></td>
                                 <td class="px-4 py-2 font-bold text-left">${data.nama}</td>
                                 <td class="px-4 py-2 text-center">${data.blok}</td>
-                                <td class="px-4 py-2 text-right">${data.tunggakan}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda1}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda2}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda3}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda4}</td>
-                                <td class="px-4 py-2 text-right">${data.bulanan}</td>
                                 <td class="px-4 py-2 text-right">${data.jumlah}</td>
-                                <td class="px-4 py-2 text-right">${data.bayar}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.tunggakan}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda1}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda2}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda3}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda4}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.bulanan}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.bayar}</td>
                             </tr>`;
                     } else {
                         tableBody.innerHTML += `
-                            <tr class="border-b" id="row-${data.id}">
-                                <td class="px-4 py-2 text-right">${index + 1}</td>
+                            <tr class="border-b ${data.nama ? '' : 'hidden'}" id="row-${data.id}">
+                                <td class="px-4 py-2 text-right hidden detail-column">${index + 1}</td>
                                 <td class="px-4 py-2 cursor-pointer text-blue-500 text-left" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">${data.nama}</td>
                                 <td class="px-4 py-2 text-center">${data.blok}</td>
-                                <td class="px-4 py-2 text-right">${data.tunggakan}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda1}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda2}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda3}</td>
-                                <td class="px-4 py-2 text-right">${data.ronda4}</td>
-                                <td class="px-4 py-2 text-right">${data.bulanan}</td>
                                 <td class="px-4 py-2 text-right">${data.jumlah}</td>
-                                <td class="px-4 py-2 text-right">${data.bayar}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.tunggakan}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda1}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda2}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda3}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda4}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.bulanan}</td>
+                                <td class="px-4 py-2 text-right hidden detail-column">${data.bayar}</td>
                             </tr>`;
                     }
                 });
@@ -395,6 +397,21 @@
             setTimeout(() => {
                 alertBox.classList.remove("show");
             }, 3000);
+        }
+
+        function toggleDetails() {
+            showDetails = !showDetails;
+            const detailColumns = document.querySelectorAll('.detail-column');
+            detailColumns.forEach(column => {
+                column.classList.toggle('hidden', !showDetails);
+            });
+
+            const rows = document.querySelectorAll('#data-table-body tr');
+            rows.forEach(row => {
+                if (!row.querySelector('td:nth-child(2)').innerText) {
+                    row.classList.toggle('hidden', !showDetails);
+                }
+            });
         }
 
         document.getElementById("notification-icon").addEventListener("click", () => {
