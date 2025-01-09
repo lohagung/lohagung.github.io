@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>RT 09</title>
+    <title>Denda Ronda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -88,23 +88,10 @@
             </select>
             <i id="detail-icon" class="fas fa-eye text-teal-700 text-xl cursor-pointer ml-4" onclick="toggleDetails()"></i>
         </div>
-        <div id="data-list" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div id="data-list" class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <!-- Data List items will be dynamically inserted here -->
         </div>
     </div>
-    <!-- Footer -->
-    <footer class="bg-teal-700 text-white py-4">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <p>© 2025 Youshe. All rights reserved.</p>
-                <div class="flex space-x-4">
-                    <a class="text-white" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="text-white" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="text-white" href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
     <!-- Popup Form -->
     <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
@@ -127,37 +114,43 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbzfdo3CVpQY501W56AZVHAa-ui3Uek-q3sZiww84Yagb7V7MoYpvi-uyW1oT9_jAzJQFQ/exec";
         let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
         let showDetails = false;
+        let allData = [];
 
         async function getDatas() {
             const sheet = document.getElementById("sheet-select").value;
-            document.getElementById("report-title").innerText = `LAPORAN DENDA RONDA ${sheet.toUpperCase()}`;
+            document.getElementById("report-title").innerText = `DENDA RONDA ${sheet.toUpperCase()}`;
             const response = await fetch(`${scriptURL}?action=get-data&sheet=${sheet}`);
             const result = await response.json();
             if (result.success) {
-                const dataList = document.getElementById("data-list");
-                dataList.innerHTML = "";
-                result.data.forEach((data, index) => {
-                    const blokImage = data.blok.toLowerCase().replace(/[\s.]/g, '');
-                    const imageUrl = `/file/${blokImage}.jpg`;
-                    const fallbackImageUrl = '/file/no-profil.jpeg';
-                    const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
-                    if (data.nama || showDetails) {
-                        dataList.innerHTML += `
-                            <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
-                                <div class="flex items-center">
-                                    <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
-                                    <div>
-                                        <p class="text-lg font-semibold">${data.nama}</p>
-                                        <p class="text-sm text-gray-600">${data.blok}</p>
-                                    </div>
-                                </div>
-                                <p class="text-lg font-semibold">${jumlahFormatted}</p>
-                            </div>`;
-                    }
-                });
+                allData = result.data;
+                renderDataList(allData);
             } else {
                 showAlert("Gagal memuat data!");
             }
+        }
+
+        function renderDataList(data) {
+            const dataList = document.getElementById("data-list");
+            dataList.innerHTML = "";
+            data.forEach((data, index) => {
+                const blokImage = data.blok.toLowerCase().replace(/[\s.]/g, '');
+                const imageUrl = `/file/${blokImage}.jpg`;
+                const fallbackImageUrl = '/file/no-profil.jpeg';
+                const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
+                if (data.nama || showDetails) {
+                    dataList.innerHTML += `
+                        <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
+                            <div class="flex items-center">
+                                <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <p class="text-lg font-semibold">${data.nama}</p>
+                                    <p class="text-sm text-gray-600">${data.blok}</p>
+                                </div>
+                            </div>
+                            <p class="text-lg font-semibold">${jumlahFormatted}</p>
+                        </div>`;
+                }
+            });
         }
 
         async function saveData() {
@@ -180,9 +173,7 @@
             const result = await response.json();
             showAlert(result.message);
             if (result.success) {
-                if (action === "update") {
-                }
-                if (bayar) {
+                if (bayar && bayar != 0) {
                     addNotification(`${nama} membayar ${bayar} ${new Date().toLocaleString()}`, id);
                 }
                 closePopup();
@@ -302,11 +293,10 @@
             const detailIcon = document.getElementById("detail-icon");
             detailIcon.classList.toggle('fa-eye', !showDetails);
             detailIcon.classList.toggle('fa-eye-slash', showDetails);
-            getDatas();
+            renderDataList(allData);
         }
 
         document.getElementById("notification-icon").addEventListener("click", () => {
-            
             const notificationList = document.getElementById("notification-list");
             notificationList.classList.toggle("hidden");
         });
@@ -321,29 +311,12 @@
 
         document.getElementById("search-input").addEventListener("input", (event) => {
             const searchTerm = event.target.value.toLowerCase();
-            const dataList = document.getElementById("data-list");
-            dataList.innerHTML = "";
-            result.data.forEach((data) => {
+            const filteredData = allData.filter(data => {
                 const name = data.nama.toLowerCase();
                 const block = data.blok.toLowerCase();
-                const blokImage = data.blok.toLowerCase().replace(/[\s.]/g, '');
-                const imageUrl = `/file/${blokImage}.jpg`;
-                const fallbackImageUrl = '/file/no-profil.jpeg';
-                const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
-                if (name.includes(searchTerm) || block.includes(searchTerm)) {
-                    dataList.innerHTML += `
-                        <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
-                            <div class="flex items-center">
-                                <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
-                                <div>
-                                    <p class="text-lg font-semibold">${data.nama}</p>
-                                    <p class="text-sm text-gray-600">${data.blok}</p>
-                                </div>
-                            </div>
-                            <p class="text-lg font-semibold">${jumlahFormatted}</p>
-                        </div>`;
-                }
+                return name.includes(searchTerm) || block.includes(searchTerm);
             });
+            renderDataList(filteredData);
         });
 
         window.onload = () => {
