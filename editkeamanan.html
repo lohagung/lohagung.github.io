@@ -10,23 +10,6 @@
         body {
             font-family: 'Roboto', sans-serif;
         }
-        table {
-            -webkit-print-color-adjust: exact;
-            border-collapse: collapse;
-        }
-        th, td {
-            white-space: nowrap;
-            border: 1px solid gray;
-        }
-        table tr:nth-child(even) {
-            background-color: #0f766e3b;
-        }
-        table tr:hover {
-            background-color: #fbbf24;
-        }
-        .highlight {
-            background-color: #fbbf24 !important;
-        }
         .notification-item {
             background-color: #f3f4f6;
         }
@@ -48,6 +31,16 @@
         .alert.show {
             display: block;
         }
+        .notification-items li {
+            font-size: xx-small;
+            white-space: nowrap;
+        }
+        .data-item:hover, .data-item:focus, .data-item:active {
+            background-color: #fbbf24;
+        }
+        .highlighted {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -62,25 +55,20 @@
                 <i id="notification-icon" class="fas fa-bell text-white text-xl cursor-pointer relative">
                     <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 hidden">0</span>
                 </i>
-                <div id="notification-list" class="absolute right-0 mt-8 w-64 bg-white shadow-lg rounded-lg hidden max-h-96 overflow-y-auto">
-                    <ul id="notification-items" class="p-2">
+                <div id="notification-list" class="absolute right-0 mt-8 w-64 bg-white shadow-lg rounded-lg hidden overflow-y-auto max-h-96 md:max-h-64">
+                    <ul id="notification-items" class="p-2 notification-items">
                         <!-- Notification items will be dynamically inserted here -->
                     </ul>
-                    <div id="notification-pagination" class="p-2 text-center hidden">
-                        <button id="prev-notifications" class="text-blue-500">Previous</button>
-                        <button id="next-notifications" class="text-blue-500">Next</button>
-                    </div>
                 </div>
             </div>
-            <i id="add-icon" class="fas fa-plus text-white text-xl cursor-pointer"></i>
             <i id="search-icon" class="fas fa-search text-white text-xl cursor-pointer"></i>
         </div>
         <div id="search-bar" class="absolute inset-0 bg-teal-700 p-4 flex items-center justify-center hidden">
-            <input id="search-input" type="text" placeholder="Search by name or block" class="w-1/2 p-2 rounded">
+            <input id="search-input" type="text" placeholder="Search by name or block" class="w-full p-2 rounded">
             <i id="close-search" class="fas fa-times text-white text-2xl ml-4 cursor-pointer"></i>
         </div>
     </div>
-    <!-- Data Table -->
+    <!-- Data List -->
     <div class="container mx-auto p-4">
         <h1 id="report-title" class="text-2xl font-bold mb-4 text-center uppercase">LAPORAN DENDA RONDA 2025</h1>
         <div class="flex items-center justify-between mb-4">
@@ -100,27 +88,8 @@
             </select>
             <i id="detail-icon" class="fas fa-eye text-teal-700 text-xl cursor-pointer ml-4" onclick="toggleDetails()"></i>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden detail-column">No</th>
-                        <th class="px-4 py-2 border text-left bg-teal-700 text-white">Nama</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white">Jumlah</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Tunggakan</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 1</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 2</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 3</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Ronda 4</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Bulanan</th>
-                        <th class="px-4 py-2 border text-right bg-teal-700 text-white hidden detail-column">Bayar</th>
-                    </tr>
-                </thead>
-                <tbody id="data-table-body">
-                    <!-- Data Data akan dimuat di sini -->
-                </tbody>
-            </table>
+        <div id="data-list" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Data List items will be dynamically inserted here -->
         </div>
     </div>
     <!-- Footer -->
@@ -136,7 +105,6 @@
             </div>
         </div>
     </footer>
-
     <!-- Popup Form -->
     <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
@@ -151,16 +119,13 @@
             </div>
         </div>
     </div>
-
     <!-- Alert -->
     <div id="alert" class="alert">
         <p id="alert-message"></p>
     </div>
-
     <script>
         const scriptURL = "https://script.google.com/macros/s/AKfycbzfdo3CVpQY501W56AZVHAa-ui3Uek-q3sZiww84Yagb7V7MoYpvi-uyW1oT9_jAzJQFQ/exec";
         let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-        let currentNotificationPage = 0;
         let showDetails = false;
 
         async function getDatas() {
@@ -169,39 +134,25 @@
             const response = await fetch(`${scriptURL}?action=get-data&sheet=${sheet}`);
             const result = await response.json();
             if (result.success) {
-                const tableBody = document.getElementById("data-table-body");
-                tableBody.innerHTML = "";
+                const dataList = document.getElementById("data-list");
+                dataList.innerHTML = "";
                 result.data.forEach((data, index) => {
-                    if (data.nama === "TOTAL") {
-                        tableBody.innerHTML += `
-                            <tr class="border-b">
-                                <td class="px-4 py-2 text-right hidden detail-column"></td>
-                                <td class="px-4 py-2 font-bold text-left">${data.nama}</td>
-                                <td class="px-4 py-2 text-center">${data.blok}</td>
-                                <td class="px-4 py-2 text-right">${data.jumlah}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.tunggakan}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda1}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda2}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda3}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda4}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.bulanan}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.bayar}</td>
-                            </tr>`;
-                    } else {
-                        tableBody.innerHTML += `
-                            <tr class="border-b ${data.nama ? '' : 'hidden'}" id="row-${data.id}">
-                                <td class="px-4 py-2 text-right hidden detail-column">${index + 1}</td>
-                                <td class="px-4 py-2 cursor-pointer text-blue-500 text-left" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">${data.nama}</td>
-                                <td class="px-4 py-2 text-center">${data.blok}</td>
-                                <td class="px-4 py-2 text-right">${data.jumlah}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.tunggakan}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda1}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda2}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda3}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.ronda4}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.bulanan}</td>
-                                <td class="px-4 py-2 text-right hidden detail-column">${data.bayar}</td>
-                            </tr>`;
+                    const blokImage = data.blok.toLowerCase().replace(/[\s.]/g, '');
+                    const imageUrl = `/file/${blokImage}.jpg`;
+                    const fallbackImageUrl = '/file/no-profil.jpeg';
+                    const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
+                    if (data.nama || showDetails) {
+                        dataList.innerHTML += `
+                            <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
+                                <div class="flex items-center">
+                                    <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
+                                    <div>
+                                        <p class="text-lg font-semibold">${data.nama}</p>
+                                        <p class="text-sm text-gray-600">${data.blok}</p>
+                                    </div>
+                                </div>
+                                <p class="text-lg font-semibold">${jumlahFormatted}</p>
+                            </div>`;
                     }
                 });
             } else {
@@ -222,9 +173,7 @@
             const jumlah = document.getElementById("jumlah") ? document.getElementById("jumlah").value : "";
             const bayar = document.getElementById("bayar") ? document.getElementById("bayar").value : "";
             const sheet = document.getElementById("sheet-select").value;
-
             let action = id ? "update" : "insert";
-
             const response = await fetch(
                 `${scriptURL}?action=${action}&id=${id}&nama=${nama}&blok=${blok}&tunggakan=${tunggakan}&ronda1=${ronda1}&ronda2=${ronda2}&ronda3=${ronda3}&ronda4=${ronda4}&bulanan=${bulanan}&jumlah=${jumlah}&bayar=${bayar}&sheet=${sheet}`
             );
@@ -232,7 +181,6 @@
             showAlert(result.message);
             if (result.success) {
                 if (action === "update") {
-
                 }
                 if (bayar) {
                     addNotification(`${nama} membayar ${bayar} ${new Date().toLocaleString()}`, id);
@@ -269,27 +217,27 @@
                 </div>
                 <div class="mb-4">
                     <label for="tunggakan" class="block text-gray-700">Tunggakan</label>
-                    <input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1" value="${tunggakan}" required oninput="calculateJumlah()">
+                    <input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1" value="${tunggakan}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="ronda1" class="block text-gray-700">Ronda 1</label>
-                    <input type="number" id="ronda1" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda1}" required oninput="calculateJumlah()">
+                    <input type="number" id="ronda1" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda1}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="ronda2" class="block text-gray-700">Ronda 2</label>
-                    <input type="number" id="ronda2" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda2}" required oninput="calculateJumlah()">
+                    <input type="number" id="ronda2" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda2}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="ronda3" class="block text-gray-700">Ronda 3</label>
-                    <input type="number" id="ronda3" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda3}" required oninput="calculateJumlah()">
+                    <input type="number" id="ronda3" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda3}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="ronda4" class="block text-gray-700">Ronda 4</label>
-                    <input type="number" id="ronda4" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda4}" required oninput="calculateJumlah()">
+                    <input type="number" id="ronda4" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda4}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="bulanan" class="block text-gray-700">Bulanan</label>
-                    <input type="number" id="bulanan" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bulanan}" required oninput="calculateJumlah()">
+                    <input type="number" id="bulanan" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bulanan}" oninput="calculateJumlah()">
                 </div>
                 <div class="mb-4">
                     <label for="jumlah" class="block text-gray-700">Jumlah</label>
@@ -297,56 +245,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="bayar" class="block text-gray-700">Bayar</label>
-                    <input type="number" id="bayar" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bayar}" required oninput="calculateJumlah()">
-                </div>
-            `;
-            document.getElementById("popup-form").classList.remove("hidden");
-        }
-
-        function openAddPopup() {
-            document.getElementById("id").value = "";
-            document.getElementById("form-title").innerText = "Tambah Data";
-            document.getElementById("submit-btn").innerText = "Simpan Data";
-            document.getElementById("form-content").innerHTML = `
-                <div class="mb-4">
-                    <label for="nama" class="block text-gray-700">Nama Data</label>
-                    <input type="text" id="nama" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                </div>
-                <div class="mb-4">
-                    <label for="blok" class="block text-gray-700">Blok</label>
-                    <input type="text" id="blok" class="w-full p-2 border border-gray-300 rounded mt-1" required>
-                </div>
-                <div class="mb-4">
-                    <label for="tunggakan" class="block text-gray-700">Tunggakan</label>
-                    <input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="ronda1" class="block text-gray-700">Ronda 1</label>
-                    <input type="number" id="ronda1" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="ronda2" class="block text-gray-700">Ronda 2</label>
-                    <input type="number" id="ronda2" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="ronda3" class="block text-gray-700">Ronda 3</label>
-                    <input type="number" id="ronda3" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="ronda4" class="block text-gray-700">Ronda 4</label>
-                    <input type="number" id="ronda4" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="bulanan" class="block text-gray-700">Bulanan</label>
-                    <input type="number" id="bulanan" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
-                </div>
-                <div class="mb-4">
-                    <label for="jumlah" class="block text-gray-700">Jumlah</label>
-                    <input type="number" id="jumlah" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" readonly>
-                </div>
-                <div class="mb-4">
-                    <label for="bayar" class="block text-gray-700">Bayar</label>
-                    <input type="number" id="bayar" class="w-full p-2 border border-gray-300 rounded mt-1" required oninput="calculateJumlah()">
+                    <input type="number" id="bayar" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bayar}" oninput="calculateJumlah()">
                 </div>
             `;
             document.getElementById("popup-form").classList.remove("hidden");
@@ -359,25 +258,26 @@
         function addNotification(message, id) {
             const notificationList = document.getElementById("notification-items");
             const notificationCount = document.getElementById("notification-count");
-
-            notifications.push({ message, id, clicked: false });
+            notifications.unshift({ message, id, clicked: false });
             localStorage.setItem('notifications', JSON.stringify(notifications));
             notificationCount.innerText = notifications.filter(n => !n.clicked).length;
             notificationCount.classList.remove("hidden");
-
             renderNotifications();
         }
 
         function renderNotifications() {
             const notificationList = document.getElementById("notification-items");
             notificationList.innerHTML = "";
-
-            notifications.slice(currentNotificationPage * 10, (currentNotificationPage + 1) * 10).forEach((notification, index) => {
+            notifications.forEach((notification, index) => {
                 const listItem = document.createElement("li");
                 listItem.className = `p-2 border-b border-gray-200 notification-item ${notification.clicked ? 'clicked' : ''}`;
                 listItem.innerText = notification.message;
                 listItem.onclick = () => {
                     document.getElementById(`row-${notification.id}`).scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById(`row-${notification.id}`).classList.add('highlighted');
+                    setTimeout(() => {
+                        document.getElementById(`row-${notification.id}`).classList.remove('highlighted');
+                    }, 3000);
                     notification.clicked = true;
                     localStorage.setItem('notifications', JSON.stringify(notifications));
                     renderNotifications();
@@ -385,8 +285,6 @@
                 };
                 notificationList.appendChild(listItem);
             });
-
-            document.getElementById("notification-pagination").classList.toggle("hidden", notifications.length <= 10);
         }
 
         function showAlert(message) {
@@ -401,25 +299,17 @@
 
         function toggleDetails() {
             showDetails = !showDetails;
-            const detailColumns = document.querySelectorAll('.detail-column');
-            detailColumns.forEach(column => {
-                column.classList.toggle('hidden', !showDetails);
-            });
-
-            const rows = document.querySelectorAll('#data-table-body tr');
-            rows.forEach(row => {
-                if (!row.querySelector('td:nth-child(2)').innerText) {
-                    row.classList.toggle('hidden', !showDetails);
-                }
-            });
+            const detailIcon = document.getElementById("detail-icon");
+            detailIcon.classList.toggle('fa-eye', !showDetails);
+            detailIcon.classList.toggle('fa-eye-slash', showDetails);
+            getDatas();
         }
 
         document.getElementById("notification-icon").addEventListener("click", () => {
+            
             const notificationList = document.getElementById("notification-list");
             notificationList.classList.toggle("hidden");
         });
-
-        document.getElementById("add-icon").addEventListener("click", openAddPopup);
 
         document.getElementById("search-icon").addEventListener("click", () => {
             document.getElementById("search-bar").classList.remove("hidden");
@@ -431,14 +321,27 @@
 
         document.getElementById("search-input").addEventListener("input", (event) => {
             const searchTerm = event.target.value.toLowerCase();
-            const rows = document.querySelectorAll("#data-table-body tr");
-            rows.forEach(row => {
-                const name = row.children[1].innerText.toLowerCase();
-                const block = row.children[2].innerText.toLowerCase();
+            const dataList = document.getElementById("data-list");
+            dataList.innerHTML = "";
+            result.data.forEach((data) => {
+                const name = data.nama.toLowerCase();
+                const block = data.blok.toLowerCase();
+                const blokImage = data.blok.toLowerCase().replace(/[\s.]/g, '');
+                const imageUrl = `/file/${blokImage}.jpg`;
+                const fallbackImageUrl = '/file/no-profil.jpeg';
+                const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
                 if (name.includes(searchTerm) || block.includes(searchTerm)) {
-                    row.classList.remove("hidden");
-                } else {
-                    row.classList.add("hidden");
+                    dataList.innerHTML += `
+                        <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
+                            <div class="flex items-center">
+                                <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <p class="text-lg font-semibold">${data.nama}</p>
+                                    <p class="text-sm text-gray-600">${data.blok}</p>
+                                </div>
+                            </div>
+                            <p class="text-lg font-semibold">${jumlahFormatted}</p>
+                        </div>`;
                 }
             });
         });
