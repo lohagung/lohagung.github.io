@@ -105,20 +105,6 @@
             </div>
         </div>
     </footer>
-    <!-- Popup Form -->
-    <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
-            <h2 id="form-title" class="text-xl font-semibold mb-4">Tambah Data</h2>
-            <input type="hidden" id="id">
-            <div id="form-content" class="grid grid-cols-2 gap-4">
-                <!-- Form fields will be dynamically inserted here -->
-            </div>
-            <div class="flex justify-end">
-                <button id="submit-btn" type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveData()">Simpan Data</button>
-                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded ml-2" onclick="closePopup()">Batal</button>
-            </div>
-        </div>
-    </div>
     <!-- Alert -->
     <div id="alert" class="alert">
         <p id="alert-message"></p>
@@ -332,7 +318,7 @@
                 const jumlahFormatted = data.jumlah == 0 ? '<span class="text-green-500"><i class="fas fa-check"></i> Lunas</span>' : `<span class="text-red-500">Rp ${parseInt(data.jumlah).toLocaleString('id-ID')}</span>`;
                 if (name.includes(searchTerm) || block.includes(searchTerm)) {
                     dataList.innerHTML += `
-                        <div id="row-${data.id}" class="data-item flex justify-between items-center p-4 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
+                        <div id="row-${data.id}" class="data-item flex justify-between items-center p-2 bg-white shadow rounded cursor-pointer" onclick="openEditPopup('${data.id}', '${data.nama}', '${data.blok}', '${data.tunggakan}', '${data.ronda1}', '${data.ronda2}', '${data.ronda3}', '${data.ronda4}', '${data.bulanan}', '${data.jumlah}', '${data.bayar}')">
                             <div class="flex items-center">
                                 <img src="${imageUrl}" alt="Profile picture of ${data.nama} from block ${data.blok}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" class="w-12 h-12 rounded-full mr-4">
                                 <div>
