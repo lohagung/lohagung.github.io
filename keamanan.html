@@ -1,250 +1,379 @@
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>RT 09</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="/logo.png" type="image/jpeg"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        main {
-            flex: 1;
-        }
-        table {
-            -webkit-print-color-adjust: exact;
-            border-collapse: collapse;
-        }
-        th, td {
-            white-space: nowrap;
-            border: 1px solid gray;
-        }
-        table tr:nth-child(even) {
-            background-color: #0f766e3b;
-        }
-        table tr:hover {
-            background-color: #fbbf24;
-        }
-        @media (max-width: 640px) {
-            #search-input {
-                width: 100% !important;
-            }
-        }
-        .tooltip {
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            display: none;
-            z-index: 1000;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            width: 90%;
-            max-width: 600px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <!-- Header -->
-    <div class="bg-teal-700 p-4 flex items-center justify-between relative">
-        <div class="flex items-center">
-           <img src="/logo.png" 
-         alt="loh agung 6" style="max-height:28px">
-            <h1 class="text-white text-xl ml-4">RT09 #Keamanan</h1>
-        </div>
-        <div class="flex items-center space-x-4">
-            <i class="fas fa-bell text-white text-xl"></i>
-            <i id="search-icon" class="fas fa-search text-white text-xl cursor-pointer"></i>
-        </div>
-        <div id="search-bar" class="absolute inset-0 bg-teal-700 p-4 flex items-center justify-center hidden">
-            <input id="search-input" type="text" placeholder="Search by name or block" class="w-1/2 p-2 rounded">
-            <i id="close-search" class="fas fa-times text-white text-2xl ml-4 cursor-pointer"></i>
-        </div>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   RT 09
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="/logo.png" rel="icon" type="image/jpeg"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+  </script>
+  <style>
+   body {
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    main {
+      flex: 1;
+    }
+    table {
+      -webkit-print-color-adjust: exact;
+      border-collapse: collapse;
+    }
+    th, td {
+      white-space: nowrap;
+      border: 1px solid gray;
+    }
+    table tr:nth-child(even) {
+      background-color: #0f766e3b;
+    }
+    table tr:hover {
+      background-color: #fbbf24;
+    }
+    @media (max-width: 640px) {
+      #search-input {
+        width: 100% !important;
+      }
+      .grid-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .grid-item img {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+      }
+      .grid-item .left {
+        display: flex;
+        align-items: center;
+      }
+      .grid-item .right {
+        text-align: right;
+      }
+      .flex {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+    .tooltip {
+      position: absolute;
+      background-color: #333;
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 12px;
+      display: none;
+      z-index: 1000;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+ </head>
+ <body class="bg-gray-100">
+  <!-- Header -->
+  <div class="bg-teal-700 p-4 flex items-center justify-between relative">
+   <div class="flex items-center">
+    <img alt="Logo of RT09 community" height="28" src="https://storage.googleapis.com/a1aa/image/mw5QHpliBoogMR5uPMe5NM4YesQPOTvYBz7ufJ4VAlxGLfNQB.jpg" style="max-height:28px" width="28"/>
+    <h1 class="text-white text-xl ml-4">
+     RT09 #Keamanan
+    </h1>
+   </div>
+   <div class="flex items-center space-x-4">
+    <i class="fas fa-bell text-white text-xl">
+    </i>
+    <i class="fas fa-search text-white text-xl cursor-pointer" id="search-icon">
+    </i>
+   </div>
+   <div class="absolute inset-0 bg-teal-700 p-4 flex items-center justify-center hidden" id="search-bar">
+    <input class="w-1/2 p-2 rounded" id="search-input" placeholder="Search by name or block" type="text"/>
+    <i class="fas fa-times text-white text-2xl ml-4 cursor-pointer" id="close-search">
+    </i>
+   </div>
+  </div>
+  <!-- Main Content -->
+  <main class="container mx-auto p-4">
+   <h2 class="text-2xl font-bold mb-4 text-center uppercase" id="report-title">
+    DENDA RONDA 2025
+   </h2>
+   <div class="mb-4 flex items-center space-x-4">
+    <div>
+     <select class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="month-select">
+      <option value="Januari">
+       Januari 2025
+      </option>
+      <option value="Februari">
+       Februari
+      </option>
+      <option value="Maret">
+       Maret
+      </option>
+      <option value="April">
+       April
+      </option>
+      <option value="Mei">
+       Mei
+      </option>
+      <option value="Juni">
+       Juni
+      </option>
+      <option value="Juli">
+       Juli
+      </option>
+      <option value="Agustus">
+       Agustus
+      </option>
+      <option value="September">
+       September
+      </option>
+      <option value="Oktober">
+       Oktober
+      </option>
+      <option value="November">
+       November
+      </option>
+      <option value="Desember">
+       Desember
+      </option>
+     </select>
     </div>
-    <!-- Main Content -->
-    <main class="container mx-auto p-4">
-        <h2 id="report-title" class="text-2xl font-bold mb-4 text-center uppercase">DENDA RONDA 2025</h2>
-        <div class="mb-4 flex items-center space-x-4">
-            <div>
-                <select id="month-select" class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <option value="Januari">Januari 2025</option>
-                    <option value="Februari">Februari</option>
-                    <option value="Maret">Maret</option>
-                    <option value="April">April</option>
-                    <option value="Mei">Mei</option>
-                    <option value="Juni">Juni</option>
-                    <option value="Juli">Juli</option>
-                    <option value="Agustus">Agustus</option>
-                    <option value="September">September</option>
-                    <option value="Oktober">Oktober</option>
-                    <option value="November">November</option>
-                    <option value="Desember">Desember</option>
-                </select>
-            </div>
-            <div>
-                <button id="toggle-rows" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <i class="fas fa-eye-slash"></i>
-                </button>
-            </div>
-            <div>
-                <button id="toggle-details" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <i class="fas fa-info-circle"></i>
-                </button>
-            </div>
-            <div>
-                <button id="print-button" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <i class="fas fa-print"></i>
-                </button>
-            </div>
-            <div>
-                <button id="toggle-view" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <i class="fas fa-th-large"></i>
-                </button>
-            </div>
-        </div>
-        <div id="table-view" class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200">
-                <thead>
-                    <tr>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">No</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Nama</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Blok</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Tunggakan</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 1</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 2</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 3</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Ronda 4</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">Bulanan</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Jumlah</th>
-                        <th class="px-4 py-2 border text-center bg-teal-700 text-white">Bayar</th>
-                    </tr>
-                </thead>
-                <tbody id="data-table-body">
-                    <!-- Data will be inserted here by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-        <div id="grid-view" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <!-- Grid items will be inserted here by JavaScript -->
-        </div>
-    </main>
-
-    <!-- Search Results Page -->
-    <main id="search-results-page" class="container mx-auto p-4 hidden">
-        <h1 class="text-2xl font-bold mb-4 text-center uppercase">PENCARIAN DATA</h1>      
-        <div id="search-results" class="bg-white shadow-lg rounded mt-2 p-4"></div>
-		<button id="back-button" class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4">
-            Kembali
-        </button>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-teal-700 text-white py-4">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center">
-                <p>© 2025 Youshe.</p>
-                <div class="flex space-x-4">
-                    <a class="text-white" href="https://raw.githubusercontent.com/lohagung/lohagung.github.io/refs/heads/main/LA6.apk"><i class="fas fa-download"></i> Unduh Aplikasi</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <div id="tooltip" class="tooltip"></div>
-
-    <!-- Modal -->
-    <div id="modal" class="modal">
-        <div id="content-to-capture" class="modal-content">
-            <span class="close">&times;</span>
-            <h1 class="text-center text-xl font-bold">TAGIHAN DENDA RONDA</h1>
-            <p class="text-center text-xs">Perum Loh Agung 6 & Kavling RT 09 RW 23 Jaten Karanganyar</p>
-            <div class="flex justify-between mt-4">
-                <p id="modal-no" class="text-left"></p>
-                <p id="modal-name-block" class="text-right"></p>
-            </div>
-            <hr class="my-2">
-            <div class="flex justify-between">
-                <p>Tunggakan</p>
-                <p id="modal-tunggakan" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Ronda 1</p>
-                <p id="modal-ronda1" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Ronda 2</p>
-                <p id="modal-ronda2" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Ronda 3</p>
-                <p id="modal-ronda3" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Ronda 4</p>
-                <p id="modal-ronda4" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Bulanan</p>
-                <p id="modal-bulanan" class="text-right"></p>
-            </div>
-            <hr class="my-2">
-            <div class="flex justify-between">
-                <p>TOTAL</p>
-                <p id="modal-total" class="text-right text-red-500 font-bold"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Kurang</p>
-                <p id="modal-jumlah" class="text-right"></p>
-            </div>
-            <div class="flex justify-between">
-                <p>Bayar</p>
-                <p id="modal-bayar" class="text-right"></p>
-            </div></br>
-            <p class="text-center mt-4">Seksi Keamanan</p></br>
-            <p class="text-center">Wahyudi</p></br></br>
-            <button class="text-center" id="download-button">Simpan</button>
-        </div>
+    <div>
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-rows">
+      <i class="fas fa-eye-slash">
+      </i>
+     </button>
     </div>
-
-    <script>
+    <div>
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-details">
+      <i class="fas fa-info-circle">
+      </i>
+     </button>
+    </div>
+    <div>
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="print-button">
+      <i class="fas fa-print">
+      </i>
+     </button>
+    </div>
+    <div>
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-view">
+      <i class="fas fa-th-list">
+      </i>
+     </button>
+    </div>
+   </div>
+   <div class="hidden overflow-x-auto" id="table-view">
+    <table class="min-w-full bg-white border border-gray-200">
+     <thead>
+      <tr>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white">
+        No
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white">
+        Nama
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white">
+        Blok
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Tunggakan
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Ronda 1
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Ronda 2
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Ronda 3
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Ronda 4
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white hidden">
+        Bulanan
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white">
+        Jumlah
+       </th>
+       <th class="px-4 py-2 border text-center bg-teal-700 text-white">
+        Bayar
+       </th>
+      </tr>
+     </thead>
+     <tbody id="data-table-body">
+      <!-- Data will be inserted here by JavaScript -->
+     </tbody>
+    </table>
+   </div>
+   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" id="grid-view">
+    <!-- Grid items will be inserted here by JavaScript -->
+   </div>
+  </main>
+  <!-- Search Results Page -->
+  <main class="container mx-auto p-4 hidden" id="search-results-page">
+   <h1 class="text-2xl font-bold mb-4 text-center uppercase">
+    PENCARIAN DATA
+   </h1>
+   <div class="bg-white shadow-lg rounded mt-2 p-4" id="search-results">
+   </div>
+   <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4" id="back-button">
+    Kembali
+   </button>
+  </main>
+  <!-- Footer -->
+  <footer class="bg-teal-700 text-white py-4">
+   <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center">
+     <p>
+      © 2025 Youshe.
+     </p>
+     <div class="flex space-x-4">
+      <a class="text-white" href="https://raw.githubusercontent.com/lohagung/lohagung.github.io/refs/heads/main/LA6.apk">
+       <i class="fas fa-download">
+       </i>
+       Unduh Aplikasi
+      </a>
+     </div>
+    </div>
+   </div>
+  </footer>
+  <div class="tooltip" id="tooltip">
+  </div>
+  <!-- Modal -->
+  <div class="modal" id="modal">
+   <div class="modal-content" id="content-to-capture">
+    <span class="close">
+     ×
+    </span>
+    <h1 class="text-center text-xl font-bold">
+     TAGIHAN DENDA RONDA
+    </h1>
+    <p class="text-center text-xs">
+     Perum Loh Agung 6 &amp; Kavling RT 09 RW 23 Jaten Karanganyar
+    </p>
+    <div class="flex justify-between mt-4">
+     <p class="text-left" id="modal-no">
+     </p>
+     <p class="text-right" id="modal-name-block">
+     </p>
+    </div>
+    <hr class="my-2"/>
+    <div class="flex justify-between">
+     <p>
+      Tunggakan
+     </p>
+     <p class="text-right" id="modal-tunggakan">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Ronda 1
+     </p>
+     <p class="text-right" id="modal-ronda1">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Ronda 2
+     </p>
+     <p class="text-right" id="modal-ronda2">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Ronda 3
+     </p>
+     <p class="text-right" id="modal-ronda3">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Ronda 4
+     </p>
+     <p class="text-right" id="modal-ronda4">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Bulanan
+     </p>
+     <p class="text-right" id="modal-bulanan">
+     </p>
+    </div>
+    <hr class="my-2"/>
+    <div class="flex justify-between">
+     <p>
+      TOTAL
+     </p>
+     <p class="text-right text-red-500 font-bold" id="modal-total">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Kurang
+     </p>
+     <p class="text-right" id="modal-jumlah">
+     </p>
+    </div>
+    <div class="flex justify-between">
+     <p>
+      Bayar
+     </p>
+     <p class="text-right" id="modal-bayar">
+     </p>
+    </div>
+    <p class="text-center mt-4">
+     Seksi Keamanan
+    </p>
+    <p class="text-center">
+     Wahyudi
+    </p>
+    <button class="text-center" id="download-button">
+     Simpan
+    </button>
+   </div>
+  </div>
+  <script>
         let showDetails = false;
         let showAll = false;
+        let isGridView = true;
 
         // Function to fetch data from Google Sheets API
         async function fetchData(month) {
@@ -327,58 +456,26 @@
 
                 tableBody.appendChild(tr);
 
-                // Grid Item
+                // Grid Item 
                 const gridItem = document.createElement('div');
-                gridItem.className = 'bg-white p-4 rounded shadow flex flex-col items-center';
+                gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item';
                 const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
                     const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
+
                     return acc + num;
                 }, 0);
                 const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
                 gridItem.innerHTML = `
-                    <img src="/file/${imageName}.jpg" 
-         alt="Profile picture of ${row[0]}" 
-         class="w-24 h-24 rounded-full mb-4"
-         onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
-                    <p class="text-lg font-bold text-center">${row[0]}</p>
-                    <p class="text-sm text-gray-600 text-center">${row[1]}</p>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">No.0${today.getFullYear()}${today.getDate()}</p>
-                        <p class="text-sm text-gray-600">${formattedDate}</p>
+                    <div class="left">
+                        <img alt="Profile picture of ${row[0]}" class="w-12 h-12 rounded-full mb-4" height="50" src="https://storage.googleapis.com/a1aa/image/fsw8dUJiVdTceExGDslwblxgPiKroBNFub8KwARAbzriRfGoA.jpg" width="50"/>
+                        <div>
+                            <p class="text-lg font-bold">${row[0]}</p>
+                            <p class="text-sm text-gray-600">${row[1]}</p>
+                        </div>
                     </div>
-                    <hr class="my-2 w-full">
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Tunggakan</p>
-                        <p class="text-sm text-gray-600">${row[2]}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Ronda 1</p>
-                        <p class="text-sm text-gray-600">${row[3]}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Ronda 2</p>
-                        <p class="text-sm text-gray-600">${row[4]}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Ronda 3</p>
-<p class="text-sm text-gray-600">${row[5]}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Ronda 4</p>
-                        <p class="text-sm text-gray-600">${row[6]}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Bulanan</p>
-                        <p class="text-sm text-gray-600">${row[7]}</p>
-                    </div>
-                    <hr class="my-2 w-full">
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">TOTAL</p>
-                        <p class="text-sm text-gray-600">Rp${total.toLocaleString('id-ID')}</p>
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <p class="text-sm text-gray-600">Bayar</p>
-                        <p class="text-sm text-gray-600">${row[9]}</p>
+                    <div class="right">
+                        <p class="text-sm text-red-500">Jumlah: Rp${total.toLocaleString('id-ID')}</p>
+                        <p class="text-sm text-gray-600">Bayar: ${row[9]}</p>
                     </div>
                 `;
                 gridView.appendChild(gridItem);
@@ -561,7 +658,6 @@
         });
 
         // Toggle view functionality
-        let isGridView = false;
         document.getElementById('toggle-view').addEventListener('click', () => {
             isGridView = !isGridView;
             document.getElementById('table-view').classList.toggle('hidden', isGridView);
@@ -586,5 +682,5 @@
             });
         }
     </script>
-</body>
+ </body>
 </html>
