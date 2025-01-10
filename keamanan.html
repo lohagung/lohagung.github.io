@@ -251,7 +251,7 @@
    <h1 class="text-2xl font-bold mb-4 text-center uppercase">
     PENCARIAN DATA
    </h1>
-   <div class="bg-white shadow-lg rounded mt-2 p-4" id="search-results">
+   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" id="search-results">
    </div>
    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4" id="back-button">
     Kembali
@@ -460,7 +460,7 @@
                     : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
                 const bayarContent = total.trim() === 'Rp0'
                     ? 'Tidak Ada Denda'
-                    : (row[9].trim() === 'Rp0' ? 'Belum Bayar' : row[9]);             
+                    : (row[9].trim() === 'Rp0' ?'Belum Bayar' : row[9]);             
                 gridItem.innerHTML = `
                     <div class="left">
                         <img src="/file/${imageName}.jpg" 
@@ -515,27 +515,41 @@
             const rows = document.querySelectorAll('#data-table-body tr');
             const searchResults = document.getElementById('search-results');
             searchResults.innerHTML = ''; // Clear previous search results
-            searchResults.classList.add('hidden'); // Hide search results container
 
             rows.forEach(row => {
                 const name = row.children[1].textContent.toLowerCase();
                 const block = row.children[2].textContent.toLowerCase();
                 if (name.includes(searchTerm) || block.includes(searchTerm)) {
-                    row.classList.remove('hidden');
                     const resultItem = document.createElement('div');
-                    resultItem.className = 'p-2 cursor-pointer hover:bg-gray-200';
-                    resultItem.textContent = `${row.children[1].textContent} - ${row.children[2].textContent}`;
-                    resultItem.addEventListener('click', () => {
-                        showModal(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent));
-                        searchResults.classList.add('hidden');
-                    });
+                    resultItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
+                    const total = row.children[8].textContent.trim();
+                    const imageName = row.children[2].textContent.replace(/[\s.]/g, '').toLowerCase();
+                    const jumlahContent = total === 'Rp0' 
+                        ? '<i class="fas fa-check text-green-500"></i> <span class="text-green-500">LUNAS</span>'
+                        : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
+                    const bayarContent = total === 'Rp0'
+                        ? 'Tidak Ada Denda'
+                        : (row.children[9].textContent.trim() === 'Rp0' ? 'Belum Bayar' : row.children[9].textContent.trim());
+                    resultItem.innerHTML = `
+                        <div class="left">
+                            <img src="/file/${imageName}.jpg" 
+                                 alt="Profile picture of ${row.children[1].textContent}" 
+                                 class="w-24 h-24 rounded-full mb-4"
+                                 onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
+                            <div>
+                                <p class="text-lg font-bold">${row.children[1].textContent}</p>
+                                <p class="text-sm text-gray-600">${row.children[2].textContent}</p>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <p class="text-sm">${jumlahContent}</p>
+                            <p class="text-sm text-gray-600">${bayarContent}</p>
+                        </div>
+                    `;
+                    resultItem.addEventListener('click', () => showModal(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent)));
                     searchResults.appendChild(resultItem);
-                    searchResults.classList.remove('hidden'); // Show search results container
-                } else {
-                    row.classList.add('hidden');
                 }
             });
-            updateRowColors();
 
             // Show search results page
             document.getElementById('search-results-page').classList.remove('hidden');
