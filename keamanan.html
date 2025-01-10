@@ -61,9 +61,6 @@
         flex-direction: row;
         flex-wrap: wrap;
       }
-      #print-button {
-        display: none;
-      }
     }
     .tooltip {
       position: absolute;
@@ -416,13 +413,7 @@
                         td.classList.add('text-center');
                     }
 
-                    if (cellIndex === 7 && !cell.trim()) { // If "Bulanan" is empty
-                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
-                    } else if (cellIndex >= 3 && cellIndex <= 6 && row[7].trim()) { // If "Bulanan" is not empty
-                        td.innerHTML = '<i class="fas fa-times text-red-500"></i>';
-                    } else {
-                        td.textContent = cell;
-                    }
+                    td.textContent = cell;
 
                     tr.appendChild(td);
                 });
@@ -431,16 +422,16 @@
                 const jumlahCell = tr.children[9];
                 const bayarCell = tr.children[10];
                 if (jumlahCell.textContent.trim() === 'Rp0') {
-                    jumlahCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
-                    if (bayarCell.textContent.trim() === 'Rp0') {
-                        bayarCell.innerHTML = '<span class="text-black">Tidak ada denda</span>';
-                    }
-                } else {
-                    jumlahCell.classList.add('bg-red-500', 'text-white', 'rounded', 'px-2', 'py-1');
-                }
-
-                if (bayarCell.textContent.trim() === 'Rp0' && jumlahCell.textContent.trim() !== 'Rp0') {
-                    bayarCell.innerHTML = '<span class="italic text-red-500">Belum bayar</span>';
+                    bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                    bayarCell.addEventListener('click', () => {
+                        const originalValue = row[9];
+                        bayarCell.innerHTML = originalValue;
+                        setTimeout(() => {
+                            bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                        }, 5000);
+                    });
+                } else if (jumlahCell.textContent.trim() !== 'Rp0' && bayarCell.textContent.trim() === 'Rp0') {
+                    bayarCell.innerHTML = '<span class="text-red-500 font-bold">Belum Bayar</span>';
                 }
 
                 // Add event listener for showing tooltip on "Jumlah" column
@@ -457,39 +448,36 @@
                     }, 5000);
                 });
 
-                // Make "Jumlah" column text larger and bold
-                jumlahCell.classList.add('text-lg', 'font-bold');
-
                 tableBody.appendChild(tr);
 
                 // Grid Item 
                 const gridItem = document.createElement('div');
-                gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item';
-                const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
-                    const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
-                    return acc + num;
-                }, 0);
+                gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
+                const total = row[8]; // Use the value from column 8 for "Jumlah"
                 const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
+                const jumlahContent = total.trim() === 'Rp0' 
+                    ? '<i class="fas fa-check text-green-500"></i> <span class="text-green-500">LUNAS</span>'
+                    : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
+                const bayarContent = total.trim() === 'Rp0'
+                    ? 'Tidak Ada Denda'
+                    : (row[9].trim() === 'Rp0' ? 'Belum Bayar' : row[9]);             
                 gridItem.innerHTML = `
                     <div class="left">
                         <img src="/file/${imageName}.jpg" 
-         alt="Profile picture of ${row[0]}" 
-         class="w-24 h-24 rounded-full mb-4"
-         onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
+                             alt="Profile picture of ${row[0]}" 
+                             class="w-24 h-24 rounded-full mb-4"
+                             onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                         <div>
                             <p class="text-lg font-bold">${row[0]}</p>
                             <p class="text-sm text-gray-600">${row[1]}</p>
                         </div>
                     </div>
                     <div class="right">
-                        <p class="text-lg font-bold ${total === 0 ? 'text-green-500' : 'bg-red-500 text-white rounded px-2 py-1'}">
-                            ${total === 0 ? '<i class="fas fa-check"></i> LUNAS' : `Rp${total.toLocaleString('id-ID')}`}
-                        </p>
-                        <p class="text-sm ${total === 0 ? 'text-black' : 'text-red-500 italic'}">
-                            ${total === 0 ? 'Tidak ada denda' : row[9] === 'Rp0' ? 'Belum bayar' : row[9]}
-                        </p>
+                        <p class="text-sm">${jumlahContent}</p>
+                        <p class="text-sm text-gray-600">${bayarContent}</p>
                     </div>
                 `;
+                gridItem.addEventListener('click', () => showModal(index, row));
                 gridView.appendChild(gridItem);
             });
 
