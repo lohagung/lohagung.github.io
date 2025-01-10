@@ -36,10 +36,6 @@
     table tr:hover {
       background-color: #fbbf24;
     }
-    @media (max-width: 640px) {
-      #search-input {
-        width: 100% !important;
-      }
       .grid-item {
         display: flex;
         justify-content: space-between;
@@ -57,10 +53,15 @@
       .grid-item .right {
         text-align: right;
       }
+    @media (max-width: 640px) {
+      #search-input {
+        width: 100% !important;
+      }
       .flex {
         flex-direction: row;
         flex-wrap: wrap;
       }
+#print-button, .fa-bell  {display:none;}
     }
     .tooltip {
       position: absolute;
@@ -110,7 +111,7 @@
   <!-- Header -->
   <div class="bg-teal-700 p-4 flex items-center justify-between relative">
    <div class="flex items-center">
-    <img alt="Logo of RT09 community" height="28" src="https://storage.googleapis.com/a1aa/image/mw5QHpliBoogMR5uPMe5NM4YesQPOTvYBz7ufJ4VAlxGLfNQB.jpg" style="max-height:28px" width="28"/>
+    <img alt="Logo of RT09 community" height="28" src="https://placehold.co/28x28" style="max-height:28px" width="28"/>
     <h1 class="text-white text-xl ml-4">
      RT09 #Keamanan
     </h1>
@@ -242,7 +243,7 @@
      </tbody>
     </table>
    </div>
-   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" id="grid-view">
+   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="grid-view">
     <!-- Grid items will be inserted here by JavaScript -->
    </div>
   </main>
@@ -251,11 +252,55 @@
    <h1 class="text-2xl font-bold mb-4 text-center uppercase">
     PENCARIAN DATA
    </h1>
-   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4" id="search-results">
+   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="search-results">
    </div>
    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4" id="back-button">
     Kembali
    </button>
+  </main>
+  <!-- Detail Page -->
+  <main class="container mx-auto p-4 hidden" id="detail-page">
+   <div class="relative">
+    <img alt="Cover photo of the selected block" class="w-full h-64 object-cover" id="detail-cover" src=""/>
+    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white">
+     <h1 class="text-3xl font-bold" id="detail-title">
+     </h1>
+     <hr class="w-1/2 my-2"/>
+    </div>
+   </div>
+   <div class="p-4 bg-white shadow rounded mt-4">
+    <h2 class="text-xl font-bold mb-2">
+     Rincian Denda Ronda
+    </h2>
+    <div id="detail-content">
+     <!-- Detailed content will be inserted here by JavaScript -->
+    </div>
+    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mt-4" id="back-to-main">
+     Kembali
+    </button>
+   </div>
+  </main>
+  <!-- Rincian Page -->
+  <main class="container mx-auto p-4 hidden" id="rincian-page">
+   <div class="relative">
+    <img alt="Cover photo of the selected block" class="w-full h-64 object-cover" id="rincian-cover" src=""/>
+    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white">
+     <h1 class="text-3xl font-bold" id="rincian-title">
+     </h1>
+     <hr class="w-1/2 my-2"/>
+    </div>
+   </div>
+   <div class="p-4 bg-white shadow rounded mt-4">
+    <h2 class="text-xl font-bold mb-2">
+     Rincian Denda Ronda
+    </h2>
+    <div id="rincian-content">
+     <!-- Detailed content will be inserted here by JavaScript -->
+    </div>
+    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mt-4" id="back-to-search">
+     Kembali
+    </button>
+   </div>
   </main>
   <!-- Footer -->
   <footer class="bg-teal-700 text-white py-4">
@@ -370,106 +415,170 @@
     </button>
    </div>
   </div>
-  <script>
-        let showDetails = false;
-        let showAll = false;
-        let isGridView = true;
+<script>
+    let showDetails = false;
+    let showAll = false;
+    let isGridView = true;
 
-        // Function to fetch data from Google Sheets API
-        async function fetchData(month) {
-            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
-            const data = await response.json();
-            const rows = data.values;
-            const tableBody = document.getElementById('data-table-body');
-            const gridView = document.getElementById('grid-view');
-            tableBody.innerHTML = ''; // Clear existing data
-            gridView.innerHTML = ''; // Clear existing data
+    // Function to fetch data from Google Sheets API
+    async function fetchData(month) {
+        const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/${month}?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
+        const data = await response.json();
+        const rows = data.values;
+        const tableBody = document.getElementById('data-table-body');
+        const gridView = document.getElementById('grid-view');
+        tableBody.innerHTML = ''; // Clear existing data
+        gridView.innerHTML = ''; // Clear existing data
 
-            // Get today's date in the desired format
-            const today = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = today.toLocaleDateString('id-ID', options);
+        rows.forEach((row, index) => {
+            if (index === 0) return; // Skip header row
 
-            rows.forEach((row, index) => {
-                if (index === 0) return; // Skip header row
+            // Table Row
+            const tr = document.createElement('tr');
+            const tdNo = document.createElement('td');
+            tdNo.className = 'px-4 py-2 border text-center';
+            tdNo.textContent = index; // Row number
+            tr.appendChild(tdNo);
 
-                // Table Row
-                const tr = document.createElement('tr');
-                const tdNo = document.createElement('td');
-                tdNo.className = 'px-4 py-2 border text-center';
-                tdNo.textContent = `No.0${index}${month}${today.getFullYear()}${today.getDate()}`; // Row number
-                tr.appendChild(tdNo);
-
-                row.forEach((cell, cellIndex) => {
-                    const td = document.createElement('td');
-                    td.className = 'px-4 py-2 border';
-                    if (cellIndex === 0) { // Left align "Nama"
-                        td.classList.add('text-left');
-                        td.classList.add('cursor-pointer');
-                        td.addEventListener('click', () => showModal(index, row));
-                    } else if (cellIndex === 2 || cellIndex >= 3) { // Right align specific columns
-                        td.classList.add('text-right');
-                    } else { // Center align other columns
-                        td.classList.add('text-center');
-                    }
-
-                    td.textContent = cell;
-
-                    tr.appendChild(td);
-                });
-
-                // Check if "Jumlah" column has "Rp0" and set "Bayar" column accordingly
-                const jumlahCell = tr.children[9];
-                const bayarCell = tr.children[10];
-                if (jumlahCell.textContent.trim() === 'Rp0') {
-                    bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
-                    bayarCell.addEventListener('click', () => {
-                        const originalValue = row[9];
-                        bayarCell.innerHTML = originalValue;
-                        setTimeout(() => {
-                            bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
-                        }, 5000);
-                    });
-                } else if (jumlahCell.textContent.trim() !== 'Rp0' && bayarCell.textContent.trim() === 'Rp0') {
-                    bayarCell.innerHTML = '<span class="text-red-500 font-bold">Belum Bayar</span>';
+            row.forEach((cell, cellIndex) => {
+                const td = document.createElement('td');
+                td.className = 'px-4 py-2 border';
+                if (cellIndex === 0) { // Left align "Nama"
+                    td.classList.add('text-left');
+                    td.classList.add('cursor-pointer');
+                    td.addEventListener('click', () => showModal(index, row));
+                } else if (cellIndex === 2 || cellIndex >= 3) { // Right align specific columns
+                    td.classList.add('text-right');
+                } else { // Center align other columns
+                    td.classList.add('text-center');
                 }
 
-                // Add event listener for showing tooltip on "Jumlah" column
-                jumlahCell.addEventListener('click', (event) => {
-                    const tooltip = document.getElementById('tooltip');
-                    const nama = row[0];
-                    const blok = row[1];
-                    tooltip.textContent = `${nama} - ${blok}`;
-                    tooltip.style.display = 'block';
-                    tooltip.style.left = `${event.pageX}px`;
-                    tooltip.style.top = `${event.pageY}px`;
+                td.textContent = cell;
+
+                tr.appendChild(td);
+            });
+
+            // Check if "Jumlah" column has "Rp0" and set "Bayar" column accordingly
+            const jumlahCell = tr.children[9];
+            const bayarCell = tr.children[10];
+            if (jumlahCell.textContent.trim() === 'Rp0') {
+                bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                bayarCell.addEventListener('click', () => {
+                    const originalValue = row[9];
+                    bayarCell.innerHTML = originalValue;
                     setTimeout(() => {
-                        tooltip.style.display = 'none';
+                        bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
                     }, 5000);
                 });
+            } else if (jumlahCell.textContent.trim() !== 'Rp0' && bayarCell.textContent.trim() === 'Rp0') {
+                bayarCell.innerHTML = '<span class="text-red-500 font-bold">Belum Bayar</span>';
+            }
 
-                tableBody.appendChild(tr);
+            // Add event listener for showing tooltip on "Jumlah" column
+            jumlahCell.addEventListener('click', (event) => {
+                const tooltip = document.getElementById('tooltip');
+                const nama = row[0];
+                const blok = row[1];
+                tooltip.textContent = `${nama} - ${blok}`;
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${event.pageX}px`;
+                tooltip.style.top = `${event.pageY}px`;
+                setTimeout(() => {
+                    tooltip.style.display = 'none';
+                }, 5000);
+            });
 
-                // Grid Item 
-                const gridItem = document.createElement('div');
-                gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
-                const total = row[8]; // Use the value from column 8 for "Jumlah"
-                const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
-                const jumlahContent = total.trim() === 'Rp0' 
+            tableBody.appendChild(tr);
+
+            // Grid Item 
+            const gridItem = document.createElement('div');
+            gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
+            const total = row[8]; // Use the value from column 8 for "Jumlah"
+            const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
+            const jumlahContent = total.trim() === 'Rp0' 
+                ? '<b class="fas fa-check text-green-500"></b> <b class="text-green-500">LUNAS</b>'
+                : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
+            const bayarContent = total.trim() === 'Rp0'
+                ? 'Tidak Ada Denda'
+                : (row[9].trim() === 'Rp0' ?'Belum Bayar' : 'Bayar: <b class="text-green-500"">' + row[9]) + '</b>';             
+            gridItem.innerHTML = `
+                <div class="left">
+                    <img src="/file/${imageName}.jpg" 
+                         alt="Profile picture of ${row[0]}" 
+                         class="w-24 h-24 rounded-full mb-4"
+                         onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
+                    <div>
+                        <p class="text-lg font-bold">${row[0]}</p>
+                        <p class="text-sm text-gray-600">${row[1]}</p>
+                    </div>
+                </div>
+                <div class="right">
+                    <p class="text-sm">${jumlahContent}</p>
+                    <p class="text-sm text-gray-600">${bayarContent}</p>
+                </div>
+            `;
+            gridItem.addEventListener('click', () => showDetailPage(index, row));
+            gridView.appendChild(gridItem);
+        });
+
+        // Hide empty rows by default
+        toggleRows();
+        // Apply hidden columns if details are toggled off
+        if (!showDetails) {
+            toggleDetails();
+        }
+    }
+
+    // Event listener for month selection change
+    document.getElementById('month-select').addEventListener('change', (event) => {
+        const selectedMonth = event.target.value;
+        document.getElementById('report-title').textContent = `LAPORAN DENDA RONDA ${selectedMonth.toUpperCase()}`;
+        fetchData(selectedMonth);
+        showDetails = true;
+        toggleDetails();
+    });
+
+    // Initial fetch for default month
+    fetchData('Januari');
+
+    // Search functionality
+    document.getElementById('search-icon').addEventListener('click', () => {
+        document.getElementById('search-bar').classList.remove('hidden');
+    });
+
+    document.getElementById('close-search').addEventListener('click', () => {
+        document.getElementById('search-bar').classList.add('hidden');
+    });
+
+    document.getElementById('search-input').addEventListener('input', (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#data-table-body tr');
+        const searchResults = document.getElementById('search-results');
+        searchResults.innerHTML = ''; // Clear previous search results
+
+        rows.forEach(row => {
+            const name = row.children[1].textContent.toLowerCase();
+            const block = row.children[2].textContent.toLowerCase();
+            if (name.includes(searchTerm) || block.includes(searchTerm)) {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
+                const total = row.children[8].textContent.trim();
+                const imageName = row.children[2].textContent.replace(/[\s.]/g, '').toLowerCase();
+                const jumlahContent = total === 'Rp0' 
                     ? '<i class="fas fa-check text-green-500"></i> <span class="text-green-500">LUNAS</span>'
                     : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
-                const bayarContent = total.trim() === 'Rp0'
+                const bayarContent = total === 'Rp0'
                     ? 'Tidak Ada Denda'
-                    : (row[9].trim() === 'Rp0' ?'Belum Bayar' : row[9]);             
-                gridItem.innerHTML = `
+                    : (row.children[9].textContent.trim() === 'Rp0' ? 'Belum Bayar' : row.children[9].textContent.trim());
+                resultItem.innerHTML = `
                     <div class="left">
                         <img src="/file/${imageName}.jpg" 
-                             alt="Profile picture of ${row[0]}" 
+                             alt="Profile picture of ${row.children[1].textContent}" 
                              class="w-24 h-24 rounded-full mb-4"
                              onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                         <div>
-                            <p class="text-lg font-bold">${row[0]}</p>
-                            <p class="text-sm text-gray-600">${row[1]}</p>
+                            <p class="text-lg font-bold">${row.children[1].textContent}</p>
+                            <p class="text-sm text-gray-600">${row.children[2].textContent}</p>
                         </div>
                     </div>
                     <div class="right">
@@ -477,224 +586,265 @@
                         <p class="text-sm text-gray-600">${bayarContent}</p>
                     </div>
                 `;
-                gridItem.addEventListener('click', () => showModal(index, row));
-                gridView.appendChild(gridItem);
-            });
-
-            // Hide empty rows by default
-            toggleRows();
-            // Apply hidden columns if details are toggled off
-            if (!showDetails) {
-                toggleDetails();
+                resultItem.addEventListener('click', () => showRincianPage(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent)));
+                searchResults.appendChild(resultItem);
             }
-        }
-
-        // Event listener for month selection change
-        document.getElementById('month-select').addEventListener('change', (event) => {
-            const selectedMonth = event.target.value;
-            document.getElementById('report-title').textContent = `LAPORAN DENDA RONDA ${selectedMonth.toUpperCase()}`;
-            fetchData(selectedMonth);
-            showDetails = true;
-            toggleDetails();
         });
 
-        // Initial fetch for default month
-        fetchData('Januari');
+        // Show search results page
+        document.getElementById('search-results-page').classList.remove('hidden');
+        document.querySelector('main.container').classList.add('hidden');
+    });
 
-        // Search functionality
-        document.getElementById('search-icon').addEventListener('click', () => {
-            document.getElementById('search-bar').classList.remove('hidden');
-        });
+    // Back button functionality
+    document.getElementById('back-button').addEventListener('click', () => {
+        document.getElementById('search-results-page').classList.add('hidden');
+        document.querySelector('main.container').classList.remove('hidden');
+    });
 
-        document.getElementById('close-search').addEventListener('click', () => {
-            document.getElementById('search-bar').classList.add('hidden');
-        });
+    // Toggle rows functionality
+    document.getElementById('toggle-rows').addEventListener('click', () => {
+        toggleRows();
+    });
 
-        document.getElementById('search-input').addEventListener('input', (event) => {
-            const searchTerm = event.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#data-table-body tr');
-            const searchResults = document.getElementById('search-results');
-            searchResults.innerHTML = ''; // Clear previous search results
-
-            rows.forEach(row => {
-                const name = row.children[1].textContent.toLowerCase();
-                const block = row.children[2].textContent.toLowerCase();
-                if (name.includes(searchTerm) || block.includes(searchTerm)) {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
-                    const total = row.children[8].textContent.trim();
-                    const imageName = row.children[2].textContent.replace(/[\s.]/g, '').toLowerCase();
-                    const jumlahContent = total === 'Rp0' 
-                        ? '<i class="fas fa-check text-green-500"></i> <span class="text-green-500">LUNAS</span>'
-                        : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
-                    const bayarContent = total === 'Rp0'
-                        ? 'Tidak Ada Denda'
-                        : (row.children[9].textContent.trim() === 'Rp0' ? 'Belum Bayar' : row.children[9].textContent.trim());
-                    resultItem.innerHTML = `
-                        <div class="left">
-                            <img src="/file/${imageName}.jpg" 
-                                 alt="Profile picture of ${row.children[1].textContent}" 
-                                 class="w-24 h-24 rounded-full mb-4"
-                                 onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
-                            <div>
-                                <p class="text-lg font-bold">${row.children[1].textContent}</p>
-                                <p class="text-sm text-gray-600">${row.children[2].textContent}</p>
-                            </div>
-                        </div>
-                        <div class="right">
-                            <p class="text-sm">${jumlahContent}</p>
-                            <p class="text-sm text-gray-600">${bayarContent}</p>
-                        </div>
-                    `;
-                    resultItem.addEventListener('click', () => showModal(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent)));
-                    searchResults.appendChild(resultItem);
-                }
-            });
-
-            // Show search results page
-            document.getElementById('search-results-page').classList.remove('hidden');
-            document.querySelector('main.container').classList.add('hidden');
-        });
-
-        // Back button functionality
-        document.getElementById('back-button').addEventListener('click', () => {
-            document.getElementById('search-results-page').classList.add('hidden');
-            document.querySelector('main.container').classList.remove('hidden');
-        });
-
-        // Toggle rows functionality
-        document.getElementById('toggle-rows').addEventListener('click', () => {
-            toggleRows();
-        });
-
-        function toggleRows() {
-            const rows = document.querySelectorAll('#data-table-body tr');
-            const gridItems = document.querySelectorAll('#grid-view > div');
-            if (showAll) {
-                rows.forEach((row, index) => {
-                    row.classList.remove('hidden');
-                    row.children[0].textContent = index + 1;
-                });
-                gridItems.forEach((item, index) => {
-                    item.classList.remove('hidden');
-                });
-                document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye-slash"></i>';
-            } else {
-                let counter = 1;
-                rows.forEach(row => {
-                    if (!row.children[1].textContent.trim()) {
-                        row.classList.add('hidden');
-                    } else {
-                        row.children[0].textContent = counter++;
-                    }
-                });
-                gridItems.forEach(item => {
-                    const name = item.querySelector('p.text-lg').textContent.trim();
-                    if (!name) {
-                        item.classList.add('hidden');
-                    }
-                });
-                document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye"></i>';
-            }
-            showAll = !showAll;
-            updateRowColors();
-        }
-
-        function updateRowColors() {
-            const rows = document.querySelectorAll('#data-table-body tr:not(.hidden)');
+    function toggleRows() {
+        const rows = document.querySelectorAll('#data-table-body tr');
+        const gridItems = document.querySelectorAll('#grid-view > div');
+        if (showAll) {
             rows.forEach((row, index) => {
-                if (index % 2 === 0) {
-                    row.style.backgroundColor = '#0f766e3b';
+                row.classList.remove('hidden');
+                row.children[0].textContent = index + 1;
+            });
+            gridItems.forEach((item, index) => {
+                item.classList.remove('hidden');
+            });
+            document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            let counter = 1;
+            rows.forEach(row => {
+                if (!row.children[1].textContent.trim()) {
+                    row.classList.add('hidden');
                 } else {
-                    row.style.backgroundColor = 'transparent';
+                    row.children[0].textContent = counter++;
                 }
             });
+            gridItems.forEach(item => {
+                const name = item.querySelector('p.text-lg').textContent.trim();
+                if (!name) {
+                    item.classList.add('hidden');
+                }
+            });
+            document.getElementById('toggle-rows').innerHTML = '<i class="fas fa-eye"></i>';
         }
+        showAll = !showAll;
+        updateRowColors();
+    }
 
-        // Print functionality
-        document.getElementById('print-button').addEventListener('click', () => {
-            const printContent = document.getElementById('report-title').outerHTML + document.querySelector('table').outerHTML;
-            const originalContent = document.body.innerHTML;
-            document.body.innerHTML = printContent;
-            window.print();
-            document.body.innerHTML = originalContent;
-            window.location.reload();
+    function updateRowColors() {
+        const rows = document.querySelectorAll('#data-table-body tr:not(.hidden)');
+        rows.forEach((row, index) => {
+            if (index % 2 === 0) {
+                row.style.backgroundColor = '#0f766e3b';
+            } else {
+                row.style.backgroundColor = 'transparent';
+            }
         });
+    }
 
-        window.onafterprint = () => {
-            window.location.reload();
-        };
+    // Print functionality
+    document.getElementById('print-button').addEventListener('click', () => {
+        const printContent = document.getElementById('report-title').outerHTML + document.querySelector('table').outerHTML;
+        const originalContent = document.body.innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload();
+    });
 
-        // Modal functionality
-        const modal = document.getElementById('modal');
-        const span = document.getElementsByClassName('close')[0];
+    window.onafterprint = () => {
+        window.location.reload();
+    };
 
-        span.onclick = function() {
+    // Modal functionality
+    const modal = document.getElementById('modal');
+    const span = document.getElementsByClassName('close')[0];
+
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
             modal.style.display = 'none';
         }
+    }
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
+    function showModal(index, row) {
+        document.getElementById('modal-no').textContent = `NO. ${index}`;
+        document.getElementById('modal-name-block').textContent = `${row[0]} - ${row[1]}`;
+        document.getElementById('modal-tunggakan').textContent = row[2];
+        document.getElementById('modal-ronda1').textContent = row[3];
+        document.getElementById('modal-ronda2').textContent = row[4];
+        document.getElementById('modal-ronda3').textContent = row[5];
+        document.getElementById('modal-ronda4').textContent = row[6];
+        document.getElementById('modal-bulanan').textContent = row[7];
+        
+        // Calculate total
+        const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
+            const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
+            return acc + num;
+        }, 0);
+        document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
+        
+        document.getElementById('modal-jumlah').textContent = row[8];
+        document.getElementById('modal-bayar').textContent = row[9];
+        modal.style.display = 'flex';
+    }
 
-        function showModal(index, row) {
-            document.getElementById('modal-no').textContent = `NO. ${index}`;
-            document.getElementById('modal-name-block').textContent = `${row[0]} - ${row[1]}`;
-            document.getElementById('modal-tunggakan').textContent = row[2];
-            document.getElementById('modal-ronda1').textContent = row[3];
-            document.getElementById('modal-ronda2').textContent = row[4];
-            document.getElementById('modal-ronda3').textContent = row[5];
-            document.getElementById('modal-ronda4').textContent = row[6];
-            document.getElementById('modal-bulanan').textContent = row[7];
-            
-            // Calculate total
-            const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
-                const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
-                return acc + num;
-            }, 0);
-            document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
-            
-            document.getElementById('modal-jumlah').textContent = row[8];
-            document.getElementById('modal-bayar').textContent = row[9];
-            modal.style.display = 'flex';
-        }
-
-        document.getElementById('download-button').addEventListener('click', function () {
-            const content = document.getElementById('content-to-capture');
-            html2canvas(content).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'tagihan-denda-ronda.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
+    document.getElementById('download-button').addEventListener('click', function () {
+        const content = document.getElementById('content-to-capture');
+        html2canvas(content).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'tagihan-denda-ronda.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         });
+    });
 
-        // Toggle view functionality
-        document.getElementById('toggle-view').addEventListener('click', () => {
-            isGridView = !isGridView;
-            document.getElementById('table-view').classList.toggle('hidden', isGridView);
-            document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
-            document.getElementById('toggle-view').innerHTML = isGridView ? '<i class="fas fa-th-list"></i>' : '<i class="fas fa-th-large"></i>';
+    // Toggle view functionality
+    document.getElementById('toggle-view').addEventListener('click', () => {
+        isGridView = !isGridView;
+        document.getElementById('table-view').classList.toggle('hidden', isGridView);
+        document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
+        document.getElementById('toggle-view').innerHTML = isGridView ? '<i class="fas fa-th-list"></i>' : '<i class="fas fa-th-large"></i>';
+    });
+
+    // Toggle details functionality
+    document.getElementById('toggle-details').addEventListener('click', () => {
+        toggleDetails();
+    });
+
+    function toggleDetails() {
+        showDetails = !showDetails;
+        const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
+        const noColumn = document.querySelectorAll('th:nth-child(1), td:nth-child(1)');
+        detailColumns.forEach(column => {
+            column.classList.toggle('hidden', showDetails);
         });
-
-        // Toggle details functionality
-        document.getElementById('toggle-details').addEventListener('click', () => {
-            toggleDetails();
+        noColumn.forEach(column => {
+            column.classList.toggle('hidden', showDetails);
         });
+    }
 
-        function toggleDetails() {
-            showDetails = !showDetails;
-            const detailColumns = document.querySelectorAll('th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)');
-            const noColumn = document.querySelectorAll('th:nth-child(1), td:nth-child(1)');
-            detailColumns.forEach(column => {
-                column.classList.toggle('hidden', showDetails);
-            });
-            noColumn.forEach(column => {
-                column.classList.toggle('hidden', showDetails);
-            });
-        }
-    </script>
- </body>
+    // Show Detail Page
+    function showDetailPage(index, row) {
+        document.getElementById('detail-title').textContent = `${row[0]} - ${row[1]}`;
+        const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
+        document.getElementById('detail-cover').src = `/file/${imageName}.jpg`;
+        document.getElementById('detail-cover').onerror = function() {
+            this.onerror = null;
+            this.src = '/file/no-profil.jpeg';
+        };
+        const detailContent = `
+            <div class="flex justify-between">
+                <p>Tunggakan</p>
+                <p class="text-right">${row[2]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 1</p>
+                <p class="text-right">${row[3]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 2</p>
+                <p class="text-right">${row[4]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 3</p>
+                <p class="text-right">${row[5]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 4</p>
+                <p class="text-right">${row[6]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bulanan</p>
+                <p class="text-right">${row[7]}</p>
+            </div>
+            <hr class="my-2"/>
+            <div class="flex justify-between">
+                <p>TOTAL</p>
+                <p class="text-right text-red-500 font-bold">${row[8]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bayar</p>
+                <p class="text-right">${row[9]}</p>
+            </div>
+        `;
+        document.getElementById('detail-content').innerHTML = detailContent;
+        document.getElementById('detail-page').classList.remove('hidden');
+        document.querySelector('main.container').classList.add('hidden');
+    }
+
+    // Show Rincian Page
+    function showRincianPage(index, row) {
+        document.getElementById('rincian-title').textContent = `${row[1]} - ${row[2]}`;
+        const imageName = row[2].replace(/[\s.]/g, '').toLowerCase();
+        document.getElementById('rincian-cover').src = `/file/${imageName}.jpg`;
+        document.getElementById('rincian-cover').onerror = function() {
+            this.onerror = null;
+            this.src = '/file/no-profil.jpeg';
+        };
+        const rincianContent = `
+            <div class="flex justify-between">
+                <p>Tunggakan</p>
+                <p class="text-right">${row[3]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 1</p>
+                <p class="text-right">${row[4]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 2</p>
+                <p class="text-right">${row[5]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 3</p>
+                <p class="text-right">${row[6]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Ronda 4</p>
+                <p class="text-right">${row[7]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bulanan</p>
+                <p class="text-right">${row[8]}</p>
+            </div>
+            <hr class="my-2"/>
+            <div class="flex justify-between">
+                <p>TOTAL</p>
+                <p class="text-right text-red-500 font-bold">${row[9]}</p>
+            </div>
+            <div class="flex justify-between">
+                <p>Bayar</p>
+                <p class="text-right">${row[10]}</p>
+            </div>
+        `;
+        document.getElementById('rincian-content').innerHTML = rincianContent;
+        document.getElementById('rincian-page').classList.remove('hidden');
+        document.getElementById('search-results-page').classList.add('hidden');
+    }
+
+    // Back to main page from detail page
+    document.getElementById('back-to-main').addEventListener('click', () => {
+        document.getElementById('detail-page').classList.add('hidden');
+        document.querySelector('main.container').classList.remove('hidden');
+    });
+
+    // Back to search results page from rincian page
+    document.getElementById('back-to-search').addEventListener('click', () => {
+        document.getElementById('rincian-page').classList.add('hidden');
+        document.getElementById('search-results-page').classList.remove('hidden');
+    });
+</script>
+</body>
 </html>
