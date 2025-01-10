@@ -61,6 +61,9 @@
         flex-direction: row;
         flex-wrap: wrap;
       }
+      #print-button {
+        display: none;
+      }
     }
     .tooltip {
       position: absolute;
@@ -428,16 +431,16 @@
                 const jumlahCell = tr.children[9];
                 const bayarCell = tr.children[10];
                 if (jumlahCell.textContent.trim() === 'Rp0') {
-                    bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
-                    bayarCell.addEventListener('click', () => {
-                        const originalValue = row[9];
-                        bayarCell.innerHTML = originalValue;
-                        setTimeout(() => {
-                            bayarCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
-                        }, 5000);
-                    });
-                } else if (jumlahCell.textContent.trim() !== 'Rp0' && bayarCell.textContent.trim() === 'Rp0') {
-                    bayarCell.innerHTML = '<span class="text-red-500 font-bold">Belum Bayar</span>';
+                    jumlahCell.innerHTML = '<i class="fas fa-check text-green-500 font-bold"></i> <span class="text-green-500 font-bold">LUNAS</span>';
+                    if (bayarCell.textContent.trim() === 'Rp0') {
+                        bayarCell.innerHTML = '<span class="text-black">Tidak ada denda</span>';
+                    }
+                } else {
+                    jumlahCell.classList.add('bg-red-500', 'text-white', 'rounded', 'px-2', 'py-1');
+                }
+
+                if (bayarCell.textContent.trim() === 'Rp0' && jumlahCell.textContent.trim() !== 'Rp0') {
+                    bayarCell.innerHTML = '<span class="italic text-red-500">Belum bayar</span>';
                 }
 
                 // Add event listener for showing tooltip on "Jumlah" column
@@ -454,6 +457,9 @@
                     }, 5000);
                 });
 
+                // Make "Jumlah" column text larger and bold
+                jumlahCell.classList.add('text-lg', 'font-bold');
+
                 tableBody.appendChild(tr);
 
                 // Grid Item 
@@ -461,7 +467,6 @@
                 gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item';
                 const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
                     const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
-
                     return acc + num;
                 }, 0);
                 const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
@@ -477,8 +482,12 @@
                         </div>
                     </div>
                     <div class="right">
-                        <p class="text-sm text-red-500">Jumlah: Rp${total.toLocaleString('id-ID')}</p>
-                        <p class="text-sm text-gray-600">Bayar: ${row[9]}</p>
+                        <p class="text-lg font-bold ${total === 0 ? 'text-green-500' : 'bg-red-500 text-white rounded px-2 py-1'}">
+                            ${total === 0 ? '<i class="fas fa-check"></i> LUNAS' : `Rp${total.toLocaleString('id-ID')}`}
+                        </p>
+                        <p class="text-sm ${total === 0 ? 'text-black' : 'text-red-500 italic'}">
+                            ${total === 0 ? 'Tidak ada denda' : row[9] === 'Rp0' ? 'Belum bayar' : row[9]}
+                        </p>
                     </div>
                 `;
                 gridView.appendChild(gridItem);
