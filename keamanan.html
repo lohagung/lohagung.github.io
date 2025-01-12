@@ -253,7 +253,7 @@
     PENCARIAN DATA
    </h1>
    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="search-results">
-   </div>
+   </div></br>
    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4" id="back-button">
     Kembali
    </button>
@@ -561,29 +561,21 @@
             const block = row.children[2].textContent.toLowerCase();
             if (name.includes(searchTerm) || block.includes(searchTerm)) {
                 const resultItem = document.createElement('div');
-                resultItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
-                const total = row.children[8].textContent.trim();
+                resultItem.className = 'bg-white p-2 rounded shadow flex items-center grid-item hover:bg-yellow-500 cursor-pointer';
+                const total = row.children[9].textContent.trim();
                 const imageName = row.children[2].textContent.replace(/[\s.]/g, '').toLowerCase();
-                const jumlahContent = total === 'Rp0' 
-                    ? '<i class="fas fa-check text-green-500"></i> <span class="text-green-500">LUNAS</span>'
-                    : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
-                const bayarContent = total === 'Rp0'
-                    ? 'Tidak Ada Denda'
-                    : (row.children[9].textContent.trim() === 'Rp0' ? 'Belum Bayar' : row.children[9].textContent.trim());
                 resultItem.innerHTML = `
                     <div class="left">
                         <img src="/file/${imageName}.jpg" 
                              alt="Profile picture of ${row.children[1].textContent}" 
-                             class="w-24 h-24 rounded-full mb-4"
+                             class="w-24 h-24 rounded-full mb-2"
                              onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                         <div>
                             <p class="text-lg font-bold">${row.children[1].textContent}</p>
-                            <p class="text-sm text-gray-600">${row.children[2].textContent}</p>
-                        </div>
+                         </div>
                     </div>
                     <div class="right">
-                        <p class="text-sm">${jumlahContent}</p>
-                        <p class="text-sm text-gray-600">${bayarContent}</p>
+                        <p class="bg-red-500 text-white p-2 rounded"">${row.children[2].textContent}</p>
                     </div>
                 `;
                 resultItem.addEventListener('click', () => showRincianPage(Array.from(rows).indexOf(row), Array.from(row.children).map(cell => cell.textContent)));
@@ -772,7 +764,7 @@
             </div>
             <hr class="my-2"/>
             <div class="flex justify-between">
-                <p>TOTAL</p>
+                <p>Kekurangan</p>
                 <p class="text-right text-red-500 font-bold">${row[8]}</p>
             </div>
             <div class="flex justify-between">
@@ -821,7 +813,7 @@
             </div>
             <hr class="my-2"/>
             <div class="flex justify-between">
-                <p>TOTAL</p>
+                <p>Kekurangan</p>
                 <p class="text-right text-red-500 font-bold">${row[9]}</p>
             </div>
             <div class="flex justify-between">
