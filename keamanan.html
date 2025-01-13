@@ -117,6 +117,10 @@
     </h1>
    </div>
    <div class="flex items-center space-x-4">
+    <a href="?jadwalronda">
+     <i class="fas fa-calendar-alt text-white text-xl">
+     </i>
+    </a>
     <i class="fas fa-bell text-white text-xl">
     </i>
     <i class="fas fa-search text-white text-xl cursor-pointer" id="search-icon">
@@ -300,6 +304,60 @@
     </button>
    </div>
   </main>
+  <!-- Jadwal Ronda Page -->
+  <main class="container mx-auto p-4 hidden" id="jadwal-ronda-page">
+   <h1 class="text-2xl font-bold mb-4 text-center uppercase">
+    JADWAL RONDA
+   </h1>
+   <div class="mb-4 flex items-center space-x-4">
+    <div>
+     <select class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="jadwal-month-select">
+      <option value="Januari">
+       Januari
+      </option>
+      <option value="Februari">
+       Februari
+      </option>
+      <option value="Maret">
+       Maret
+      </option>
+      <option value="April">
+       April
+      </option>
+      <option value="Mei">
+       Mei
+      </option>
+      <option value="Juni">
+       Juni
+      </option>
+      <option value="Juli">
+       Juli
+      </option>
+      <option value="Agustus">
+       Agustus
+      </option>
+      <option value="September">
+       September
+      </option>
+      <option value="Oktober">
+       Oktober
+      </option>
+      <option value="November">
+       November
+      </option>
+      <option value="Desember">
+       Desember
+      </option>
+     </select>
+    </div>
+   </div>
+   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="jadwal-ronda-grid">
+    <!-- Jadwal Ronda items will be inserted here by JavaScript -->
+   </div>
+   <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mt-4" id="back-to-main-from-jadwal">
+    Kembali
+   </button>
+  </main>
   <!-- Footer -->
   <footer class="bg-teal-700 text-white py-4">
    <div class="container mx-auto px-4">
@@ -408,12 +466,12 @@
     <p class="text-center">
      Wahyudi
     </p>
-    <button class="text-center" id="download-button">
+<button class="text-center" id="download-button">
      Simpan
     </button>
    </div>
   </div>
-<script>
+  <script>
     let showDetails = false;
     let showAll = false;
     let isGridView = true;
@@ -836,6 +894,94 @@
         document.getElementById('rincian-page').classList.add('hidden');
         document.getElementById('search-results-page').classList.remove('hidden');
     });
+
+    // Back to main page from jadwal ronda page
+    document.getElementById('back-to-main-from-jadwal').addEventListener('click', () => {
+        document.getElementById('jadwal-ronda-page').classList.add('hidden');
+        document.querySelector('main.container').classList.remove('hidden');
+    });
+
+    // Function to fetch jadwal ronda data from Google Sheets API
+async function fetchJadwalRonda(month) {
+    try {
+        const response = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/Jadwal?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`
+        );
+
+        if (!response.ok) throw new Error('Failed to fetch data from Google Sheets.');
+
+        const data = await response.json();
+        const rows = data.values;
+        const jadwalRondaGrid = document.getElementById('jadwal-ronda-grid');
+        jadwalRondaGrid.innerHTML = ''; // Clear existing data
+
+        const monthIndex = {
+            'Januari': 0,
+            'Februari': 10,
+            'Maret': 20,
+            'April': 30,
+            'Mei': 40,
+            'Juni': 50,
+            'Juli': 60,
+            'Agustus': 70,
+            'September': 80,
+            'Oktober': 90,
+            'November': 100,
+            'Desember': 110,
+        };
+
+        const startRow = monthIndex[month];
+        const endRow = startRow + 9;
+
+        if (startRow === undefined) {
+            throw new Error('Invalid month selected.');
+        }
+
+        // Calculate days in the month
+        const daysInMonth = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month) + 1, 0).getDate();
+
+        for (let i = startRow; i <= endRow; i++) {
+            const row = rows[i];
+            if (!row) continue;
+
+            const teamNumber = i - startRow + 1;
+            const teamItem = document.createElement('div');
+            teamItem.className = 'bg-white p-4 rounded shadow';
+            const dates = [];
+            for (let day = teamNumber; day <= daysInMonth; day += 10) {
+                dates.push(day);
+            }
+            teamItem.innerHTML = `
+                <h2 class="text-lg font-bold mb-2">Team ${teamNumber}</h2>
+                <p>${row[0] || 'Nama Tidak Tersedia'}</p>
+                <p>${row[1] || 'Info Tidak Tersedia'}</p>
+                <p>${row[2] || 'Info Tidak Tersedia'}</p>
+                <p>${row[3] || 'Info Tidak Tersedia'}</p>
+                <p class="mt-2 text-sm text-gray-500">Tanggal: ${dates.join(', ')}</p>
+            `;
+            jadwalRondaGrid.appendChild(teamItem);
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+        alert('Gagal memuat data jadwal ronda. Silakan coba lagi.');
+    }
+}
+
+
+    // Event listener for jadwal month selection change
+    document.getElementById('jadwal-month-select').addEventListener('change', (event) => {
+        const selectedMonth = event.target.value;
+        fetchJadwalRonda(selectedMonth);
+    });
+
+    // Initial fetch for default month in jadwal ronda
+    fetchJadwalRonda('Januari');
+
+    // Show Jadwal Ronda Page
+    if (window.location.search.includes('jadwalronda')) {
+        document.getElementById('jadwal-ronda-page').classList.remove('hidden');
+        document.querySelector('main.container').classList.add('hidden');
+    }
 </script>
 </body>
 </html>
