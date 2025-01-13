@@ -36,23 +36,23 @@
     table tr:hover {
       background-color: #fbbf24;
     }
-      .grid-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .grid-item img {
-        width: 50px;
-        height: 50px;
-        margin-right: 10px;
-      }
-      .grid-item .left {
-        display: flex;
-        align-items: center;
-      }
-      .grid-item .right {
-        text-align: right;
-      }
+    .grid-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .grid-item img {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+    .grid-item .left {
+      display: flex;
+      align-items: center;
+    }
+    .grid-item .right {
+      text-align: right;
+    }
     @media (max-width: 640px) {
       #search-input {
         width: 100% !important;
@@ -61,7 +61,7 @@
         flex-direction: row;
         flex-wrap: wrap;
       }
-#print-button, .fa-bell,  {display:none;}
+      #print-button, .fa-bell {display:none;}
     }
     .tooltip {
       position: absolute;
@@ -175,14 +175,14 @@
      </select>
     </div>
     <div>
-     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-rows">
-      <i class="fas fa-eye-slash">
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline hidden" id="toggle-details">
+      <i class="fas fa-info-circle">
       </i>
      </button>
     </div>
     <div>
-     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-details">
-      <i class="fas fa-info-circle">
+     <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="toggle-rows">
+      <i class="fas fa-eye-slash">
       </i>
      </button>
     </div>
@@ -253,7 +253,7 @@
     PENCARIAN DATA
    </h1>
    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="search-results">
-   </div></br>
+   </div>
    <button class="block w-full bg-teal-700 text-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline mb-4" id="back-button">
     Kembali
    </button>
@@ -265,7 +265,6 @@
     <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white">
      <h1 class="text-3xl font-bold" id="detail-title">
      </h1>
-
     </div>
    </div>
    <div class="p-4 bg-white shadow rounded mt-4">
@@ -287,7 +286,6 @@
     <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white">
      <h1 class="text-3xl font-bold" id="rincian-title">
      </h1>
-     
     </div>
    </div>
    <div class="p-4 bg-white shadow rounded mt-4">
@@ -709,6 +707,7 @@
         document.getElementById('table-view').classList.toggle('hidden', isGridView);
         document.getElementById('grid-view').classList.toggle('hidden', !isGridView);
         document.getElementById('toggle-view').innerHTML = isGridView ? '<i class="fas fa-th-list"></i>' : '<i class="fas fa-th-large"></i>';
+        document.getElementById('toggle-details').classList.toggle('hidden', isGridView);
     });
 
     // Toggle details functionality
