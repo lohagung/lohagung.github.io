@@ -61,7 +61,7 @@
         flex-direction: row;
         flex-wrap: wrap;
       }
-#print-button, .fa-bell  {display:none;}
+#print-button, .fa-bell,  {display:none;}
     }
     .tooltip {
       position: absolute;
@@ -496,20 +496,20 @@
             const total = row[8]; // Use the value from column 8 for "Jumlah"
             const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
             const jumlahContent = total.trim() === 'Rp0' 
-                ? '<b class="fas fa-check text-green-500"></b> <b class="text-green-500">LUNAS</b>'
+                ? '<div class="bg-green-600 text-white p-2 rounded"><b class="fas fa-check"></b> Lunas</div>'
                 : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
             const bayarContent = total.trim() === 'Rp0'
-                ? 'Tidak Ada Denda'
-                : (row[9].trim() === 'Rp0' ?'Belum Bayar' : 'Bayar: <b class="text-green-500"">' + row[9]) + '</b>';             
+                ? ''
+                : (row[9].trim() === 'Rp0' ?'' : 'Bayar: <b class="text-green-500"">' + row[9]) + '</b>';             
             gridItem.innerHTML = `
                 <div class="left">
                     <img src="/file/${imageName}.jpg" 
-                         alt="Profile picture of ${row[0]}" 
-                         class="w-24 h-24 rounded-full mb-4"
+                         alt="Tagihan Denda Ronda ${row[0]}" 
+                         class="w-24 h-24 rounded-full mb-2"
                          onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <div>
                         <p class="text-lg font-bold">${row[0]}</p>
-                        <p class="text-sm text-gray-600">${row[1]}</p>
+                        <p class="text-sm text-gray-500"><i class="fas fa-home text-teal-700"> </i> Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
                     </div>
                 </div>
                 <div class="right">
