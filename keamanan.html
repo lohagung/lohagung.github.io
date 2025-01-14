@@ -952,20 +952,19 @@
                 for (let day = teamNumber; day <= daysInMonth; day += 10) {
                     const date = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month), day);
                     const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
-                    dates.push(`<b class="bg-yellow-500 p-2">${dayName}</b><b class="bg-red-500 p-2 "> ${day.toString().padStart(2, '0')}</b>`);
+                    dates.push(`<b class="bg-gray-500 px-2 p-1"> ${dayName} </b><b class="bg-red-500 p-2 rounded shadow "> ${day.toString().padStart(2, '0')}</b>`);
                 }
                 teamItem.innerHTML = `
-                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><hr class="my-2"/>
+                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 text-xs text-white text-center "> ${dates.join('')}</p><hr class="my-4"/>
                     <p><i class="fas fa-user text-red-600">
-      </i>  <b>${row[0] || 'Nama Tidak Tersedia'} </b><i class="text-red-500">Ketua</i></p>
-                    <p> <i class="fas fa-user text-green-600">
+      </i>  <b> ${row[0] || 'Nama Tidak Tersedia'} </b><i class="text-red-500">Ketua</i></p>
+                    <p> <i class="fas fa-user text-gray-600">
       </i>  ${row[1] || 'Info Tidak Tersedia'}</p>
-                    <p><i class="fas fa-user text-green-600">
+                    <p><i class="fas fa-user text-gray-600">
       </i>  ${row[2] || 'Info Tidak Tersedia'}</p>
-                    <p><i class="fas fa-user text-green-600">
+                    <p><i class="fas fa-user text-gray-600">
       </i>  ${row[3] || 'Info Tidak Tersedia'}</p>
-</br>
-                    <p class="mt-2 text-xs text-white">${dates.join(' ')}</p>
+   <hr class="100 my-2"/>                 
 
                 `;
                 jadwalRondaGrid.appendChild(teamItem);
