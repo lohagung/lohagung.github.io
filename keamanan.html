@@ -105,6 +105,19 @@
       text-decoration: none;
       cursor: pointer;
     }
+.jadwal {
+float: right;
+    position: sticky;
+    margin-top: -80px;
+    margin-bottom: 10px;
+}
+.jadwal img {
+border: 2px solid #6b7280;
+    padding: 5px;
+}
+.jadwal p {
+    padding-top: 88px;
+}
   </style>
  </head>
  <body class="bg-gray-100">
@@ -956,15 +969,20 @@
                 }
                 teamItem.innerHTML = `
                     <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 text-xs text-white text-center "> ${dates.join('')}</p><hr class="my-4"/>
-                    <p><i class="fas fa-user text-red-600">
-      </i>  <b> ${row[0] || 'Nama Tidak Tersedia'} </b><i class="text-red-500">Ketua</i></p>
-                    <p> <i class="fas fa-user text-gray-600">
-      </i>  ${row[1] || 'Info Tidak Tersedia'}</p>
-                    <p><i class="fas fa-user text-gray-600">
-      </i>  ${row[2] || 'Info Tidak Tersedia'}</p>
-                    <p><i class="fas fa-user text-gray-600">
-      </i>  ${row[3] || 'Info Tidak Tersedia'}</p>
-   <hr class="100 my-2"/>                 
+                    <p>${row[0] ? `<i class="fas fa-user text-red-600 px-4"></i> ${row[0]}` : ''}</p>
+                    <p>${row[1] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[1]}` : ''}</p>
+                    <p>${row[2] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[2]}` : ''}</p>
+                    <p>${row[3] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[3]}` : ''}</p>
+<div class="jadwal text-center relative w-24 h-24 mx-auto">
+  <img src="/file/${row[4]}.jpg" 
+       alt="Profile picture of ${row[0]}" 
+       class="w-full h-full rounded-full object-cover"
+       onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
+  <p class="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-opacity-50 rounded-full">
+    <b class="bg-yellow-600 rounded shadow px-2 text-sm">Ketua Ronda</b>
+  </p>
+</div>
+                 
 
                 `;
                 jadwalRondaGrid.appendChild(teamItem);
