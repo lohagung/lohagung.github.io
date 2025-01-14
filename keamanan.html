@@ -130,8 +130,8 @@ border: 2px solid #6b7280;
     </h1>
    </div>
    <div class="flex items-center space-x-4">
-    <a href="?jadwalronda">
-     <i class="fas bg-yellow-400 rounded px-2 py-1 text-sm"> JADWAL
+    <a href="?jadwalronda" id="menu-link">
+     <i class="fas bg-yellow-400 rounded px-2 py-1 text-sm" id="menu-text"> JADWAL
      </i>
     </a>
     <i class="fas fa-bell text-white text-xl">
@@ -323,6 +323,9 @@ border: 2px solid #6b7280;
     JADWAL RONDA
    </h1>
    <div class="mb-4 flex items-center space-x-4">
+    <a href="?dendaronda" class="text-teal-700">
+     <i class="fas fa-arrow-left text-2xl"></i>
+    </a>
     <div>
      <select class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="jadwal-month-select">
       <option value="Januari">
@@ -485,7 +488,7 @@ border: 2px solid #6b7280;
     </button>
    </div>
   </div>
-  <script>
+<script>
     let showDetails = false;
     let showAll = false;
     let isGridView = true;
@@ -578,7 +581,7 @@ border: 2px solid #6b7280;
                          class="w-24 h-24 rounded-full mb-2"
                          onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <div>
-                        <p class="text-lg font-bold">${row[0]}</p>
+                        <p class="text-lg font-bold cursor-pointer" onclick="window.location.href='?${row[0].replace(/[\s.]/g, '')}${row[1].replace(/[\s.]/g, '')}'">${row[0]}</p>
                         <p class="text-sm text-gray-500">Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
                     </div>
                 </div>
@@ -1006,6 +1009,10 @@ border: 2px solid #6b7280;
     if (window.location.search.includes('jadwalronda')) {
         document.getElementById('jadwal-ronda-page').classList.remove('hidden');
         document.querySelector('main.container').classList.add('hidden');
+        document.getElementById('menu-link').href = "?dendaronda";
+        document.getElementById('menu-text').textContent = "Denda Ronda";
+        document.getElementById('menu-text').classList.remove('bg-yellow-400');
+        document.getElementById('menu-text').classList.add('bg-red-500', 'text-white');
     }
   </script>
  </body>
