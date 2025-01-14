@@ -113,12 +113,12 @@
    <div class="flex items-center">
     <img alt="Logo of RT09 community" height="28" src="https://placehold.co/28x28" style="max-height:28px" width="28"/>
     <h1 class="text-white text-xl ml-4">
-     RT09 #Keamanan
+     KEAMANAN
     </h1>
    </div>
    <div class="flex items-center space-x-4">
     <a href="?jadwalronda">
-     <i class="fas fa-calendar-alt text-white text-xl">
+     <i class="fas bg-yellow-400 rounded px-2 py-1 text-sm"> JADWAL
      </i>
     </a>
     <i class="fas fa-bell text-white text-xl">
@@ -466,6 +466,7 @@
     <p class="text-center">
      Wahyudi
     </p>
+    
 <button class="text-center" id="download-button">
      Simpan
     </button>
@@ -548,11 +549,11 @@
 
             // Grid Item 
             const gridItem = document.createElement('div');
-            gridItem.className = 'bg-white p-4 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
+            gridItem.className = 'bg-white p-2 rounded shadow flex items-center grid-item hover:bg-yellow-300 cursor-pointer';
             const total = row[8]; // Use the value from column 8 for "Jumlah"
             const imageName = row[1].replace(/[\s.]/g, '').toLowerCase();
             const jumlahContent = total.trim() === 'Rp0' 
-                ? '<div class="bg-green-600 text-white p-2 rounded"><b class="fas fa-check"></b> Lunas</div>'
+                ? '<div class="text-green-600 p-2 rounded"><b class="fas fa-check text-xl"> Lunas</b></div>'
                 : `<div class="bg-red-500 text-white p-2 rounded">${total}</div>`;
             const bayarContent = total.trim() === 'Rp0'
                 ? ''
@@ -565,7 +566,7 @@
                          onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <div>
                         <p class="text-lg font-bold">${row[0]}</p>
-                        <p class="text-sm text-gray-500"><i class="fas fa-home text-teal-700"> </i> Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
+                        <p class="text-sm text-gray-500">Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
                     </div>
                 </div>
                 <div class="right">
@@ -588,7 +589,7 @@
     // Event listener for month selection change
     document.getElementById('month-select').addEventListener('change', (event) => {
         const selectedMonth = event.target.value;
-        document.getElementById('report-title').textContent = `LAPORAN DENDA RONDA ${selectedMonth.toUpperCase()}`;
+        document.getElementById('report-title').textContent = `DENDA RONDA ${selectedMonth.toUpperCase()}`;
         fetchData(selectedMonth);
         showDetails = true;
         toggleDetails();
@@ -861,8 +862,8 @@
                 <p class="text-right">${row[6]}</p>
             </div>
             <div class="flex justify-between">
-                <p>Ronda 4</p>
-                <p class="text-right">${row[7]}</p>
+                <p>Ronda 4</p>               
+<p class="text-right">${row[7]}</p>
             </div>
             <div class="flex justify-between">
                 <p>Bulanan</p>
@@ -902,71 +903,78 @@
     });
 
     // Function to fetch jadwal ronda data from Google Sheets API
-async function fetchJadwalRonda(month) {
-    try {
-        const response = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/Jadwal?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`
-        );
+    async function fetchJadwalRonda(month) {
+        try {
+            const response = await fetch(
+                `https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/Jadwal?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`
+            );
 
-        if (!response.ok) throw new Error('Failed to fetch data from Google Sheets.');
+            if (!response.ok) throw new Error('Failed to fetch data from Google Sheets.');
 
-        const data = await response.json();
-        const rows = data.values;
-        const jadwalRondaGrid = document.getElementById('jadwal-ronda-grid');
-        jadwalRondaGrid.innerHTML = ''; // Clear existing data
+            const data = await response.json();
+            const rows = data.values;
+            const jadwalRondaGrid = document.getElementById('jadwal-ronda-grid');
+            jadwalRondaGrid.innerHTML = ''; // Clear existing data
 
-        const monthIndex = {
-            'Januari': 0,
-            'Februari': 10,
-            'Maret': 20,
-            'April': 30,
-            'Mei': 40,
-            'Juni': 50,
-            'Juli': 60,
-            'Agustus': 70,
-            'September': 80,
-            'Oktober': 90,
-            'November': 100,
-            'Desember': 110,
-        };
+            const monthIndex = {
+                'Januari': 0,
+                'Februari': 10,
+                'Maret': 20,
+                'April': 30,
+                'Mei': 40,
+                'Juni': 50,
+                'Juli': 60,
+                'Agustus': 70,
+                'September': 80,
+                'Oktober': 90,
+                'November': 100,
+                'Desember': 110,
+            };
 
-        const startRow = monthIndex[month];
-        const endRow = startRow + 9;
+            const startRow = monthIndex[month];
+            const endRow = startRow + 9;
 
-        if (startRow === undefined) {
-            throw new Error('Invalid month selected.');
-        }
-
-        // Calculate days in the month
-        const daysInMonth = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month) + 1, 0).getDate();
-
-        for (let i = startRow; i <= endRow; i++) {
-            const row = rows[i];
-            if (!row) continue;
-
-            const teamNumber = i - startRow + 1;
-            const teamItem = document.createElement('div');
-            teamItem.className = 'bg-white p-4 rounded shadow';
-            const dates = [];
-            for (let day = teamNumber; day <= daysInMonth; day += 10) {
-                dates.push(day);
+            if (startRow === undefined) {
+                throw new Error('Invalid month selected.');
             }
-            teamItem.innerHTML = `
-                <h2 class="text-lg font-bold mb-2">Team ${teamNumber}</h2>
-                <p>${row[0] || 'Nama Tidak Tersedia'}</p>
-                <p>${row[1] || 'Info Tidak Tersedia'}</p>
-                <p>${row[2] || 'Info Tidak Tersedia'}</p>
-                <p>${row[3] || 'Info Tidak Tersedia'}</p>
-                <p class="mt-2 text-sm text-gray-500">Tanggal: ${dates.join(', ')}</p>
-            `;
-            jadwalRondaGrid.appendChild(teamItem);
-        }
-    } catch (error) {
-        console.error('Error:', error.message);
-        alert('Gagal memuat data jadwal ronda. Silakan coba lagi.');
-    }
-}
 
+            // Calculate days in the month
+            const daysInMonth = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month) + 1, 0).getDate();
+
+            for (let i = startRow; i <= endRow; i++) {
+                const row = rows[i];
+                if (!row) continue;
+
+                const teamNumber = i - startRow + 1;
+                const teamItem = document.createElement('div');
+                teamItem.className = 'bg-white p-4 rounded shadow';
+                const dates = [];
+                for (let day = teamNumber; day <= daysInMonth; day += 10) {
+                    const date = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month), day);
+                    const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
+                    dates.push(`<b class="bg-yellow-500 p-2">${dayName}</b><b class="bg-red-500 p-2 "> ${day.toString().padStart(2, '0')}</b>`);
+                }
+                teamItem.innerHTML = `
+                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><hr class="my-2"/>
+                    <p><i class="fas fa-user text-red-600">
+      </i>  <b>${row[0] || 'Nama Tidak Tersedia'} </b><i class="text-red-500">Ketua</i></p>
+                    <p> <i class="fas fa-user text-green-600">
+      </i>  ${row[1] || 'Info Tidak Tersedia'}</p>
+                    <p><i class="fas fa-user text-green-600">
+      </i>  ${row[2] || 'Info Tidak Tersedia'}</p>
+                    <p><i class="fas fa-user text-green-600">
+      </i>  ${row[3] || 'Info Tidak Tersedia'}</p>
+</br>
+                    <p class="mt-2 text-xs text-white">${dates.join(' ')}</p>
+
+                `;
+                jadwalRondaGrid.appendChild(teamItem);
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+            alert('Gagal memuat data jadwal ronda. Silakan coba lagi.');
+        }
+    }
 
     // Event listener for jadwal month selection change
     document.getElementById('jadwal-month-select').addEventListener('change', (event) => {
@@ -982,6 +990,6 @@ async function fetchJadwalRonda(month) {
         document.getElementById('jadwal-ronda-page').classList.remove('hidden');
         document.querySelector('main.container').classList.add('hidden');
     }
-</script>
-</body>
+  </script>
+ </body>
 </html>
