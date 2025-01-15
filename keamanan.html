@@ -120,8 +120,12 @@ border: 2px solid #6b7280;
 }
 .tgl {
     margin-left: -6px;
-    margin-right: 5px;
+    margin-right: 2px;
     border: 2px solid;
+}
+.jadwalhari {
+    margin-left: -15px;
+    margin-right: -15px;
 }
   </style>
  </head>
@@ -987,10 +991,10 @@ border: 2px solid #6b7280;
                 for (let day = teamNumber; day <= daysInMonth; day += 10) {
                     const date = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month), day);
                     const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
-                    dates.push(`<b class="jadwalnama bg-gray-500 px-2 p-1 border rounded"> ${dayName} </b><b class="tgl bg-red-500 p-2 rounded-full shadow "> ${day.toString().padStart(2, '0')}</b>`);
+                    dates.push(`<b class="jadwalnama bg-gray-500 px-1 p-1 border rounded"> ${dayName} </b><b class="tgl bg-red-500 p-2 rounded-full shadow "> ${day.toString().padStart(2, '0')}</b>`);
                 }
                 teamItem.innerHTML = `
-                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 mb-6 text-xs text-white text-center p-2 bg-teal-700"> ${dates.join('')}</p>
+                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="jadwalhari mt-2 mb-6 text-xs text-white text-center py-3 bg-teal-700"> ${dates.join('')}</p>
                     <p>${row[0] ? `<i class="fas fa-user text-red-600 px-4"></i> ${row[0]}` : ''}</p>
                     <p>${row[1] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[1]}` : ''}</p>
                     <p>${row[2] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[2]}` : ''}</p>
