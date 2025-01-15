@@ -482,8 +482,7 @@ border: 2px solid #6b7280;
     <p class="text-center">
      Wahyudi
     </p>
-    
-<button class="text-center" id="download-button">
+    <button class="text-center" id="download-button">
      Simpan
     </button>
    </div>
@@ -581,7 +580,7 @@ border: 2px solid #6b7280;
                          class="w-24 h-24 rounded-full mb-2"
                          onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <div>
-                        <p class="text-lg font-bold cursor-pointer" onclick="window.location.href='?${row[0].replace(/[\s.]/g, '')}${row[1].replace(/[\s.]/g, '')}'">${row[0]}</p>
+                        <p class="text-lg font-bold cursor-pointer" onclick="window.location.href='?${row[0].replace(/[\s.]/g, '').toLowerCase()}${row[1].replace(/[\s.]/g, '').toLowerCase()}'">${row[0]}</p>
                         <p class="text-sm text-gray-500">Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
                     </div>
                 </div>
@@ -753,14 +752,14 @@ border: 2px solid #6b7280;
         document.getElementById('modal-ronda3').textContent = row[5];
         document.getElementById('modal-ronda4').textContent = row[6];
         document.getElementById('modal-bulanan').textContent = row[7];
-        
+
         // Calculate total
         const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
             const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
             return acc + num;
         }, 0);
         document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
-        
+
         document.getElementById('modal-jumlah').textContent = row[8];
         document.getElementById('modal-bayar').textContent = row[9];
         modal.style.display = 'flex';
