@@ -105,33 +105,20 @@
       text-decoration: none;
       cursor: pointer;
     }
-.jadwal {
-float: right;
-    position: sticky;
-    margin-top: -80px;
-    margin-bottom: 10px;
-}
-.jadwal img {
-border: 2px solid #6b7280;
-    padding: 5px;
-}
-.jadwal p {
-    padding-top: 88px;
-}
   </style>
  </head>
  <body class="bg-gray-100">
   <!-- Header -->
   <div class="bg-teal-700 p-4 flex items-center justify-between relative">
    <div class="flex items-center">
-    <img alt="Logo of RT09 community" height="28" src="/logo.png" style="max-height:28px" width="28"/>
+    <img alt="Logo of RT09 community" height="28" src="https://placehold.co/28x28" style="max-height:28px" width="28"/>
     <h1 class="text-white text-xl ml-4">
      KEAMANAN
     </h1>
    </div>
    <div class="flex items-center space-x-4">
-    <a href="?jadwalronda" id="menu-link">
-     <i class="fas bg-yellow-400 rounded px-2 py-1 text-sm" id="menu-text"> JADWAL
+    <a href="?jadwalronda">
+     <i class="fas bg-yellow-400 rounded px-2 py-1 text-sm"> JADWAL
      </i>
     </a>
     <i class="fas fa-bell text-white text-xl">
@@ -323,9 +310,6 @@ border: 2px solid #6b7280;
     JADWAL RONDA
    </h1>
    <div class="mb-4 flex items-center space-x-4">
-    <a href="?dendaronda" class="text-teal-700">
-     <i class="fas fa-arrow-left text-2xl"></i>
-    </a>
     <div>
      <select class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="jadwal-month-select">
       <option value="Januari">
@@ -482,12 +466,13 @@ border: 2px solid #6b7280;
     <p class="text-center">
      Wahyudi
     </p>
-    <button class="text-center" id="download-button">
+    
+<button class="text-center" id="download-button">
      Simpan
     </button>
    </div>
   </div>
-<script>
+  <script>
     let showDetails = false;
     let showAll = false;
     let isGridView = true;
@@ -580,7 +565,7 @@ border: 2px solid #6b7280;
                          class="w-24 h-24 rounded-full mb-2"
                          onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
                     <div>
-                        <p class="text-lg font-bold cursor-pointer" onclick="window.location.href='?${row[0].replace(/[\s.]/g, '').toLowerCase()}${row[1].replace(/[\s.]/g, '').toLowerCase()}'">${row[0]}</p>
+                        <p class="text-lg font-bold">${row[0]}</p>
                         <p class="text-sm text-gray-500">Blok <b class="text-sm text-teal-700">${row[1]}</b></p>
                     </div>
                 </div>
@@ -752,14 +737,14 @@ border: 2px solid #6b7280;
         document.getElementById('modal-ronda3').textContent = row[5];
         document.getElementById('modal-ronda4').textContent = row[6];
         document.getElementById('modal-bulanan').textContent = row[7];
-
+        
         // Calculate total
         const total = [row[2], row[3], row[4], row[5], row[6], row[7]].reduce((acc, val) => {
             const num = parseInt(val.replace(/[^0-9]/g, ''), 10) || 0;
             return acc + num;
         }, 0);
         document.getElementById('modal-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
-
+        
         document.getElementById('modal-jumlah').textContent = row[8];
         document.getElementById('modal-bayar').textContent = row[9];
         modal.style.display = 'flex';
@@ -967,24 +952,19 @@ border: 2px solid #6b7280;
                 for (let day = teamNumber; day <= daysInMonth; day += 10) {
                     const date = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month), day);
                     const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
-                    dates.push(`<b class="bg-gray-500 px-2 p-1"> ${dayName} </b><b class="bg-red-500 p-2 rounded shadow "> ${day.toString().padStart(2, '0')}</b>`);
+                    dates.push(`<b class="bg-gray-500 p-1"> ${dayName} </b><b class="bg-red-500 p-2 rounded shadow "> ${day.toString().padStart(2, '0')}</b>`);
                 }
                 teamItem.innerHTML = `
-                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 text-xs text-white text-center "> ${dates.join('')}</p><hr class="my-4"/>
-                    <p>${row[0] ? `<i class="fas fa-user text-red-600 px-4"></i> ${row[0]}` : ''}</p>
-                    <p>${row[1] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[1]}` : ''}</p>
-                    <p>${row[2] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[2]}` : ''}</p>
-                    <p>${row[3] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[3]}` : ''}</p>
-<div class="jadwal text-center relative w-24 h-24 mx-auto">
-  <img src="/file/${row[4]}.jpg" 
-       alt="Profile picture of ${row[0]}" 
-       class="w-full h-full rounded-full object-cover"
-       onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
-  <p class="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-opacity-50 rounded-full">
-    <b class="bg-yellow-600 rounded shadow px-2 text-sm">Ketua #${teamNumber}</b>
-  </p>
-</div>
-                 
+                    <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 text-xs text-white text-center "> <b class="bg-red-500 p-2 rounded shadow "> tgl</b>${dates.join('')}</p><hr class="my-4"/>
+                    <p><i class="fas fa-user text-red-600">
+      </i>  <b> ${row[0] || 'Nama Tidak Tersedia'} </b><i class="text-red-500">Ketua</i></p>
+                    <p> <i class="fas fa-user text-gray-600">
+      </i>  ${row[1] || 'Info Tidak Tersedia'}</p>
+                    <p><i class="fas fa-user text-gray-600">
+      </i>  ${row[2] || 'Info Tidak Tersedia'}</p>
+                    <p><i class="fas fa-user text-gray-600">
+      </i>  ${row[3] || 'Info Tidak Tersedia'}</p>
+   <hr class="100 my-2"/>                 
 
                 `;
                 jadwalRondaGrid.appendChild(teamItem);
@@ -1008,10 +988,6 @@ border: 2px solid #6b7280;
     if (window.location.search.includes('jadwalronda')) {
         document.getElementById('jadwal-ronda-page').classList.remove('hidden');
         document.querySelector('main.container').classList.add('hidden');
-        document.getElementById('menu-link').href = "?dendaronda";
-        document.getElementById('menu-text').textContent = "Denda Ronda";
-        document.getElementById('menu-text').classList.remove('bg-yellow-400');
-        document.getElementById('menu-text').classList.add('bg-red-500', 'text-white');
     }
   </script>
  </body>
