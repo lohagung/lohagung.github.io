@@ -4,12 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Text Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
-      <link href="/logo.png" rel="icon" type="image/jpeg"/>
+    <link href="/logo.png" rel="icon" type="image/jpeg"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.css"></link>
     <style>
-        #editorPopup {
-            cursor: move;
-        }
         .history-item {
             white-space: nowrap;
             font-size: xx-small;
@@ -53,6 +50,9 @@
         .bg-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        .touch-cursor {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen bg-gradient">
@@ -91,9 +91,20 @@
             </div>
         </div>
         <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
+        <div class="flex justify-end space-x-2 mt-2">
+            <button id="scrollToTop" class="text-gray-600 icon-button text-sm">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            <button id="selectAllCopy" class="text-gray-600 icon-button text-sm">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button id="scrollToBottom" class="text-gray-600 icon-button text-sm">
+                <i class="fas fa-arrow-down"></i>
+            </button>
+        </div>
     </div>
 
-    <div id="minimizedIcon" class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50 hidden">
+    <div id="minimizedIcon" class="fixed right-4 bottom-4 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50 hidden">
         <i class="fas fa-pencil-alt"></i>
     </div>
 
@@ -119,6 +130,9 @@
         const clearHistoryButton = document.getElementById('clearHistory');
         const endOfHistory = document.getElementById('endOfHistory');
         const notification = document.getElementById('notification');
+        const scrollToTopButton = document.getElementById('scrollToTop');
+        const scrollToBottomButton = document.getElementById('scrollToBottom');
+        const selectAllCopyButton = document.getElementById('selectAllCopy');
 
         let saveCount = 0;
         let history = [];
@@ -166,12 +180,14 @@
         desktopViewButton.addEventListener('click', () => {
             preview.style.width = '100%';
             preview.style.height = '100%';
+            preview.classList.remove('touch-cursor');
             updatePreview();
         });
 
         mobileViewButton.addEventListener('click', () => {
             preview.style.width = '375px';
             preview.style.height = '667px';
+            preview.classList.add('touch-cursor');
             updatePreview();
         });
 
@@ -209,6 +225,20 @@
             if (!historyMenu.contains(event.target) && !historyButton.contains(event.target)) {
                 historyMenu.classList.add('hidden');
             }
+        });
+
+        scrollToTopButton.addEventListener('click', () => {
+            htmlEditor.scrollTop = 0;
+        });
+
+        scrollToBottomButton.addEventListener('click', () => {
+            htmlEditor.scrollTop = htmlEditor.scrollHeight;
+        });
+
+        selectAllCopyButton.addEventListener('click', () => {
+            htmlEditor.select();
+            document.execCommand('copy');
+            showNotification('Copied to clipboard');
         });
 
         function updatePreview() {
@@ -273,30 +303,6 @@
                 notification.style.display = 'none';
             }, 2000);
         }
-
-        // Drag and Drop functionality
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        editorPopup.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - editorPopup.getBoundingClientRect().left;
-            offsetY = e.clientY - editorPopup.getBoundingClientRect().top;
-            editorPopup.style.cursor = 'grabbing';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                editorPopup.style.left = `${e.clientX - offsetX}px`;
-                editorPopup.style.top = `${e.clientY - offsetY}px`;
-                editorPopup.style.transform = 'none';
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            editorPopup.style.cursor = 'move';
-        });
     </script>
 </body>
 </html>
