@@ -6,6 +6,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="/logo.png" rel="icon" type="image/jpeg"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.css"></link>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         .history-item {
             white-space: nowrap;
@@ -76,6 +78,9 @@
                         <div id="endOfHistory" class="text-gray-600">Terakhir</div>
                     </div>
                 </div>
+                <button id="downloadHistory" class="text-gray-600 icon-button">
+                    <i class="fas fa-file-archive"></i>
+                </button>
                 <button id="saveEditor" class="text-gray-600 icon-button">
                     <i class="fas fa-download"></i>
                 </button>
@@ -91,16 +96,24 @@
             </div>
         </div>
         <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
-        <div class="flex justify-end space-x-2 mt-2">
-            <button id="scrollToTop" class="text-gray-600 icon-button text-sm">
-                <i class="fas fa-arrow-up"></i>
+        <div class="flex justify-between items-center mt-2">
+            <button id="clearText" class="text-gray-600 icon-button text-sm">
+                <i class="fas fa-eraser"></i>
             </button>
-            <button id="selectAllCopy" class="text-gray-600 icon-button text-sm">
-                <i class="fas fa-copy"></i>
-            </button>
-            <button id="scrollToBottom" class="text-gray-600 icon-button text-sm">
-                <i class="fas fa-arrow-down"></i>
-            </button>
+            <div class="flex space-x-2">
+                <button id="pasteText" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-paste"></i>
+                </button>
+                <button id="selectAllCopy" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <button id="scrollToTop" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <button id="scrollToBottom" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -133,6 +146,9 @@
         const scrollToTopButton = document.getElementById('scrollToTop');
         const scrollToBottomButton = document.getElementById('scrollToBottom');
         const selectAllCopyButton = document.getElementById('selectAllCopy');
+        const pasteTextButton = document.getElementById('pasteText');
+        const clearTextButton = document.getElementById('clearText');
+        const downloadHistoryButton = document.getElementById('downloadHistory');
 
         let saveCount = 0;
         let history = [];
@@ -239,6 +255,33 @@
             htmlEditor.select();
             document.execCommand('copy');
             showNotification('Copied to clipboard');
+        });
+
+        pasteTextButton.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                htmlEditor.value += text;
+                updatePreview();
+                showNotification('Pasted from clipboard');
+            } catch (err) {
+                showNotification('Failed to paste');
+            }
+        });
+
+        clearTextButton.addEventListener('click', () => {
+            htmlEditor.value = '';
+            updatePreview();
+            showNotification('Text cleared');
+        });
+
+        downloadHistoryButton.addEventListener('click', () => {
+            const zip = new JSZip();
+            history.forEach((item, index) => {
+                zip.file(`version-${index + 1}.html`, item.content);
+            });
+            zip.generateAsync({ type: 'blob' }).then((content) => {
+                saveAs(content, 'history.zip');
+            });
         });
 
         function updatePreview() {
