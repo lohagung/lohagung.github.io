@@ -118,6 +118,11 @@ border: 2px solid #6b7280;
 .jadwal p {
     padding-top: 88px;
 }
+b.bg-red-500.p-2.rounded-full.shadow {
+    margin-left: -7px;
+    border: 2px solid;
+    margin-right: 3px;
+}
   </style>
  </head>
  <body class="bg-gray-100">
@@ -965,11 +970,11 @@ border: 2px solid #6b7280;
                 for (let day = teamNumber; day <= daysInMonth; day += 10) {
                     const date = new Date(new Date().getFullYear(), Object.keys(monthIndex).indexOf(month), day);
                     const dayName = date.toLocaleDateString('id-ID', { weekday: 'long' });
-                    dates.push(`<b class="bg-gray-500 px-2 p-1"> ${dayName} </b><b class="bg-red-500 p-2 rounded shadow "> ${day.toString().padStart(2, '0')}</b>`);
+                    dates.push(`<b class="bg-gray-500 px-2 p-1 rounded"> ${dayName} </b><b class="bg-red-500 p-2 rounded-full shadow "> ${day.toString().padStart(2, '0')}</b>`);
                 }
                 teamItem.innerHTML = `
                     <h2 class=" text-lg font-bold mb-2 text-center ">Team Ronda #${teamNumber}</h2><p class="mt-2 text-xs text-white text-center "> ${dates.join('')}</p><hr class="my-4"/>
-                    <p>${row[0] ? `<i class="fas fa-user text-red-600 px-4"></i> ${row[0]}` : ''}</p>
+                    <p>${row[0] ? `<i class="fas fa-user text-teal-600 px-4"></i><b class="text-teal-700"> ${row[0]}</b>` : ''}</p>
                     <p>${row[1] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[1]}` : ''}</p>
                     <p>${row[2] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[2]}` : ''}</p>
                     <p>${row[3] ? `<i class="fas fa-user text-gray-600 px-4"></i> ${row[3]}` : ''}</p>
@@ -979,7 +984,7 @@ border: 2px solid #6b7280;
        class="w-full h-full rounded-full object-cover"
        onerror="this.onerror=null; this.src='/file/no-profil.jpeg';">
   <p class="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-opacity-50 rounded-full">
-    <b class="bg-yellow-600 rounded shadow px-2 text-sm">Ketua Ronda</b>
+    <b class="bg-yellow-600 rounded shadow px-2 text-sm">Ketua #${teamNumber}</b>
   </p>
 </div>
                  
