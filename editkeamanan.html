@@ -158,11 +158,11 @@
             const nama = document.getElementById("nama").value;
             const blok = document.getElementById("blok").value;
             const tunggakan = document.getElementById("tunggakan") ? document.getElementById("tunggakan").value : "";
-            const ronda1 = document.getElementById("ronda1") ? document.getElementById("ronda1").value : "";
-            const ronda2 = document.getElementById("ronda2") ? document.getElementById("ronda2").value : "";
-            const ronda3 = document.getElementById("ronda3") ? document.getElementById("ronda3").value : "";
-            const ronda4 = document.getElementById("ronda4") ? document.getElementById("ronda4").value : "";
-            const bulanan = document.getElementById("bulanan") ? document.getElementById("bulanan").value : "";
+            const ronda1 = document.getElementById("ronda1").checked ? 5000 : 0;
+            const ronda2 = document.getElementById("ronda2").checked ? 5000 : 0;
+            const ronda3 = document.getElementById("ronda3").checked ? 5000 : 0;
+            const ronda4 = document.getElementById("ronda4").checked ? 5000 : 0;
+            const bulanan = document.getElementById("bulanan").checked ? 25000 : 0;
             const jumlah = document.getElementById("jumlah") ? document.getElementById("jumlah").value : "";
             const bayar = document.getElementById("bayar") ? document.getElementById("bayar").value : "";
             const sheet = document.getElementById("sheet-select").value;
@@ -183,11 +183,11 @@
 
         function calculateJumlah() {
             const tunggakan = parseFloat(document.getElementById("tunggakan").value) || 0;
-            const ronda1 = parseFloat(document.getElementById("ronda1").value) || 0;
-            const ronda2 = parseFloat(document.getElementById("ronda2").value) || 0;
-            const ronda3 = parseFloat(document.getElementById("ronda3").value) || 0;
-            const ronda4 = parseFloat(document.getElementById("ronda4").value) || 0;
-            const bulanan = parseFloat(document.getElementById("bulanan").value) || 0;
+            const ronda1 = document.getElementById("ronda1").checked ? 5000 : 0;
+            const ronda2 = document.getElementById("ronda2").checked ? 5000 : 0;
+            const ronda3 = document.getElementById("ronda3").checked ? 5000 : 0;
+            const ronda4 = document.getElementById("ronda4").checked ? 5000 : 0;
+            const bulanan = document.getElementById("bulanan").checked ? 25000 : 0;
             const bayar = parseFloat(document.getElementById("bayar").value) || 0;
             const jumlah = tunggakan + ronda1 + ronda2 + ronda3 + ronda4 + bulanan - bayar;
             document.getElementById("jumlah").value = jumlah;
@@ -212,23 +212,28 @@
                 </div>
                 <div class="mb-4">
                     <label for="ronda1" class="block text-gray-700">Ronda 1</label>
-                    <input type="number" id="ronda1" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda1}" oninput="calculateJumlah()">
+                    <input type="checkbox" id="ronda1" class="mr-2" ${ronda1 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <label for="ronda1" class="text-gray-700">5000</label>
                 </div>
                 <div class="mb-4">
                     <label for="ronda2" class="block text-gray-700">Ronda 2</label>
-                    <input type="number" id="ronda2" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda2}" oninput="calculateJumlah()">
+                    <input type="checkbox" id="ronda2" class="mr-2" ${ronda2 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <label for="ronda2" class="text-gray-700">5000</label>
                 </div>
                 <div class="mb-4">
                     <label for="ronda3" class="block text-gray-700">Ronda 3</label>
-                    <input type="number" id="ronda3" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda3}" oninput="calculateJumlah()">
+                    <input type="checkbox" id="ronda3" class="mr-2" ${ronda3 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <label for="ronda3" class="text-gray-700">5000</label>
                 </div>
                 <div class="mb-4">
                     <label for="ronda4" class="block text-gray-700">Ronda 4</label>
-                    <input type="number" id="ronda4" class="w-full p-2 border border-gray-300 rounded mt-1" value="${ronda4}" oninput="calculateJumlah()">
+                    <input type="checkbox" id="ronda4" class="mr-2" ${ronda4 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <label for="ronda4" class="text-gray-700">5000</label>
                 </div>
                 <div class="mb-4">
                     <label for="bulanan" class="block text-gray-700">Bulanan</label>
-                    <input type="number" id="bulanan" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bulanan}" oninput="calculateJumlah()">
+                    <input type="checkbox" id="bulanan" class="mr-2" ${bulanan == 25000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <label for="bulanan" class="text-gray-700">25000</label>
                 </div>
                 <div class="mb-4">
                     <label for="jumlah" class="block text-gray-700">Jumlah</label>
@@ -240,6 +245,17 @@
                 </div>
             `;
             document.getElementById("popup-form").classList.remove("hidden");
+        }
+
+        function handleCheckboxChange(checkbox) {
+            if (!checkbox.checked) {
+                const pin = prompt("Masukkan PIN untuk uncheck:");
+                if (pin !== "777") {
+                    checkbox.checked = true;
+                    showAlert("PIN salah!");
+                }
+            }
+            calculateJumlah();
         }
 
         function closePopup() {
@@ -295,41 +311,40 @@
             detailIcon.classList.toggle('fa-eye-slash', showDetails);
             renderDataList(allData);
         }
+document.getElementById("notification-icon").addEventListener("click", () => {
+    const notificationList = document.getElementById("notification-list");
+    notificationList.classList.toggle("hidden");
+});
 
-        document.getElementById("notification-icon").addEventListener("click", () => {
-            const notificationList = document.getElementById("notification-list");
-            notificationList.classList.toggle("hidden");
-        });
+document.getElementById("search-icon").addEventListener("click", () => {
+    document.getElementById("search-bar").classList.remove("hidden");
+});
 
-        document.getElementById("search-icon").addEventListener("click", () => {
-            document.getElementById("search-bar").classList.remove("hidden");
-        });
+document.getElementById("close-search").addEventListener("click", () => {
+    document.getElementById("search-bar").classList.add("hidden");
+});
 
-        document.getElementById("close-search").addEventListener("click", () => {
-            document.getElementById("search-bar").classList.add("hidden");
-        });
+document.getElementById("search-input").addEventListener("input", (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredData = allData.filter(data => {
+        const name = data.nama.toLowerCase();
+        const block = data.blok.toLowerCase();
+        return name.includes(searchTerm) || block.includes(searchTerm);
+    });
+    renderDataList(filteredData);
+});
 
-        document.getElementById("search-input").addEventListener("input", (event) => {
-            const searchTerm = event.target.value.toLowerCase();
-            const filteredData = allData.filter(data => {
-                const name = data.nama.toLowerCase();
-                const block = data.blok.toLowerCase();
-                return name.includes(searchTerm) || block.includes(searchTerm);
-            });
-            renderDataList(filteredData);
-        });
+window.onload = () => {
+    getDatas();
+    renderNotifications();
+};
 
-        window.onload = () => {
-            getDatas();
-            renderNotifications();
-        };
-
-        window.addEventListener("click", (event) => {
-            const notificationList = document.getElementById("notification-list");
-            if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
-                notificationList.classList.add("hidden");
-            }
-        });
-    </script>
+window.addEventListener("click", (event) => {
+    const notificationList = document.getElementById("notification-list");
+    if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
+        notificationList.classList.add("hidden");
+    }
+});
+</script>
 </body>
 </html>
