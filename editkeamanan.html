@@ -41,6 +41,28 @@
         .highlighted {
             background-color: yellow;
         }
+        .pin-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+        .pin-popup input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -106,6 +128,11 @@
             </div>
         </div>
     </div>
+    <!-- PIN Popup -->
+    <div id="pin-popup" class="pin-popup">
+        <h2 class="text-xl font-semibold">Masukkan PIN</h2>
+        <input type="password" id="pin-input" placeholder="PIN" oninput="checkPin()">
+    </div>
     <!-- Alert -->
     <div id="alert" class="alert">
         <p id="alert-message"></p>
@@ -115,6 +142,7 @@
         let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
         let showDetails = false;
         let allData = [];
+        let currentCheckbox = null;
 
         async function getDatas() {
             const sheet = document.getElementById("sheet-select").value;
@@ -249,13 +277,27 @@
 
         function handleCheckboxChange(checkbox) {
             if (!checkbox.checked) {
-                const pin = prompt("Masukkan PIN untuk uncheck:");
-                if (pin !== "777") {
-                    checkbox.checked = true;
-                    showAlert("PIN salah!");
-                }
+                currentCheckbox = checkbox;
+                document.getElementById("pin-popup").style.display = "block";
+                document.getElementById("pin-input").focus();
+            } else {
+                calculateJumlah();
             }
-            calculateJumlah();
+        }
+
+        function checkPin() {
+            const pin = document.getElementById("pin-input").value;
+            if (pin === "777") {
+                currentCheckbox.checked = false;
+                document.getElementById("pin-popup").style.display = "none";
+                document.getElementById("pin-input").value = "";
+                calculateJumlah();
+            } else if (pin.length >= 3) {
+                showAlert("PIN salah!");
+                document.getElementById("pin-popup").style.display = "none";
+                document.getElementById("pin-input").value = "";
+                currentCheckbox.checked = true;
+            }
         }
 
         function closePopup() {
@@ -311,40 +353,41 @@
             detailIcon.classList.toggle('fa-eye-slash', showDetails);
             renderDataList(allData);
         }
-document.getElementById("notification-icon").addEventListener("click", () => {
-    const notificationList = document.getElementById("notification-list");
-    notificationList.classList.toggle("hidden");
-});
 
-document.getElementById("search-icon").addEventListener("click", () => {
-    document.getElementById("search-bar").classList.remove("hidden");
-});
+        document.getElementById("notification-icon").addEventListener("click", () => {
+            const notificationList = document.getElementById("notification-list");
+            notificationList.classList.toggle("hidden");
+        });
 
-document.getElementById("close-search").addEventListener("click", () => {
-    document.getElementById("search-bar").classList.add("hidden");
-});
+        document.getElementById("search-icon").addEventListener("click", () => {
+            document.getElementById("search-bar").classList.remove("hidden");
+        });
 
-document.getElementById("search-input").addEventListener("input", (event) => {
-    const searchTerm = event.target.value.toLowerCase();
-    const filteredData = allData.filter(data => {
-        const name = data.nama.toLowerCase();
-        const block = data.blok.toLowerCase();
-        return name.includes(searchTerm) || block.includes(searchTerm);
-    });
-    renderDataList(filteredData);
-});
+        document.getElementById("close-search").addEventListener("click", () => {
+            document.getElementById("search-bar").classList.add("hidden");
+        });
 
-window.onload = () => {
-    getDatas();
-    renderNotifications();
-};
+        document.getElementById("search-input").addEventListener("input", (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredData = allData.filter(data => {
+                const name = data.nama.toLowerCase();
+                const block = data.blok.toLowerCase();
+                return name.includes(searchTerm) || block.includes(searchTerm);
+            });
+            renderDataList(filteredData);
+        });
 
-window.addEventListener("click", (event) => {
-    const notificationList = document.getElementById("notification-list");
-    if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
-        notificationList.classList.add("hidden");
-    }
-});
-</script>
+        window.onload = () => {
+            getDatas();
+            renderNotifications();
+        };
+
+        window.addEventListener("click", (event) => {
+            const notificationList = document.getElementById("notification-list");
+            if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
+                notificationList.classList.add("hidden");
+            }
+        });
+    </script>
 </body>
 </html>
