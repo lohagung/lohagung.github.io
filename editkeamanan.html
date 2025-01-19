@@ -140,19 +140,19 @@
     <!-- Popup Form -->
     <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
+<h2 id="form-title" class="text-xl font-semibold text-center"></h2>
             <div class="flex justify-between items-center mb-4">
-                <h2 id="form-title" class="text-xl font-semibold">Tambah Data</h2>
+                <span id="total-amount" class="text-lg font-semibold text-red-700"></span>
                 <div class="flex items-center space-x-4">
-                    <span id="selected-month" class="text-lg font-semibold text-teal-700"></span>
-                    <span id="total-amount" class="text-lg font-semibold text-red-700"></span>
+                    <span id="selected-month" class="text-lg font-semibold text-teal-700"></span>                   
                 </div>
             </div>
             <input type="hidden" id="id">
             <div id="form-content" class="grid gap-4">
                 <!-- Form fields will be dynamically inserted here -->
             </div>
-            <div class="flex justify-end">
-                <button id="submit-btn" type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveData()">Simpan Data</button>
+            <div class="flex justify-center">
+                <button id="submit-btn" type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveData()">Bayar</button>
                 <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded ml-2" onclick="closePopup()">Batal</button>
             </div>
         </div>
@@ -301,9 +301,8 @@
                     <input type="checkbox" id="bulanan" class="mr-2" ${bulanan == 25000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
                     <label for="bulanan" class="text-red-700">Bulanan</label>
                 </div>
-                <div class="mb-4">
-                    <label for="bayar" class="block text-gray-700">Bayar</label>
-                    <input type="number" id="bayar" class="w-full p-2 border border-gray-300 rounded mt-1" value="${bayar}" oninput="calculateJumlah()">
+                <div class="mb-4  text-center">
+                    <input type="number" id="bayar" class="w-full p-4 border border-gray-300 rounded mt-2" value="${bayar}" oninput="calculateJumlah()">
                 </div>
             `;
             document.getElementById("popup-form").classList.remove("hidden");
