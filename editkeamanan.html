@@ -3,6 +3,7 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Denda Ronda</title>
+    <link href="/logo.png" rel="icon" type="image/jpeg"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -117,7 +118,13 @@
     <!-- Popup Form -->
     <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
-            <h2 id="form-title" class="text-xl font-semibold mb-4">Tambah Data</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="form-title" class="text-xl font-semibold">Tambah Data</h2>
+                <div class="flex items-center space-x-4">
+                    <span id="selected-month" class="text-lg font-semibold text-teal-700"></span>
+                    <span id="total-amount" class="text-lg font-semibold text-red-700"></span>
+                </div>
+            </div>
             <input type="hidden" id="id">
             <div id="form-content" class="grid grid-cols-2 gap-4">
                 <!-- Form fields will be dynamically inserted here -->
@@ -219,12 +226,16 @@
             const bayar = parseFloat(document.getElementById("bayar").value) || 0;
             const jumlah = tunggakan + ronda1 + ronda2 + ronda3 + ronda4 + bulanan - bayar;
             document.getElementById("jumlah").value = jumlah;
+            document.getElementById("total-amount").innerText = `Rp ${parseInt(jumlah).toLocaleString('id-ID')}`;
         }
 
         function openEditPopup(id, nama, blok, tunggakan, ronda1, ronda2, ronda3, ronda4, bulanan, jumlah, bayar) {
+            const selectedMonth = document.getElementById("sheet-select").value;
             document.getElementById("id").value = id;
-            document.getElementById("form-title").innerText = "Edit Data";
-            document.getElementById("submit-btn").innerText = "Update Data";
+            document.getElementById("form-title").innerText = nama ? `${nama} ${blok}` : `Blok ${blok}`;
+            document.getElementById("selected-month").innerText = selectedMonth;
+            document.getElementById("total-amount").innerText = `Rp ${parseInt(jumlah).toLocaleString('id-ID')}`;
+            document.getElementById("submit-btn").innerText = "Bayar";
             document.getElementById("form-content").innerHTML = `
                 <div class="mb-4">
                     <label for="nama" class="block text-gray-700">Nama Data</label>
@@ -285,109 +296,110 @@
             }
         }
 
-        function checkPin() {
-            const pin = document.getElementById("pin-input").value;
-            if (pin === "777") {
-                currentCheckbox.checked = false;
-                document.getElementById("pin-popup").style.display = "none";
-                document.getElementById("pin-input").value = "";
-                calculateJumlah();
-            } else if (pin.length >= 3) {
-                showAlert("PIN salah!");
-                document.getElementById("pin-popup").style.display = "none";
-                document.getElementById("pin-input").value = "";
-                currentCheckbox.checked = true;
-            }
-        }
 
-        function closePopup() {
-            document.getElementById("popup-form").classList.add("hidden");
-        }
+function checkPin() {
+    const pin = document.getElementById("pin-input").value;
+    if (pin === "777") {
+        currentCheckbox.checked = false;
+        document.getElementById("pin-popup").style.display = "none";
+        document.getElementById("pin-input").value = "";
+        calculateJumlah();
+    } else if (pin.length >= 3) {
+        showAlert("PIN salah!");
+        document.getElementById("pin-popup").style.display = "none";
+        document.getElementById("pin-input").value = "";
+        currentCheckbox.checked = true;
+    }
+}
 
-        function addNotification(message, id) {
-            const notificationList = document.getElementById("notification-items");
-            const notificationCount = document.getElementById("notification-count");
-            notifications.unshift({ message, id, clicked: false });
-            localStorage.setItem('notifications', JSON.stringify(notifications));
-            notificationCount.innerText = notifications.filter(n => !n.clicked).length;
-            notificationCount.classList.remove("hidden");
-            renderNotifications();
-        }
+function closePopup() {
+    document.getElementById("popup-form").classList.add("hidden");
+}
 
-        function renderNotifications() {
-            const notificationList = document.getElementById("notification-items");
-            notificationList.innerHTML = "";
-            notifications.forEach((notification, index) => {
-                const listItem = document.createElement("li");
-                listItem.className = `p-2 border-b border-gray-200 notification-item ${notification.clicked ? 'clicked' : ''}`;
-                listItem.innerText = notification.message;
-                listItem.onclick = () => {
-                    document.getElementById(`row-${notification.id}`).scrollIntoView({ behavior: 'smooth' });
-                    document.getElementById(`row-${notification.id}`).classList.add('highlighted');
-                    setTimeout(() => {
-                        document.getElementById(`row-${notification.id}`).classList.remove('highlighted');
-                    }, 3000);
-                    notification.clicked = true;
-                    localStorage.setItem('notifications', JSON.stringify(notifications));
-                    renderNotifications();
-                    document.getElementById("notification-count").innerText = notifications.filter(n => !n.clicked).length;
-                };
-                notificationList.appendChild(listItem);
-            });
-        }
+function addNotification(message, id) {
+    const notificationList = document.getElementById("notification-items");
+    const notificationCount = document.getElementById("notification-count");
+    notifications.unshift({ message, id, clicked: false });
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+    notificationCount.innerText = notifications.filter(n => !n.clicked).length;
+    notificationCount.classList.remove("hidden");
+    renderNotifications();
+}
 
-        function showAlert(message) {
-            const alertBox = document.getElementById("alert");
-            const alertMessage = document.getElementById("alert-message");
-            alertMessage.innerText = message;
-            alertBox.classList.add("show");
+function renderNotifications() {
+    const notificationList = document.getElementById("notification-items");
+    notificationList.innerHTML = "";
+    notifications.forEach((notification, index) => {
+        const listItem = document.createElement("li");
+        listItem.className = `p-2 border-b border-gray-200 notification-item ${notification.clicked ? 'clicked' : ''}`;
+        listItem.innerText = notification.message;
+        listItem.onclick = () => {
+            document.getElementById(`row-${notification.id}`).scrollIntoView({ behavior: 'smooth' });
+            document.getElementById(`row-${notification.id}`).classList.add('highlighted');
             setTimeout(() => {
-                alertBox.classList.remove("show");
+                document.getElementById(`row-${notification.id}`).classList.remove('highlighted');
             }, 3000);
-        }
-
-        function toggleDetails() {
-            showDetails = !showDetails;
-            const detailIcon = document.getElementById("detail-icon");
-            detailIcon.classList.toggle('fa-eye', !showDetails);
-            detailIcon.classList.toggle('fa-eye-slash', showDetails);
-            renderDataList(allData);
-        }
-
-        document.getElementById("notification-icon").addEventListener("click", () => {
-            const notificationList = document.getElementById("notification-list");
-            notificationList.classList.toggle("hidden");
-        });
-
-        document.getElementById("search-icon").addEventListener("click", () => {
-            document.getElementById("search-bar").classList.remove("hidden");
-        });
-
-        document.getElementById("close-search").addEventListener("click", () => {
-            document.getElementById("search-bar").classList.add("hidden");
-        });
-
-        document.getElementById("search-input").addEventListener("input", (event) => {
-            const searchTerm = event.target.value.toLowerCase();
-            const filteredData = allData.filter(data => {
-                const name = data.nama.toLowerCase();
-                const block = data.blok.toLowerCase();
-                return name.includes(searchTerm) || block.includes(searchTerm);
-            });
-            renderDataList(filteredData);
-        });
-
-        window.onload = () => {
-            getDatas();
+            notification.clicked = true;
+            localStorage.setItem('notifications', JSON.stringify(notifications));
             renderNotifications();
+            document.getElementById("notification-count").innerText = notifications.filter(n => !n.clicked).length;
         };
+        notificationList.appendChild(listItem);
+    });
+}
 
-        window.addEventListener("click", (event) => {
-            const notificationList = document.getElementById("notification-list");
-            if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
-                notificationList.classList.add("hidden");
-            }
-        });
-    </script>
+function showAlert(message) {
+    const alertBox = document.getElementById("alert");
+    const alertMessage = document.getElementById("alert-message");
+    alertMessage.innerText = message;
+    alertBox.classList.add("show");
+    setTimeout(() => {
+        alertBox.classList.remove("show");
+    }, 3000);
+}
+
+function toggleDetails() {
+    showDetails = !showDetails;
+    const detailIcon = document.getElementById("detail-icon");
+    detailIcon.classList.toggle('fa-eye', !showDetails);
+    detailIcon.classList.toggle('fa-eye-slash', showDetails);
+    renderDataList(allData);
+}
+
+document.getElementById("notification-icon").addEventListener("click", () => {
+    const notificationList = document.getElementById("notification-list");
+    notificationList.classList.toggle("hidden");
+});
+
+document.getElementById("search-icon").addEventListener("click", () => {
+    document.getElementById("search-bar").classList.remove("hidden");
+});
+
+document.getElementById("close-search").addEventListener("click", () => {
+    document.getElementById("search-bar").classList.add("hidden");
+});
+
+document.getElementById("search-input").addEventListener("input", (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    const filteredData = allData.filter(data => {
+        const name = data.nama.toLowerCase();
+        const block = data.blok.toLowerCase();
+        return name.includes(searchTerm) || block.includes(searchTerm);
+    });
+    renderDataList(filteredData);
+});
+
+window.onload = () => {
+    getDatas();
+    renderNotifications();
+};
+
+window.addEventListener("click", (event) => {
+    const notificationList = document.getElementById("notification-list");
+    if (!notificationList.contains(event.target) && !document.getElementById("notification-icon").contains(event.target)) {
+        notificationList.classList.add("hidden");
+    }
+});
+</script>
 </body>
 </html>
