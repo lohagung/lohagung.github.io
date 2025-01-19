@@ -138,9 +138,13 @@
     </div>
 
     <!-- Popup Form -->
-    <div id="popup-form" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div id="popup-form" class="fixed inset-0 bg-teal-700 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded shadow-md w-11/12 md:w-1/2">
-<h2 id="form-title" class="text-xl font-semibold text-center"></h2>
+            <div class="relative mb-4">
+                <img id="cover-image" src="" alt="Cover image of the block in black and white, mirrored" class="w-full h-32 object-cover rounded-t-lg filter grayscale transform scale-x-[-1]">
+                <img id="profile-image" src="" alt="Profile picture of the resident" class="w-16 h-16 rounded-full absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 border-4 border-white">
+            </div>
+            <h2 id="form-title" class="text-xl font-semibold text-center mt-8"></h2>
             <div class="flex justify-between items-center mb-4">
                 <span id="total-amount" class="text-lg font-semibold text-red-700"></span>
                 <div class="flex items-center space-x-4">
@@ -257,6 +261,19 @@
 
         function openEditPopup(id, nama, blok, tunggakan, ronda1, ronda2, ronda3, ronda4, bulanan, jumlah, bayar) {
             const selectedMonth = document.getElementById("sheet-select").value;
+            const blokImage = blok.toLowerCase().replace(/[\s.]/g, '');
+            const imageUrl = `/file/${blokImage}.jpg`;
+            const fallbackImageUrl = '/file/no-profil.jpeg';
+            document.getElementById("cover-image").src = imageUrl;
+            document.getElementById("cover-image").onerror = function() {
+                this.onerror = null;
+                this.src = fallbackImageUrl;
+            };
+            document.getElementById("profile-image").src = imageUrl;
+            document.getElementById("profile-image").onerror = function() {
+                this.onerror = null;
+                this.src = fallbackImageUrl;
+            };
             document.getElementById("id").value = id;
             document.getElementById("form-title").innerText = nama ? `${nama} ${blok}` : `Blok ${blok}`;
             document.getElementById("selected-month").innerText = selectedMonth;
@@ -280,7 +297,7 @@
                     <label for="jumlah" class="block text-gray-700">Jumlah</label>
                     <input type="number" id="jumlah" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${jumlah}" readonly>
                 </div>
-                <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
+                <div class="mb-4 ${userRole === 'admin' ?'' : 'hidden'}">
                     <input type="checkbox" id="ronda1" class="mr-2" ${ronda1 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
                     <label for="ronda1" class="text-gray-700">Ronda 1</label>
                 </div>
@@ -289,8 +306,7 @@
                     <label for="ronda2" class="text-gray-700">Ronda 2</label>
                 </div>
                 <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
-                    
-<input type="checkbox" id="ronda3" class="mr-2" ${ronda3 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
+                    <input type="checkbox" id="ronda3" class="mr-2" ${ronda3 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
                     <label for="ronda3" class="text-gray-700">Ronda 3</label>
                 </div>
                 <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
@@ -301,7 +317,7 @@
                     <input type="checkbox" id="bulanan" class="mr-2" ${bulanan == 25000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
                     <label for="bulanan" class="text-red-700">Bulanan</label>
                 </div>
-                <div class="mb-4  text-center">
+                <div class="mb-4 text-center">
                     <input type="number" id="bayar" class="w-full p-4 border border-gray-300 rounded mt-2 text-center text-lg font-semibold" value="${bayar}" oninput="calculateJumlah()">
                 </div>
             `;
