@@ -237,11 +237,11 @@
             document.getElementById("total-amount").innerText = `Rp ${parseInt(jumlah).toLocaleString('id-ID')}`;
             document.getElementById("submit-btn").innerText = "Bayar";
             document.getElementById("form-content").innerHTML = `
-                <div class="mb-4">
+                <div class="mb-4 ">
                     <label for="nama" class="block text-gray-700">Nama Data</label>
                     <input type="text" id="nama" class="w-full p-2 border border-gray-300 rounded mt-1" value="${nama}">
                 </div>
-                <div class="mb-4">
+                <div class="mb-4 hidden">
                     <label for="blok" class="block text-gray-700">Blok</label>
                     <input type="text" id="blok" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${blok}" readonly>
                 </div>
@@ -249,34 +249,29 @@
                     <label for="tunggakan" class="block text-gray-700">Tunggakan</label>
                     <input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${tunggakan}" oninput="calculateJumlah()" readonly>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4 hidden">
                     <label for="jumlah" class="block text-gray-700">Jumlah</label>
                     <input type="number" id="jumlah" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${jumlah}" readonly>
                 </div>
                 <div class="mb-4">
-                    <label for="ronda1" class="block text-teal-700">Ronda 1</label>
                     <input type="checkbox" id="ronda1" class="mr-2" ${ronda1 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
-                    <label for="ronda1" class="text-gray-700">5000</label>
+                    <label for="ronda1" class="text-gray-700">Ronda 1</label>
                 </div>
                 <div class="mb-4">
-                    <label for="ronda2" class="block text-teal-700">Ronda 2</label>
                     <input type="checkbox" id="ronda2" class="mr-2" ${ronda2 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
-                    <label for="ronda2" class="text-gray-700">5000</label>
+                    <label for="ronda2" class="text-gray-700">Ronda 2</label>
                 </div>
                 <div class="mb-4">
-                    <label for="ronda3" class="block text-teal-700">Ronda 3</label>
                     <input type="checkbox" id="ronda3" class="mr-2" ${ronda3 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
-                    <label for="ronda3" class="text-gray-700">5000</label>
+                    <label for="ronda3" class="text-gray-700">Ronda 3</label>
                 </div>
                 <div class="mb-4">
-                    <label for="ronda4" class="block text-teal-700">Ronda 4</label>
                     <input type="checkbox" id="ronda4" class="mr-2" ${ronda4 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
-                    <label for="ronda4" class="text-gray-700">5000</label>
+                    <label for="ronda4" class="text-gray-700">Ronda 4</label>
                 </div>
                 <div class="mb-4">
-                    <label for="bulanan" class="block text-red-700">Bulanan</label>
                     <input type="checkbox" id="bulanan" class="mr-2" ${bulanan == 25000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
-                    <label for="bulanan" class="text-gray-700">25000</label>
+                    <label for="bulanan" class="text-red-700">Bulanan</label>
                 </div>
                 <div class="mb-4">
                     <label for="bayar" class="block text-gray-700">Bayar</label>
