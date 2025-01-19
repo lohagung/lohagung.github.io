@@ -146,7 +146,7 @@
             </div>
             <h2 id="form-title" class="text-xl font-semibold text-center mt-8"></h2></br></br>
             <div class="flex justify-between items-center mb-4">
-                <span id="total-amount" class="text-lg  text-red-700"></span>
+                <span id="total-amount" class="text-lg  text-red-700 cursor-pointer"></span>
                 <div class="flex items-center space-x-4">
                     <span id="selected-month" class="text-lg text-teal-600"></span>                   
                 </div>
@@ -291,13 +291,13 @@
                 </div>
                 <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
                     <label for="tunggakan" class="block text-gray-700">Tunggakan</label>
-                    <input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${tunggakan}" oninput="calculateJumlah()" readonly>
+<input type="number" id="tunggakan" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${tunggakan}" oninput="calculateJumlah()" readonly>
                 </div>
                 <div class="mb-4 hidden">
                     <label for="jumlah" class="block text-gray-700">Jumlah</label>
                     <input type="number" id="jumlah" class="w-full p-2 border border-gray-300 rounded mt-1 bg-yellow-200" value="${jumlah}" readonly>
                 </div>
-                <div class="mb-4 ${userRole === 'admin' ?'' : 'hidden'}">
+                <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
                     <input type="checkbox" id="ronda1" class="mr-2" ${ronda1 == 5000 ? 'checked' : ''} onchange="handleCheckboxChange(this)">
                     <label for="ronda1" class="text-gray-700">Ronda 1</label>
                 </div>
@@ -322,6 +322,16 @@
                 </div>
             `;
             document.getElementById("popup-form").classList.remove("hidden");
+
+            // Add event listener for total-amount click
+            document.getElementById("total-amount").addEventListener("click", function() {
+                const totalAmount = parseFloat(this.innerText.replace('Rp ', '').replace(/\./g, ''));
+                const bayarInput = document.getElementById("bayar");
+                if (totalAmount > 0 && parseFloat(bayarInput.value) === 0) {
+                    bayarInput.value = totalAmount;
+                    calculateJumlah();
+                }
+            });
         }
 
         function handleCheckboxChange(checkbox) {
