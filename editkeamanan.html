@@ -147,7 +147,7 @@
                 </div>
             </div>
             <input type="hidden" id="id">
-            <div id="form-content" class="grid grid-cols-2 gap-4">
+            <div id="form-content" class="grid gap-4">
                 <!-- Form fields will be dynamically inserted here -->
             </div>
             <div class="flex justify-end">
@@ -261,6 +261,7 @@
             document.getElementById("selected-month").innerText = selectedMonth;
             document.getElementById("total-amount").innerText = `Rp ${parseInt(jumlah).toLocaleString('id-ID')}`;
             document.getElementById("submit-btn").innerText = "Bayar";
+            document.getElementById("form-content").className = userRole === 'admin' ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4';
             document.getElementById("form-content").innerHTML = `
                 <div class="mb-4 ${userRole === 'admin' ? '' : 'hidden'}">
                     <label for="nama" class="block text-gray-700">Nama</label>
