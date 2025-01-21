@@ -170,12 +170,12 @@
 
                 const address = document.createElement('p');
                 address.className = 'text-gray-600';
-                address.textContent = `Alamat: ${item.alamat}`;
+                address.textContent = `${item.alamat}`;
                 info.appendChild(address);
 
                 const maps = document.createElement('p');
-                maps.className = 'text-gray-600';
-                maps.textContent = `Maps: ${item.maps}`;
+                maps.className = 'text-gray-600 flex items-center';
+                maps.innerHTML = `<a href="https://www.google.com/maps?q=${item.maps}" target="_blank" title="${item.maps}" class="ml-2 text-teal-700"><i class="fas fa-map-marker-alt"></i> Lokasi rumah</a>`;
                 info.appendChild(maps);
 
                 const whatsappLink = document.createElement('a');
