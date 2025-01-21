@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Dashboard</title>
+  <title>YOUSHE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
@@ -15,13 +15,13 @@
   <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
     <div class="flex items-center">
       <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/KME36NI5kxq2BpEX3lkyYBtGLVef3dBrKQGXv5mdsPOKQUHUA.jpg" width="50" />
-      <span class="text-white text-xl font-bold">Data Dashboard</span>
+      <span class="text-white text-xl font-bold">YOUSHE</span>
     </div>
     <ul class="flex space-x-4">
-      <li><a class="text-white hover:underline flex items-center" href="?pelanggan"><i class="fas fa-users mr-2"></i>Pelanggan</a></li>
-      <li><a class="text-white hover:underline flex items-center" href="?penjualan"><i class="fas fa-chart-line mr-2"></i>Penjualan</a></li>
-      <li><a class="text-white hover:underline flex items-center" href="?stok"><i class="fas fa-boxes mr-2"></i>Stok</a></li>
-      <li><a class="text-white hover:underline flex items-center" href="?produk"><i class="fas fa-tags mr-2"></i>Produk</a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?pelanggan"><i class="fas fa-users mr-2"></i><span class="hidden md:inline">Pelanggan</span></a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?penjualan"><i class="fas fa-chart-line mr-2"></i><span class="hidden md:inline">Penjualan</span></a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?stok"><i class="fas fa-boxes mr-2"></i><span class="hidden md:inline">Stok</span></a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?produk"><i class="fas fa-tags mr-2"></i><span class="hidden md:inline">Produk</span></a></li>
     </ul>
   </nav>
 
@@ -63,6 +63,11 @@
   </div>
 
   <script>
+    function formatDate(dateString) {
+      const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      return new Date(dateString).toLocaleDateString('id-ID', options);
+    }
+
     async function fetchData(action, gridId) {
       try {
         const response = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=${action}`);
@@ -108,7 +113,7 @@
 
               const tgl = document.createElement('td');
               tgl.className = 'py-2 px-4 border-b';
-              tgl.textContent = item.tgl;
+              tgl.textContent = formatDate(item.tgl);
               row.appendChild(tgl);
 
               const pembeli = document.createElement('td');
