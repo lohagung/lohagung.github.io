@@ -1,0 +1,228 @@
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-4">
+  <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
+    <div class="flex items-center">
+      <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/KME36NI5kxq2BpEX3lkyYBtGLVef3dBrKQGXv5mdsPOKQUHUA.jpg" width="50" />
+      <span class="text-white text-xl font-bold">Data Dashboard</span>
+    </div>
+    <ul class="flex space-x-4">
+      <li><a class="text-white hover:underline flex items-center" href="?pelanggan"><i class="fas fa-users mr-2"></i>Pelanggan</a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?penjualan"><i class="fas fa-chart-line mr-2"></i>Penjualan</a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?stok"><i class="fas fa-boxes mr-2"></i>Stok</a></li>
+      <li><a class="text-white hover:underline flex items-center" href="?produk"><i class="fas fa-tags mr-2"></i>Produk</a></li>
+    </ul>
+  </nav>
+
+  <div class="pt-20" id="content">
+    <div id="pelanggan-section" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Data Pelanggan</h1>
+      <div class="grid grid-cols-1 gap-6" id="pelanggan-grid"></div>
+    </div>
+
+    <div id="penjualan-section" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Data Penjualan</h1>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th class="py-2 px-4 border-b">Tanggal</th>
+              <th class="py-2 px-4 border-b">Nama</th>
+              <th class="py-2 px-4 border-b">Jenis</th>
+              <th class="py-2 px-4 border-b">Stok</th>
+              <th class="py-2 px-4 border-b">Terjual</th>
+              <th class="py-2 px-4 border-b">Sisa Air</th>
+              <th class="py-2 px-4 border-b">Pemasukan</th>
+            </tr>
+          </thead>
+          <tbody id="penjualan-grid"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="stok-section" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Data Stok</h1>
+      <div class="grid grid-cols-1 gap-6" id="stok-grid"></div>
+    </div>
+
+    <div id="produk-section" class="hidden">
+      <h1 class="text-3xl font-bold mb-6">Data Produk</h1>
+      <div class="grid grid-cols-1 gap-6" id="produk-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    function fetchData(action, gridId) {
+      fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=${action}`)
+        .then(response => response.json())
+        .then(data => {
+          const grid = document.querySelector(`#${gridId}`);
+          grid.innerHTML = '';
+
+          if (data.success && data.data) {
+            if (action === 'get-penjualan') {
+              data.data.forEach(item => {
+                const row = document.createElement('tr');
+
+                const tgl = document.createElement('td');
+                tgl.className = 'py-2 px-4 border-b';
+                tgl.textContent = item.tgl;
+                row.appendChild(tgl);
+
+                const pembeli = document.createElement('td');
+                pembeli.className = 'py-2 px-4 border-b';
+                pembeli.textContent = item.pembeli;
+                row.appendChild(pembeli);
+
+                const produk = document.createElement('td');
+                produk.className = 'py-2 px-4 border-b';
+                produk.textContent = item.produk;
+                row.appendChild(produk);
+
+                const stok_air = document.createElement('td');
+                stok_air.className = 'py-2 px-4 border-b';
+                stok_air.textContent = item.stok_air;
+                row.appendChild(stok_air);
+
+                const terjual = document.createElement('td');
+                terjual.className = 'py-2 px-4 border-b';
+                terjual.textContent = item.terjual;
+                row.appendChild(terjual);
+
+                const sisa_air = document.createElement('td');
+                sisa_air.className = 'py-2 px-4 border-b';
+                sisa_air.textContent = item.sisa_air;
+                row.appendChild(sisa_air);
+
+                const harga = document.createElement('td');
+                harga.className = 'py-2 px-4 border-b';
+                harga.textContent = item.harga;
+                row.appendChild(harga);
+
+                grid.appendChild(row);
+              });
+            } else {
+              data.data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-lg shadow-md flex items-center relative';
+
+                const img = document.createElement('img');
+                img.src = item.foto || 'https://placehold.co/100x100';
+                img.alt = `Foto ${action}`;
+                img.className = 'w-24 h-24 rounded-full mr-4';
+                card.appendChild(img);
+
+                const info = document.createElement('div');
+                info.className = 'flex-1';
+
+                if (action === 'get-pelanggan') {
+                  const name = document.createElement('h2');
+                  name.className = 'text-xl font-bold text-gray-800';
+                  name.textContent = item.nama;
+                  info.appendChild(name);
+
+                  const address = document.createElement('p');
+                  address.className = 'text-gray-600';
+                  address.textContent = `Alamat: ${item.alamat}`;
+                  info.appendChild(address);
+
+                  const maps = document.createElement('p');
+                  maps.className = 'text-gray-600';
+                  maps.textContent = `Maps: ${item.maps}`;
+                  info.appendChild(maps);
+
+                  const whatsappLink = document.createElement('a');
+                  whatsappLink.href = `https://wa.me/${item.whatsapp}`;
+                  whatsappLink.target = '_blank';
+                  whatsappLink.className = 'absolute top-4 right-4 text-green-500 text-2xl';
+                  whatsappLink.innerHTML = '<i class="fab fa-whatsapp"></i>';
+                  card.appendChild(whatsappLink);
+                } else if (action === 'get-stok') {
+                  const jenis = document.createElement('h2');
+                  jenis.className = 'text-xl font-bold text-gray-800';
+                  jenis.textContent = item.jenis;
+                  info.appendChild(jenis);
+
+                  const liter = document.createElement('p');
+                  liter.className = 'text-gray-600';
+                  liter.textContent = `Liter: ${item.liter}`;
+                  info.appendChild(liter);
+
+                  const idStok = document.createElement('span');
+                  idStok.className = 'absolute top-4 right-4 text-gray-500';
+                  idStok.textContent = `ID: ${item.id_stok}`;
+                  card.appendChild(idStok);
+                } else if (action === 'get-produk') {
+                  const jenisProduk = document.createElement('h2');
+                  jenisProduk.className = 'text-xl font-bold text-gray-800';
+                  jenisProduk.textContent = `${item.jenis_produk} (${item.liter_produk} liter)`;
+                  info.appendChild(jenisProduk);
+
+                  const hargaProduk = document.createElement('p');
+                  hargaProduk.className = 'text-gray-600';
+                  hargaProduk.textContent = `Harga: ${item.harga_produk}`;
+                  info.appendChild(hargaProduk);
+
+                  const idProduk = document.createElement('span');
+                  idProduk.className = 'absolute top-4 right-4 text-gray-500';
+                  idProduk.textContent = `ID: ${item.id_produk}`;
+                  card.appendChild(idProduk);
+                } else {
+                  Object.entries(item).forEach(([key, value]) => {
+                    if (key !== 'foto') {
+                      const paragraph = document.createElement('p');
+                      paragraph.className = 'text-gray-600';
+                      paragraph.textContent = `${key}: ${value}`;
+                      info.appendChild(paragraph);
+                    }
+                  });
+                }
+
+                card.appendChild(info);
+                grid.appendChild(card);
+              });
+            }
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('#content > div').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('pelanggan')) {
+      document.title = "Data Pelanggan";
+      showSection('pelanggan-section');
+      fetchData('get-pelanggan', 'pelanggan-grid');
+    } else if (params.has('penjualan')) {
+      document.title = "Data Penjualan";
+      showSection('penjualan-section');
+      fetchData('get-penjualan', 'penjualan-grid');
+    } else if (params.has('stok')) {
+      document.title = "Data Stok";
+      showSection('stok-section');
+      fetchData('get-stok', 'stok-grid');
+    } else if (params.has('produk')) {
+      document.title = "Data Produk";
+      showSection('produk-section');
+      fetchData('get-produk', 'produk-grid');
+    }
+  </script>
+</body>
+</html>
