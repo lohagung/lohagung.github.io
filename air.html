@@ -63,139 +63,171 @@
   </div>
 
   <script>
-    function fetchData(action, gridId) {
-      fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=${action}`)
-        .then(response => response.json())
-        .then(data => {
-          const grid = document.querySelector(`#${gridId}`);
-          grid.innerHTML = '';
+    async function fetchData(action, gridId) {
+      try {
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=${action}`);
+        const data = await response.json();
 
-          if (data.success && data.data) {
-            if (action === 'get-penjualan') {
-              data.data.forEach(item => {
-                const row = document.createElement('tr');
+        const grid = document.querySelector(`#${gridId}`);
+        grid.innerHTML = '';
 
-                const tgl = document.createElement('td');
-                tgl.className = 'py-2 px-4 border-b';
-                tgl.textContent = item.tgl;
-                row.appendChild(tgl);
+        if (data.success && data.data) {
+          if (action === 'get-penjualan') {
+            const pelangganResponse = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=get-pelanggan`);
+            const pelangganData = await pelangganResponse.json();
 
-                const pembeli = document.createElement('td');
-                pembeli.className = 'py-2 px-4 border-b';
-                pembeli.textContent = item.pembeli;
-                row.appendChild(pembeli);
+            const produkResponse = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=get-produk`);
+            const produkData = await produkResponse.json();
 
-                const produk = document.createElement('td');
-                produk.className = 'py-2 px-4 border-b';
-                produk.textContent = item.produk;
-                row.appendChild(produk);
+            const stokResponse = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=get-stok`);
+            const stokData = await stokResponse.json();
 
-                const stok_air = document.createElement('td');
-                stok_air.className = 'py-2 px-4 border-b';
-                stok_air.textContent = item.stok_air;
-                row.appendChild(stok_air);
-
-                const terjual = document.createElement('td');
-                terjual.className = 'py-2 px-4 border-b';
-                terjual.textContent = item.terjual;
-                row.appendChild(terjual);
-
-                const sisa_air = document.createElement('td');
-                sisa_air.className = 'py-2 px-4 border-b';
-                sisa_air.textContent = item.sisa_air;
-                row.appendChild(sisa_air);
-
-                const harga = document.createElement('td');
-                harga.className = 'py-2 px-4 border-b';
-                harga.textContent = item.harga;
-                row.appendChild(harga);
-
-                grid.appendChild(row);
-              });
-            } else {
-              data.data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-4 rounded-lg shadow-md flex items-center relative';
-
-                const img = document.createElement('img');
-                img.src = item.foto || 'https://placehold.co/100x100';
-                img.alt = `Foto ${action}`;
-                img.className = 'w-24 h-24 rounded-full mr-4';
-                card.appendChild(img);
-
-                const info = document.createElement('div');
-                info.className = 'flex-1';
-
-                if (action === 'get-pelanggan') {
-                  const name = document.createElement('h2');
-                  name.className = 'text-xl font-bold text-gray-800';
-                  name.textContent = item.nama;
-                  info.appendChild(name);
-
-                  const address = document.createElement('p');
-                  address.className = 'text-gray-600';
-                  address.textContent = `Alamat: ${item.alamat}`;
-                  info.appendChild(address);
-
-                  const maps = document.createElement('p');
-                  maps.className = 'text-gray-600';
-                  maps.textContent = `Maps: ${item.maps}`;
-                  info.appendChild(maps);
-
-                  const whatsappLink = document.createElement('a');
-                  whatsappLink.href = `https://wa.me/${item.whatsapp}`;
-                  whatsappLink.target = '_blank';
-                  whatsappLink.className = 'absolute top-4 right-4 text-green-500 text-2xl';
-                  whatsappLink.innerHTML = '<i class="fab fa-whatsapp"></i>';
-                  card.appendChild(whatsappLink);
-                } else if (action === 'get-stok') {
-                  const jenis = document.createElement('h2');
-                  jenis.className = 'text-xl font-bold text-gray-800';
-                  jenis.textContent = item.jenis;
-                  info.appendChild(jenis);
-
-                  const liter = document.createElement('p');
-                  liter.className = 'text-gray-600';
-                  liter.textContent = `Liter: ${item.liter}`;
-                  info.appendChild(liter);
-
-                  const idStok = document.createElement('span');
-                  idStok.className = 'absolute top-4 right-4 text-gray-500';
-                  idStok.textContent = `ID: ${item.id_stok}`;
-                  card.appendChild(idStok);
-                } else if (action === 'get-produk') {
-                  const jenisProduk = document.createElement('h2');
-                  jenisProduk.className = 'text-xl font-bold text-gray-800';
-                  jenisProduk.textContent = `${item.jenis_produk} (${item.liter_produk} liter)`;
-                  info.appendChild(jenisProduk);
-
-                  const hargaProduk = document.createElement('p');
-                  hargaProduk.className = 'text-gray-600';
-                  hargaProduk.textContent = `Harga: ${item.harga_produk}`;
-                  info.appendChild(hargaProduk);
-
-                  const idProduk = document.createElement('span');
-                  idProduk.className = 'absolute top-4 right-4 text-gray-500';
-                  idProduk.textContent = `ID: ${item.id_produk}`;
-                  card.appendChild(idProduk);
-                } else {
-                  Object.entries(item).forEach(([key, value]) => {
-                    if (key !== 'foto') {
-                      const paragraph = document.createElement('p');
-                      paragraph.className = 'text-gray-600';
-                      paragraph.textContent = `${key}: ${value}`;
-                      info.appendChild(paragraph);
-                    }
-                  });
-                }
-
-                card.appendChild(info);
-                grid.appendChild(card);
+            const pelangganMap = {};
+            if (pelangganData.success && pelangganData.data) {
+              pelangganData.data.forEach(pelanggan => {
+                pelangganMap[pelanggan.id_pelanggan] = pelanggan.nama;
               });
             }
+
+            const produkMap = {};
+            if (produkData.success && produkData.data) {
+              produkData.data.forEach(produk => {
+                produkMap[produk.id_produk] = produk.jenis_produk;
+              });
+            }
+
+            const stokMap = {};
+            if (stokData.success && stokData.data) {
+              stokData.data.forEach(stok => {
+                stokMap[stok.id_stok] = `${stok.jenis}, ${stok.liter} liter`;
+              });
+            }
+
+            data.data.forEach(item => {
+              const row = document.createElement('tr');
+
+              const tgl = document.createElement('td');
+              tgl.className = 'py-2 px-4 border-b';
+              tgl.textContent = item.tgl;
+              row.appendChild(tgl);
+
+              const pembeli = document.createElement('td');
+              pembeli.className = 'py-2 px-4 border-b';
+              pembeli.textContent = pelangganMap[item.pembeli] || item.pembeli;
+              row.appendChild(pembeli);
+
+              const produk = document.createElement('td');
+              produk.className = 'py-2 px-4 border-b';
+              produk.textContent = produkMap[item.produk] || item.produk;
+              row.appendChild(produk);
+
+              const stok_air = document.createElement('td');
+              stok_air.className = 'py-2 px-4 border-b';
+              stok_air.textContent = stokMap[item.stok_air] || item.stok_air;
+              row.appendChild(stok_air);
+
+              const terjual = document.createElement('td');
+              terjual.className = 'py-2 px-4 border-b';
+              terjual.textContent = item.terjual;
+              row.appendChild(terjual);
+
+              const sisa_air = document.createElement('td');
+              sisa_air.className = 'py-2 px-4 border-b';
+              sisa_air.textContent = item.sisa_air;
+              row.appendChild(sisa_air);
+
+              const harga = document.createElement('td');
+              harga.className = 'py-2 px-4 border-b';
+              harga.textContent = item.harga;
+              row.appendChild(harga);
+
+              grid.appendChild(row);
+            });
+          } else {
+            data.data.forEach(item => {
+              const card = document.createElement('div');
+              card.className = 'bg-white p-4 rounded-lg shadow-md flex items-center relative';
+
+              const img = document.createElement('img');
+              img.src = item.foto || 'https://placehold.co/100x100';
+              img.alt = `Foto ${action}`;
+              img.className = 'w-24 h-24 rounded-full mr-4';
+              card.appendChild(img);
+
+              const info = document.createElement('div');
+              info.className = 'flex-1';
+
+              if (action === 'get-pelanggan') {
+                const name = document.createElement('h2');
+                name.className = 'text-xl font-bold text-gray-800';
+                name.textContent = item.nama;
+                info.appendChild(name);
+
+                const address = document.createElement('p');
+                address.className = 'text-gray-600';
+                address.textContent = `Alamat: ${item.alamat}`;
+                info.appendChild(address);
+
+                const maps = document.createElement('p');
+                maps.className = 'text-gray-600';
+                maps.textContent = `Maps: ${item.maps}`;
+                info.appendChild(maps);
+
+                const whatsappLink = document.createElement('a');
+                whatsappLink.href = `https://wa.me/${item.whatsapp}`;
+                whatsappLink.target = '_blank';
+                whatsappLink.className = 'absolute top-4 right-4 text-green-500 text-2xl';
+                whatsappLink.innerHTML = '<i class="fab fa-whatsapp"></i>';
+                card.appendChild(whatsappLink);
+              } else if (action === 'get-stok') {
+                const jenis = document.createElement('h2');
+                jenis.className = 'text-xl font-bold text-gray-800';
+                jenis.textContent = item.jenis;
+                info.appendChild(jenis);
+
+                const liter = document.createElement('p');
+                liter.className = 'text-gray-600';
+                liter.textContent = `Liter: ${item.liter}`;
+                info.appendChild(liter);
+
+                const idStok = document.createElement('span');
+                idStok.className = 'absolute top-4 right-4 text-gray-500';
+                idStok.textContent = `ID: ${item.id_stok}`;
+                card.appendChild(idStok);
+              } else if (action === 'get-produk') {
+                const jenisProduk = document.createElement('h2');
+                jenisProduk.className = 'text-xl font-bold text-gray-800';
+                jenisProduk.textContent = `${item.jenis_produk} (${item.liter_produk} liter)`;
+                info.appendChild(jenisProduk);
+
+                const hargaProduk = document.createElement('p');
+                hargaProduk.className = 'text-gray-600';
+                hargaProduk.textContent = `Harga: ${item.harga_produk}`;
+                info.appendChild(hargaProduk);
+
+                const idProduk = document.createElement('span');
+                idProduk.className = 'absolute top-4 right-4 text-gray-500';
+                idProduk.textContent = `ID: ${item.id_produk}`;
+                card.appendChild(idProduk);
+              } else {
+                Object.entries(item).forEach(([key, value]) => {
+                  if (key !== 'foto') {
+                    const paragraph = document.createElement('p');
+                    paragraph.className = 'text-gray-600';
+                    paragraph.textContent = `${key}: ${value}`;
+                    info.appendChild(paragraph);
+                  }
+                });
+              }
+
+              card.appendChild(info);
+              grid.appendChild(card);
+            });
           }
-        })
-        .catch(error => console.error('Error fetching data:', error));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     }
 
     function showSection(sectionId) {
