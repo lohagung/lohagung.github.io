@@ -67,7 +67,7 @@
 
   <script>
     function formatDate(dateString) {
-      const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
       return new Date(dateString).toLocaleDateString('id-ID', options);
     }
 
@@ -77,6 +77,9 @@
 
       if (data.success && data.data) {
         if (action === 'get-penjualan') {
+          // Sort data by date in descending order
+          data.data.sort((a, b) => new Date(b.tgl) - new Date(a.tgl));
+
           data.data.forEach(item => {
             const row = document.createElement('tr');
 
@@ -118,6 +121,9 @@
             grid.appendChild(row);
           });
         } else {
+          // Sort data by id_pelanggan in descending order
+          data.data.sort((a, b) => b.id_pelanggan - a.id_pelanggan);
+
           data.data.forEach(item => {
             const card = document.createElement('div');
             card.className = 'bg-white p-4 rounded-lg shadow-md flex items-center relative';
@@ -148,7 +154,7 @@
               info.appendChild(maps);
 
               const whatsappLink = document.createElement('a');
-              whatsappLink.href = `https://wa.me/${item.whatsapp}`;
+              whatsappLink.href = `https://wa.me/+62${item.whatsapp.slice(1)}`;
               whatsappLink.target = '_blank';
               whatsappLink.className = 'absolute top-4 right-4 text-green-500 text-2xl';
               whatsappLink.innerHTML = '<i class="fab fa-whatsapp"></i>';
