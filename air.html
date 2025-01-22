@@ -37,19 +37,19 @@
     <div id="penjualan-section" class="hidden">
       <h1 class="text-3xl font-bold mb-6">Data Penjualan</h1>
       <div class="overflow-x-auto">
-        <table class="min-w-full bg-white">
-          <thead>
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+          <thead class="bg-teal-700 text-white">
             <tr>
-              <th class="py-2 px-4 border-b">Tanggal</th>
-              <th class="py-2 px-4 border-b">Nama</th>
-              <th class="py-2 px-4 border-b">Jenis</th>
-              <th class="py-2 px-4 border-b">Stok</th>
-              <th class="py-2 px-4 border-b">Terjual</th>
-              <th class="py-2 px-4 border-b">Sisa Air</th>
-              <th class="py-2 px-4 border-b">Pemasukan</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Tanggal</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Nama</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Jenis</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Stok</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Terjual</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Sisa Air</th>
+              <th class="py-3 px-4 text-left border-b border-gray-200">Pemasukan</th>
             </tr>
           </thead>
-          <tbody id="penjualan-grid"></tbody>
+          <tbody id="penjualan-grid" class="divide-y divide-gray-200"></tbody>
         </table>
       </div>
     </div>
@@ -80,41 +80,42 @@
           // Sort data by date in descending order
           data.data.sort((a, b) => new Date(b.tgl) - new Date(a.tgl));
 
-          data.data.forEach(item => {
+          data.data.forEach((item, index) => {
             const row = document.createElement('tr');
+            row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
 
             const tgl = document.createElement('td');
-            tgl.className = 'py-2 px-4 border-b';
+            tgl.className = 'py-3 px-4 border-b border-gray-200';
             tgl.textContent = formatDate(item.tgl);
             row.appendChild(tgl);
 
             const pembeli = document.createElement('td');
-            pembeli.className = 'py-2 px-4 border-b';
+            pembeli.className = 'py-3 px-4 border-b border-gray-200';
             pembeli.textContent = item.pembeli;
             row.appendChild(pembeli);
 
             const produk = document.createElement('td');
-            produk.className = 'py-2 px-4 border-b';
+            produk.className = 'py-3 px-4 border-b border-gray-200';
             produk.textContent = item.produk;
             row.appendChild(produk);
 
             const stok_air = document.createElement('td');
-            stok_air.className = 'py-2 px-4 border-b';
+            stok_air.className = 'py-3 px-4 border-b border-gray-200';
             stok_air.textContent = item.stok_air;
             row.appendChild(stok_air);
 
             const terjual = document.createElement('td');
-            terjual.className = 'py-2 px-4 border-b';
+            terjual.className = 'py-3 px-4 border-b border-gray-200';
             terjual.textContent = item.terjual;
             row.appendChild(terjual);
 
             const sisa_air = document.createElement('td');
-            sisa_air.className = 'py-2 px-4 border-b';
+            sisa_air.className = 'py-3 px-4 border-b border-gray-200';
             sisa_air.textContent = item.sisa_air;
             row.appendChild(sisa_air);
 
             const harga = document.createElement('td');
-            harga.className = 'py-2 px-4 border-b';
+            harga.className = 'py-3 px-4 border-b border-gray-200';
             harga.textContent = item.harga;
             row.appendChild(harga);
 
