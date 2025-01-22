@@ -65,7 +65,21 @@
     </div>
   </div>
 
+  <div id="loading" class="hidden flex flex-col justify-center items-center py-4">
+    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-2"></div>
+    <p>Sedang memuat halaman...</p>
+  </div>
+
+  <div id="done" class="hidden flex justify-center items-center py-4">
+    <p>Done</p>
+  </div>
+
   <script>
+    let currentPage = 1;
+    const itemsPerPage = 5;
+    let isLoading = false;
+    let allDataLoaded = false;
+
     function formatDate(dateString) {
       const options = { weekday: 'long', year: 'numeric', month: 'short', day: '2-digit' };
       return new Date(dateString).toLocaleDateString('id-ID', options);
@@ -73,14 +87,23 @@
 
     function renderData(action, data, gridId) {
       const grid = document.querySelector(`#${gridId}`);
-      grid.innerHTML = '';
+      if (currentPage === 1) {
+        grid.innerHTML = '';
+      }
 
       if (data.success && data.data) {
-        if (action === 'get-penjualan') {
-          // Sort data by date in descending order
-          data.data.sort((a, b) => new Date(b.tgl) - new Date(a.tgl));
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = data.data.slice(startIndex, endIndex);
 
-          data.data.forEach((item, index) => {
+        if (paginatedData.length === 0) {
+          allDataLoaded = true;
+          document.getElementById('done').classList.remove('hidden');
+          return;
+        }
+
+        if (action === 'get-penjualan') {
+          paginatedData.forEach((item, index) => {
             const row = document.createElement('tr');
             row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
 
@@ -122,10 +145,7 @@
             grid.appendChild(row);
           });
         } else {
-          // Sort data by id_pelanggan in descending order
-          data.data.sort((a, b) => b.id_pelanggan - a.id_pelanggan);
-
-          data.data.forEach(item => {
+          paginatedData.forEach(item => {
             const card = document.createElement('div');
             card.className = 'bg-white p-4 rounded-lg shadow-md flex items-center relative';
 
@@ -160,6 +180,11 @@
               whatsappLink.className = 'absolute top-4 right-4 text-green-500 text-2xl';
               whatsappLink.innerHTML = '<i class="fab fa-whatsapp"></i>';
               card.appendChild(whatsappLink);
+
+              const idPelanggan = document.createElement('span');
+              idPelanggan.className = 'absolute bottom-4 right-4 text-gray-500';
+              idPelanggan.textContent = `${item.id_pelanggan}`;
+              card.appendChild(idPelanggan);
             } else if (action === 'get-stok') {
               const jenis = document.createElement('h2');
               jenis.className = 'text-xl font-bold text-gray-800';
@@ -212,11 +237,17 @@
       try {
         let data = JSON.parse(localStorage.getItem(action));
         if (data) {
+          if (action === 'get-pelanggan') {
+            data.data.sort((a, b) => b.id_pelanggan - a.id_pelanggan);
+          }
           renderData(action, data, gridId);
         }
 
         const response = await fetch(`https://script.google.com/macros/s/AKfycbzQpBa-Mu7QSTvtTd45TQWekrkbf5dt-PPiDkrS__qExdGRxFfxe9YRDMo4rS2AMsa5pA/exec?action=${action}`);
         data = await response.json();
+        if (action === 'get-pelanggan') {
+          data.data.sort((a, b) => b.id_pelanggan - a.id_pelanggan);
+        }
         localStorage.setItem(action, JSON.stringify(data));
         renderData(action, data, gridId);
       } catch (error) {
@@ -231,23 +262,39 @@
       document.getElementById(sectionId).classList.remove('hidden');
     }
 
+    function handleScroll(action, gridId) {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !isLoading && !allDataLoaded) {
+        isLoading = true;
+        document.getElementById('loading').classList.remove('hidden');
+        currentPage++;
+        fetchData(action, gridId).then(() => {
+          isLoading = false;
+          document.getElementById('loading').classList.add('hidden');
+        });
+      }
+    }
+
     const params = new URLSearchParams(window.location.search);
     if (params.has('pelanggan')) {
       document.title = "Data Pelanggan";
       showSection('pelanggan-section');
       fetchData('get-pelanggan', 'pelanggan-grid');
+      window.addEventListener('scroll', () => handleScroll('get-pelanggan', 'pelanggan-grid'));
     } else if (params.has('penjualan')) {
       document.title = "Data Penjualan";
       showSection('penjualan-section');
       fetchData('get-penjualan', 'penjualan-grid');
+      window.addEventListener('scroll', () => handleScroll('get-penjualan', 'penjualan-grid'));
     } else if (params.has('stok')) {
       document.title = "Data Stok";
       showSection('stok-section');
       fetchData('get-stok', 'stok-grid');
+      window.addEventListener('scroll', () => handleScroll('get-stok', 'stok-grid'));
     } else if (params.has('produk')) {
       document.title = "Data Produk";
       showSection('produk-section');
       fetchData('get-produk', 'produk-grid');
+      window.addEventListener('scroll', () => handleScroll('get-produk', 'produk-grid'));
     }
   </script>
 </body>
