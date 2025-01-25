@@ -64,17 +64,15 @@
             left: 50%;
             transform: translate(-50%, -50%);
             opacity: 0.05;
-            display: none;
-             z-index: 1000;
+            z-index: 1000;
         }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen bg-gradient">
 
-    <div id="editorPopup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50">
+    <div id="editorPopup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50 hidden">
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center space-x-2">
-                
                 <button id="pasteText" class="text-gray-600 icon-button">
                     <i class="fas fa-paste"></i>
                 </button>
@@ -213,13 +211,13 @@
         });
 
         document.addEventListener('click', (event) => {
-            if (!editorPopup.contains(event.target)) {
+            if (!editorPopup.contains(event.target) && !eyeIcon.contains(event.target)) {
                 editorPopup.classList.add('hidden');
                 eyeIcon.style.display = 'block';
             }
         });
 
-        document.addEventListener('dblclick', () => {
+        eyeIcon.addEventListener('click', () => {
             editorPopup.classList.remove('hidden');
             eyeIcon.style.display = 'none';
         });
@@ -443,7 +441,6 @@
                     updatePreview();
                 });
                 listItem.addEventListener('dblclick', () => {
-                    
                     const newName = prompt('Rename this version:', item.name);
                     if (newName) {
                         item.name = newName;
