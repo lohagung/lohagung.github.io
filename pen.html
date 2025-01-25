@@ -215,11 +215,13 @@
         document.addEventListener('click', (event) => {
             if (!editorPopup.contains(event.target)) {
                 editorPopup.classList.add('hidden');
+                eyeIcon.style.display = 'block';
             }
         });
 
         document.addEventListener('dblclick', () => {
             editorPopup.classList.remove('hidden');
+            eyeIcon.style.display = 'none';
         });
 
         saveEditorButton.addEventListener('click', () => {
@@ -443,7 +445,7 @@
                 listItem.addEventListener('dblclick', () => {
                     const newName = prompt('Rename this version:', item.name);
                     if (newName) {
-                        item.name = newname;
+                        item.name = newName;
                         localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
                         updateHistoryMenu();
                     }
