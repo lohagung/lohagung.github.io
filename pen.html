@@ -58,6 +58,15 @@
         .highlight {
             background-color: yellow;
         }
+        #eyeIcon {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+            display: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen bg-gradient">
@@ -86,7 +95,13 @@
                 </button>
                 <div id="historyMenu" class="absolute top-10 right-0 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-64 overflow-y-auto">
                     <ul id="historyList" class="p-2">
-                        <!-- History items will be injected here -->
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 1 01/01/2023 12:00:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 2 01/01/2023 12:05:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 3 01/01/2023 12:10:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 4 01/01/2023 12:15:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 5 01/01/2023 12:20:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 6 01/01/2023 12:25:00</li>
+                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 7 01/01/2023 12:30:00</li>
                     </ul>
                     <div class="flex justify-between items-center p-2 border-t border-gray-300">
                         <button id="clearHistory" class="text-red-600 hover:bg-gray-100">Clear</button>
@@ -104,6 +119,9 @@
                 </button>
                 <button id="mobileView" class="text-gray-600 icon-button">
                     <i class="fas fa-mobile-alt"></i>
+                </button>
+                <button id="closeEditor" class="text-gray-600 icon-button">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
@@ -140,6 +158,9 @@
     </div>
 
     <div id="notification">Sukses</div>
+    <div id="eyeIcon">
+        <i class="fas fa-eye text-gray-600 text-6xl"></i>
+    </div>
 
     <script>
         const editorPopup = document.getElementById('editorPopup');
@@ -167,6 +188,8 @@
         const searchButton = document.getElementById('searchButton');
         const prevMatchButton = document.getElementById('prevMatch');
         const nextMatchButton = document.getElementById('nextMatch');
+        const closeEditorButton = document.getElementById('closeEditor');
+        const eyeIcon = document.getElementById('eyeIcon');
 
         let saveCount = 0;
         let history = [];
@@ -344,6 +367,11 @@
             }
         });
 
+        closeEditorButton.addEventListener('click', () => {
+            editorPopup.classList.add('hidden');
+            eyeIcon.style.display = 'block';
+        });
+
         function searchInEditor() {
             const searchTerm = searchInput.value;
             if (searchTerm) {
@@ -415,7 +443,7 @@
                 listItem.addEventListener('dblclick', () => {
                     const newName = prompt('Rename this version:', item.name);
                     if (newName) {
-                        item.name = newName;
+                        item.name = newname;
                         localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
                         updateHistoryMenu();
                     }
