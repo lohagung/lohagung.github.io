@@ -55,13 +55,28 @@
         .touch-cursor {
             cursor: pointer;
         }
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen bg-gradient">
 
     <div id="editorPopup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold">Edit HTML</h2>
+            <div class="flex items-center space-x-2">
+                <h2 class="text-lg font-semibold">Edit HTML</h2>
+                <button id="pasteText" class="text-gray-600 icon-button">
+                    <i class="fas fa-paste"></i>
+                </button>
+                <button id="selectAllCopy" class="text-gray-600 icon-button">
+                    <i class="fas fa-copy"></i>
+                </button>
+                <button id="openFile" class="text-gray-600 icon-button">
+                    <i class="fas fa-folder-open"></i>
+                </button>
+                <input type="file" id="fileInput" class="hidden">
+            </div>
             <div class="flex space-x-2 relative">
                 <button id="saveContent" class="text-gray-600 icon-button">
                     <i class="fas fa-save"></i>
@@ -90,23 +105,26 @@
                 <button id="mobileView" class="text-gray-600 icon-button">
                     <i class="fas fa-mobile-alt"></i>
                 </button>
-                <button id="minimizeEditor" class="text-gray-600 icon-button">
-                    <i class="fas fa-window-minimize"></i>
-                </button>
             </div>
         </div>
         <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
         <div class="flex justify-between items-center mt-2">
-            <button id="clearText" class="text-gray-600 icon-button text-sm">
-                <i class="fas fa-eraser"></i>
-            </button>
+            <div class="flex items-center space-x-2">
+                <button id="clearText" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-eraser"></i>
+                </button>
+                <input type="text" id="searchInput" class="border border-gray-300 rounded-lg p-1 text-sm" placeholder="Search...">
+                <button id="searchButton" class="text-gray-600 icon-button text-sm">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button id="prevMatch" class="text-gray-600 icon-button text-sm hidden">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button id="nextMatch" class="text-gray-600 icon-button text-sm hidden">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
             <div class="flex space-x-2">
-                <button id="pasteText" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-paste"></i>
-                </button>
-                <button id="selectAllCopy" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-copy"></i>
-                </button>
                 <button id="scrollToTop" class="text-gray-600 icon-button text-sm">
                     <i class="fas fa-arrow-up"></i>
                 </button>
@@ -117,10 +135,6 @@
         </div>
     </div>
 
-    <div id="minimizedIcon" class="fixed right-4 bottom-4 bg-yellow-400 border border-gray-600 rounded-full p-2 text-2xl z-50 hidden">
-        <i class="fas fa-pencil-alt"></i>
-    </div>
-
     <div id="preview" class="w-full h-full p-0 m-0">
         <!-- Preview content will be injected here -->
     </div>
@@ -129,8 +143,6 @@
 
     <script>
         const editorPopup = document.getElementById('editorPopup');
-        const minimizeEditorButton = document.getElementById('minimizeEditor');
-        const minimizedIcon = document.getElementById('minimizedIcon');
         const saveEditorButton = document.getElementById('saveEditor');
         const saveContentButton = document.getElementById('saveContent');
         const htmlEditor = document.getElementById('htmlEditor');
@@ -149,10 +161,18 @@
         const pasteTextButton = document.getElementById('pasteText');
         const clearTextButton = document.getElementById('clearText');
         const downloadHistoryButton = document.getElementById('downloadHistory');
+        const openFileButton = document.getElementById('openFile');
+        const fileInput = document.getElementById('fileInput');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const prevMatchButton = document.getElementById('prevMatch');
+        const nextMatchButton = document.getElementById('nextMatch');
 
         let saveCount = 0;
         let history = [];
         let historyDisplayCount = 7;
+        let currentMatchIndex = 0;
+        let matches = [];
 
         // Load saved content from localStorage
         window.addEventListener('load', () => {
@@ -169,14 +189,14 @@
             }
         });
 
-        minimizeEditorButton.addEventListener('click', () => {
-            editorPopup.classList.add('hidden');
-            minimizedIcon.classList.remove('hidden');
+        document.addEventListener('click', (event) => {
+            if (!editorPopup.contains(event.target)) {
+                editorPopup.classList.add('hidden');
+            }
         });
 
-        minimizedIcon.addEventListener('click', () => {
+        document.addEventListener('dblclick', () => {
             editorPopup.classList.remove('hidden');
-            minimizedIcon.classList.add('hidden');
         });
 
         saveEditorButton.addEventListener('click', () => {
@@ -283,6 +303,84 @@
                 saveAs(content, 'history.zip');
             });
         });
+
+        openFileButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    htmlEditor.value = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        searchButton.addEventListener('click', () => {
+            searchInEditor();
+        });
+
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchInEditor();
+            }
+        });
+
+        prevMatchButton.addEventListener('click', () => {
+            if (matches.length > 0) {
+                currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
+                scrollToMatch(currentMatchIndex);
+            }
+        });
+
+        nextMatchButton.addEventListener('click', () => {
+            if (matches.length > 0) {
+                currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+                scrollToMatch(currentMatchIndex);
+            }
+        });
+
+        function searchInEditor() {
+            const searchTerm = searchInput.value;
+            if (searchTerm) {
+                const regex = new RegExp(searchTerm, 'gi');
+                const content = htmlEditor.value;
+                matches = [...content.matchAll(regex)];
+                if (matches.length > 0) {
+                    showNotification(`Found ${matches.length} matches`);
+                    highlightMatches(content, regex);
+                    currentMatchIndex = 0;
+                    scrollToMatch(currentMatchIndex);
+                    prevMatchButton.classList.remove('hidden');
+                    nextMatchButton.classList.remove('hidden');
+                } else {
+                    showNotification('No matches found');
+                    prevMatchButton.classList.add('hidden');
+                    nextMatchButton.classList.add('hidden');
+                }
+            }
+        }
+
+        function highlightMatches(content, regex) {
+            const highlightedContent = content.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+            htmlEditor.innerHTML = highlightedContent;
+            updatePreview();
+        }
+
+        function scrollToMatch(index) {
+            if (matches.length > 0) {
+                const match = matches[index];
+                const start = match.index;
+                const end = start + match[0].length;
+                htmlEditor.focus();
+                htmlEditor.setSelectionRange(start, end);
+                htmlEditor.scrollTop = htmlEditor.scrollHeight * (start / htmlEditor.value.length);
+            }
+        }
 
         function updatePreview() {
             const iframe = document.createElement('iframe');
