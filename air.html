@@ -1,137 +1,211 @@
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Data Dashboard
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
             font-family: 'Roboto', sans-serif;
         }
-    </style>
-</head>
-<body class="bg-gray-100 p-4">
-    <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
-        <div class="flex items-center">
-            <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/GXXL66CeeLkLZU6w1oGtfajCUuHojV8HhbqG2CZpE499AGRoA.jpg" width="50"/>
-            <span class="text-white text-xl font-bold">Data Dashboard</span>
-        </div>
-        <ul class="flex space-x-4">
-            <li><a class="text-white hover:underline flex items-center" href="?data"><i class="fas fa-chart-line mr-2"></i>Data</a></li>
-            <li><a class="text-white hover:underline flex items-center" href="?tambah"><i class="fas fa-boxes mr-2"></i>Tambah</a></li>
-        </ul>
-    </nav>
-
-    <div class="container mx-auto p-4 mt-20">
-        <h1 id="page-title" class="text-3xl font-bold text-center mb-6">Penjualan App</h1>
-        <div class="flex justify-center mb-6">
-            <a href="?data" class="bg-blue-500 text-white px-4 py-2 rounded mr-4">Data Penjualan</a>
-            <a href="?tambah" class="bg-green-500 text-white px-4 py-2 rounded">Tambah Penjualan</a>
-        </div>
-
-        <div id="data-penjualan" class="hidden">
-            <h2 class="text-2xl font-semibold mb-4">Data Penjualan</h2>
-            <div id="data-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Data will be inserted here dynamically -->
-            </div>
-            <div class="mt-6">
-                <a href="/" class="bg-gray-500 text-white px-4 py-2 rounded">Kembali</a>
-            </div>
-        </div>
-
-        <div id="tambah-penjualan" class="hidden">
-            <div class="bg-white shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-semibold mb-4">Tambah Data</h2>
-                <form id="add-data-form">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Tanggal</label>
-                            <input type="date" id="tgl" class="w-full px-3 py-2 border rounded" value="${new Date().toISOString().split('T')[0]}">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Nama</label>
-                            <input type="text" id="nama" class="w-full px-3 py-2 border rounded">
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Foto</label>
-                            <input type="text" id="foto" class="w-full px-3 py-2 border rounded">
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Alamat</label>
-                            <input type="text" id="alamat" class="w-full px-3 py-2 border rounded">
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">WhatsApp</label>
-                            <input type="text" id="whatsapp" class="w-full px-3 py-2 border rounded">
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Maps</label>
-                            <input type="text" id="maps" class="w-full px-3 py-2 border rounded">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Admin</label>
-                            <select id="admin" class="w-full px-3 py-2 border rounded">
-                                <option value="Admin">Admin</option>
-                                <option value="Pegawai">Pegawai</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Produk Order</label>
-                            <select id="produk_order" class="w-full px-3 py-2 border rounded" onchange="calculateData()">
-                                <option value="Air Isi Ulang 19l">Air Isi Ulang 19l</option>
-                                <option value="Air Isi Ulang 15l">Air Isi Ulang 15l</option>
-                                <option value="AQUA">AQUA</option>
-                                <option value="GAS">GAS</option>
-                            </select>
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Produk Liter</label>
-                            <input type="number" id="produk_liter" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Produk Harga</label>
-                            <input type="number" id="produk_harga" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Stok</label>
-                            <input type="number" id="stok" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Order</label>
-                            <input type="number" id="order" class="w-full px-3 py-2 border rounded" oninput="calculateData()">
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Produk Terjual</label>
-                            <input type="number" id="produk_terjual" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Sisa Stok</label>
-                            <input type="number" id="sisa_stok" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                        <div class="hidden-field hidden">
-                            <label class="block text-gray-700">Jumlah</label>
-                            <input type="number" id="jumlah" class="w-full px-3 py-2 border rounded" readonly>
-                        </div>
-                    </div>
-                    <div id="notif" class="text-red-500 mt-2 hidden">Stok air tidak mencukupi</div>
-                    <div class="flex items-center mt-4">
-                        <button type="submit" id="submit-button" class="bg-blue-500 text-white px-4 py-2 rounded">Tambah Data</button>
-                        <button type="button" id="toggle-visibility" class="ml-4 text-gray-700">
-                            <i class="fas fa-eye-slash"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <div class="mt-6">
-                <a href="/" class="bg-gray-500 text-white px-4 py-2 rounded">Kembali</a>
-            </div>
-        </div>
+  </style>
+ </head>
+ <body class="bg-gray-100 p-4">
+  <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
+   <div class="flex items-center">
+    <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/eRoiTfOoYUkf9IjH4EMsekwuEq4I9oP2tT6hce5t2CiapkEhC.jpg" width="50"/>
+    <span class="text-white text-xl font-bold">
+     Data Dashboard
+    </span>
+   </div>
+   <ul class="flex space-x-4">
+    <li>
+     <a class="text-white hover:underline flex items-center" href="?data">
+      <i class="fas fa-chart-line mr-2">
+      </i>
+      Data
+     </a>
+    </li>
+    <li>
+     <a class="text-white hover:underline flex items-center" href="?tambah">
+      <i class="fas fa-boxes mr-2">
+      </i>
+      Tambah
+     </a>
+    </li>
+   </ul>
+  </nav>
+  <div class="container mx-auto p-4 mt-20 max-w-4xl">
+   <h1 class="text-3xl font-bold text-center mb-6" id="page-title">
+    Penjualan App
+   </h1>
+   <div class="flex justify-center mb-6">
+    <a class="bg-blue-500 text-white px-4 py-2 rounded mr-4" href="?data">
+     Data Penjualan
+    </a>
+    <a class="bg-green-500 text-white px-4 py-2 rounded" href="?tambah">
+     Tambah Penjualan
+    </a>
+   </div>
+   <div class="hidden" id="data-penjualan">
+    <h2 class="text-2xl font-semibold mb-4">
+     Data Penjualan
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" id="data-grid">
+     <!-- Data will be inserted here dynamically -->
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    <div class="mt-6">
+     <a class="bg-gray-500 text-white px-4 py-2 rounded" href="/">
+      Kembali
+     </a>
+    </div>
+   </div>
+   <div class="hidden" id="tambah-penjualan">
+    <div class="bg-white shadow-md rounded-lg p-6">
+     <h2 class="text-2xl font-semibold mb-4">
+      Tambah Data
+     </h2>
+     <form id="add-data-form">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Tanggal
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="tgl" type="date" value="${new Date().toISOString().split('T')[0]}"/>
+       </div>
+       <div>
+        <label class="block text-gray-700">
+         Nama
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="nama" type="text"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Foto
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="foto" type="text"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Alamat
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="alamat" type="text"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         WhatsApp
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="whatsapp" type="text"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Maps
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="maps" type="text"/>
+       </div>
+       <div>
+        <label class="block text-gray-700">
+         Admin
+        </label>
+        <select class="w-full px-3 py-2 border rounded" id="admin">
+         <option value="Admin">
+          Admin
+         </option>
+         <option value="Pegawai">
+          Pegawai
+         </option>
+        </select>
+       </div>
+       <div>
+        <label class="block text-gray-700">
+         Produk Order
+        </label>
+        <select class="w-full px-3 py-2 border rounded" id="produk_order" onchange="calculateData()">
+         <option value="Air Isi Ulang 19l">
+          Air Isi Ulang 19l
+         </option>
+         <option value="Air Isi Ulang 15l">
+          Air Isi Ulang 15l
+         </option>
+         <option value="AQUA">
+          AQUA
+         </option>
+         <option value="GAS">
+          GAS
+         </option>
+        </select>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Produk Liter
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="produk_liter" readonly="" type="number"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Produk Harga
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="produk_harga" readonly="" type="number"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Stok
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="stok" readonly="" type="number"/>
+       </div>
+       <div>
+        <label class="block text-gray-700">
+         Order
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="order" oninput="calculateData()" type="number"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Produk Terjual
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="produk_terjual" readonly="" type="number"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Sisa Stok
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="sisa_stok" readonly="" type="number"/>
+       </div>
+       <div class="hidden-field hidden">
+        <label class="block text-gray-700">
+         Jumlah
+        </label>
+        <input class="w-full px-3 py-2 border rounded" id="jumlah" readonly="" type="number"/>
+       </div>
+      </div>
+      <div class="text-red-500 mt-2 hidden" id="notif">
+       Stok air tidak mencukupi
+      </div>
+      <div class="flex items-center mt-4">
+       <button class="bg-blue-500 text-white px-4 py-2 rounded" id="submit-button" type="submit">
+        Tambah Data
+       </button>
+       <button class="ml-4 text-gray-700" id="toggle-visibility" type="button">
+        <i class="fas fa-eye-slash">
+        </i>
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="mt-6">
+     <a class="bg-gray-500 text-white px-4 py-2 rounded" href="/">
+      Kembali
+     </a>
+    </div>
+   </div>
+  </div>
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataPage = urlParams.has('data');
             const tambahPage = urlParams.has('tambah');
@@ -181,17 +255,22 @@
                         let totalJumlah = 0;
                         data.data.forEach(item => {
                             const card = document.createElement('div');
-                            card.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-4', 'flex', 'items-center', 'justify-between');
+                            card.classList.add('bg-white', 'shadow-md', 'rounded-lg', 'p-4', 'flex', 'items-center', 'justify-between', 'text-xs');
                             card.innerHTML = `
                                 <div class="flex items-center">
-                                    <img src="${item.foto}" alt="Foto of ${item.nama}" class="w-16 h-16 object-cover rounded-full mr-4" hidden>
+                                    <img src="${item.foto}" alt="Foto of ${item.nama}" class="w-8 h-8 object-cover rounded-full mr-2" onerror="this.onerror=null;this.src='/logo.png';">
                                     <div>
-                                        <h3 class="text-xl font-bold">${item.nama}</h3>
+                                        <h3 class="text-base font-bold">${item.nama}</h3>
                                         <p class="text-gray-600">${item.produk_order} - ${item.order}</p>
                                     </div>
                                 </div>
-                                <div class="text-red-500 font-bold text-lg">
-                                    Rp ${parseFloat(item.jumlah).toLocaleString('id-ID')}
+                                <div class="text-right">
+                                    <div class="text-red-500 font-bold text-sm">
+                                        Rp ${parseFloat(item.jumlah).toLocaleString('id-ID')}
+                                    </div>
+                                    <div class="text-gray-500 text-xs">
+                                        ${new Date(item.tgl).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </div>
                                 </div>
                             `;
                             dataGrid.appendChild(card);
@@ -299,6 +378,6 @@
                     }
                 });
         }
-    </script>
-</body>
+  </script>
+ </body>
 </html>
