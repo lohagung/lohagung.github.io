@@ -63,9 +63,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.5;
+            opacity: 0.05;
             display: none;
-            z-index: 1000;
+             z-index: 1000;
         }
     </style>
 </head>
@@ -443,6 +443,7 @@
                     updatePreview();
                 });
                 listItem.addEventListener('dblclick', () => {
+                    
                     const newName = prompt('Rename this version:', item.name);
                     if (newName) {
                         item.name = newName;
