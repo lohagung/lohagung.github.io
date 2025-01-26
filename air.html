@@ -24,9 +24,35 @@
                     <i class="fas fa-chart-line mr-2"></i>Data
                 </a>
             </li>
+            <li>
+                <a class="text-white hover:underline flex items-center" href="?tambah">
+                    <i class="fas fa-plus mr-2"></i>Tambah
+                </a>
+            </li>
         </ul>
     </nav>
     <div class="container mx-auto p-4 mt-20 max-w-4xl">
+        <div id="dashboard">
+            <h2 class="text-2xl font-semibold mb-4">Selamat Datang di Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-2">Total Penjualan</h3>
+                    <div class="text-3xl font-bold text-green-500" id="dashboard-total-penjualan">Rp 0</div>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-2">Penjualan Hari Ini</h3>
+                    <div class="text-3xl font-bold text-yellow-500" id="dashboard-penjualan-harian">Rp 0</div>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-2">Produk Terlaris</h3>
+                    <div class="text-3xl font-bold text-blue-500" id="dashboard-produk-terlaris">-</div>
+                </div>
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-2">Stok Tersisa</h3>
+                    <div class="text-3xl font-bold text-red-500" id="dashboard-stok-tersisa">0</div>
+                </div>
+            </div>
+        </div>
         <div class="hidden" id="data-penjualan">
             <div class="flex justify-center mb-2 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-2">
                 <span class="bg-blue-500 text-white px-4 py-2 rounded mr-4 w-full">Data Jumlah
@@ -168,10 +194,12 @@
             const tambahPage = urlParams.has('tambah');
 
             if (dataPage) {
+                document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('data-penjualan').classList.remove('hidden');
                 loadLocalData();
                 fetchData();
             } else if (tambahPage) {
+                document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('tambah-penjualan').classList.remove('hidden');
                 setInitialStock();
                 const floatingIcon = document.getElementById('floating-icon');
@@ -179,6 +207,8 @@
                 floatingIcon.classList.remove('bg-teal-500');
                 floatingIcon.classList.add('bg-yellow-500');
                 floatingIcon.innerHTML = '<i class="fas fa-chart-line"></i>';
+            } else {
+                loadDashboardData();
             }
 
             document.getElementById('add-data-form').addEventListener('submit', function(e) {
@@ -297,8 +327,8 @@
                     if (data.success && data.data.length > 0) {
                         const lastItem = data.data[data.data.length - 1];
                         const sisaStok = parseInt(lastItem.sisa_stok);
-                        const stok = sisaStok > 0 ? sisaStok : 7700;
-                        document.getElementById('stok').value = stok;
+                        const stok = sisaStok > 0 ? sisaStok : 7700;                     
+document.getElementById('stok').value = stok;
                     } else {
                         document.getElementById('stok').value = 7700;
                     }
@@ -385,6 +415,51 @@
                     if (data.success) {
                         alert('Sukses menambahkan penjualan');
                         window.location.href = '/';
+                    }
+                });
+        }
+
+        function loadDashboardData() {
+            fetch('https://script.google.com/macros/s/AKfycbzFfZ1GDVwBQhuajjUdG9rY8gJsqxxpsWcl909x_5G6zUpz5PEtDlFys9i8z-fTWIwo/exec?action=get-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const penjualanData = data.data;
+                        let totalPenjualan = 0;
+                        let penjualanHarian = 0;
+                        let produkTerlaris = '';
+                        let stokTersisa = 0;
+                        const produkCount = {};
+
+                        const today = new Date();
+                        const todayDate = today.getDate();
+                        const todayMonth = today.getMonth();
+
+                        penjualanData.forEach(item => {
+                            totalPenjualan += parseFloat(item.jumlah);
+
+                            const itemDate = new Date(item.tgl);
+                            const itemDay = itemDate.getDate();
+                            const itemMonth = itemDate.getMonth();
+
+                            if (itemDay === todayDate && itemMonth === todayMonth) {
+                                penjualanHarian += parseFloat(item.jumlah);
+                            }
+
+                            if (!produkCount[item.produk_order]) {
+                                produkCount[item.produk_order] = 0;
+                            }
+                            produkCount[item.produk_order] += parseInt(item.order);
+
+                            stokTersisa = parseInt(item.sisa_stok);
+                        });
+
+                        produkTerlaris = Object.keys(produkCount).reduce((a, b) => produkCount[a] > produkCount[b] ? a : b, '');
+
+                        document.getElementById('dashboard-total-penjualan').innerText = `Rp ${totalPenjualan.toLocaleString('id-ID')}`;
+                        document.getElementById('dashboard-penjualan-harian').innerText = `Rp ${penjualanHarian.toLocaleString('id-ID')}`;
+                        document.getElementById('dashboard-produk-terlaris').innerText = produkTerlaris;
+                        document.getElementById('dashboard-stok-tersisa').innerText = stokTersisa;
                     }
                 });
         }
