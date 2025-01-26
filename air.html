@@ -12,50 +12,79 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100">
     <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
         <div class="flex items-center">
             <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/CPI8hT51tTIeMyXOQMxlaL4c7tG9WWP700o4ZDgFH7VC1YEKA.jpg" width="50"/>
-            <span class="text-white text-xl font-bold">Dashboard</span>
+            <span class="text-white text-xl font-bold hidden md:block">Dashboard</span>
         </div>
         <ul class="flex space-x-4">
             <li>
                 <a class="text-white hover:underline flex items-center" href="?index">
-                    <i class="fas fa-home mr-2"></i>Dashboard
+                    <i class="fas fa-home mr-2"></i>
+                    <span class="hidden md:block">Dashboard</span>
                 </a>
             </li>
             <li>
                 <a class="text-white hover:underline flex items-center" href="?data">
-                    <i class="fas fa-chart-line mr-2"></i>Data
+                    <i class="fas fa-chart-line mr-2"></i>
+                    <span class="hidden md:block">Data</span>
                 </a>
             </li>
             <li>
                 <a class="text-white hover:underline flex items-center" href="?tambah">
-                    <i class="fas fa-plus mr-2"></i>Tambah
+                    <i class="fas fa-plus mr-2"></i>
+                    <span class="hidden md:block">Tambah</span>
                 </a>
             </li>
         </ul>
     </nav>
     <div class="container mx-auto p-4 mt-20 max-w-4xl">
         <div id="dashboard">
-            <h2 class="text-2xl font-semibold mb-4">Selamat Datang di Dashboard</h2>
+            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Selamat Datang di Dashboard</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-bold mb-2">Total Penjualan</h3>
-                    <div class="text-3xl font-bold text-green-500" id="dashboard-total-penjualan">Rp 0</div>
+                <div class="bg-gradient-to-r from-green-100 to-green-300 shadow-lg rounded-lg p-6 flex items-center">
+                    <div class="p-4 bg-green-100 rounded-full">
+                        <i class="fas fa-dollar-sign text-green-500 text-3xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Penjualan</h3>
+                        <div class="text-2xl font-bold text-green-500" id="dashboard-total-penjualan">Rp 0</div>
+                    </div>
                 </div>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-bold mb-2">Penjualan Hari Ini</h3>
-                    <div class="text-3xl font-bold text-yellow-500" id="dashboard-penjualan-harian">Rp 0</div>
+                <div class="bg-gradient-to-r from-yellow-100 to-yellow-300 shadow-lg rounded-lg p-6 flex items-center">
+                    <div class="p-4 bg-yellow-100 rounded-full">
+                        <i class="fas fa-calendar-day text-yellow-500 text-3xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Penjualan Hari Ini</h3>
+                        <div class="text-2xl font-bold text-yellow-500" id="dashboard-penjualan-harian">Rp 0</div>
+                    </div>
                 </div>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-bold mb-2">Produk Terlaris</h3>
-                    <div class="text-3xl font-bold text-blue-500" id="dashboard-produk-terlaris">-</div>
+                <div class="bg-gradient-to-r from-blue-100 to-blue-300 shadow-lg rounded-lg p-6 flex items-center">
+                    <div class="p-4 bg-blue-100 rounded-full">
+                        <i class="fas fa-star text-blue-500 text-3xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Produk Terlaris</h3>
+                        <div class="text-2xl font-bold text-blue-500" id="dashboard-produk-terlaris">-</div>
+                    </div>
                 </div>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-xl font-bold mb-2">Stok Tersisa</h3>
-                    <div class="text-3xl font-bold text-red-500" id="dashboard-stok-tersisa">0</div>
+                <div class="bg-gradient-to-r from-red-100 to-red-300 shadow-lg rounded-lg p-6 flex items-center">
+                    <div class="p-4 bg-red-100 rounded-full">
+                        <i class="fas fa-boxes text-red-500 text-3xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Stok Tersisa</h3>
+                        <div class="text-2xl font-bold text-red-500" id="dashboard-stok-tersisa">0</div>
+                    </div>
                 </div>
+            </div>
+            <div class="bg-white shadow-lg rounded-lg p-6 mt-4">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Produk Terjual</h3>
+                <ul id="dashboard-produk-terjual" class="space-y-4">
+                    <!-- List of sold products will be inserted here dynamically -->
+                </ul>
             </div>
         </div>
         <div class="hidden" id="data-penjualan">
@@ -302,7 +331,6 @@
                 `;
                 dataGrid.appendChild(card);
                 totalJumlah += parseFloat(item.jumlah);
-
                 if (itemDay === todayDate && itemMonth === todayMonth) {
                     totalHarian += parseFloat(item.jumlah);
                     if (item.produk_order === "Air Isi Ulang 19l") {
@@ -332,7 +360,7 @@
                     if (data.success && data.data.length > 0) {
                         const lastItem = data.data[data.data.length - 1];
                         const sisaStok = parseInt(lastItem.sisa_stok);
-                        const stok = sisaStok > 0 ? sisaStok : 7700;                     
+                        const stok = sisaStok > 0 ? sisaStok : 7700;
                         document.getElementById('stok').value = stok;
                     } else {
                         document.getElementById('stok').value = 7700;
@@ -465,6 +493,21 @@
                         document.getElementById('dashboard-penjualan-harian').innerText = `Rp ${penjualanHarian.toLocaleString('id-ID')}`;
                         document.getElementById('dashboard-produk-terlaris').innerText = produkTerlaris;
                         document.getElementById('dashboard-stok-tersisa').innerText = stokTersisa;
+
+                        const produkTerjualList = document.getElementById('dashboard-produk-terjual');
+                        produkTerjualList.innerHTML = '';
+                        Object.keys(produkCount).forEach(produk => {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('flex', 'items-center', 'justify-between', 'bg-gray-100', 'p-4', 'rounded-lg', 'shadow-sm');
+                            listItem.innerHTML = `
+                                <div class="flex items-center">
+                                    <i class="fas fa-box-open text-gray-500 text-2xl mr-4"></i>
+                                    <span class="text-gray-700 font-semibold">${produk}</span>
+                                </div>
+                                <span class="text-xl font-bold text-gray-800">${produkCount[produk]}</span>
+                            `;
+                            produkTerjualList.appendChild(listItem);
+                        });
                     }
                 });
         }
