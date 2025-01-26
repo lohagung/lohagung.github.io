@@ -20,6 +20,11 @@
         </div>
         <ul class="flex space-x-4">
             <li>
+                <a class="text-white hover:underline flex items-center" href="?index">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+            </li>
+            <li>
                 <a class="text-white hover:underline flex items-center" href="?data">
                     <i class="fas fa-chart-line mr-2"></i>Data
                 </a>
@@ -328,7 +333,7 @@
                         const lastItem = data.data[data.data.length - 1];
                         const sisaStok = parseInt(lastItem.sisa_stok);
                         const stok = sisaStok > 0 ? sisaStok : 7700;                     
-document.getElementById('stok').value = stok;
+                        document.getElementById('stok').value = stok;
                     } else {
                         document.getElementById('stok').value = 7700;
                     }
@@ -414,7 +419,7 @@ document.getElementById('stok').value = stok;
                 .then(data => {
                     if (data.success) {
                         alert('Sukses menambahkan penjualan');
-                        window.location.href = '/';
+                        window.location.href = '?data';
                     }
                 });
         }
