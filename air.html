@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Data Dashboard</title>
+    <title>Data Management YOUSHE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
@@ -16,7 +16,7 @@
     <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
         <div class="flex items-center">
             <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/CPI8hT51tTIeMyXOQMxlaL4c7tG9WWP700o4ZDgFH7VC1YEKA.jpg" width="50"/>
-            <span class="text-white text-xl font-bold">Data Dashboard</span>
+            <span class="text-white text-xl font-bold">Dashboard</span>
         </div>
         <ul class="flex space-x-4">
             <li>
@@ -225,11 +225,11 @@
                         <img src="${item.foto}" alt="Foto of ${item.nama}" class="w-8 h-8 object-cover rounded-full mr-2" onerror="this.onerror=null;this.src='https://placehold.co/50x50';">
                         <div>
                             <h3 class="text-base font-bold">${item.nama}</h3>
-                            <p class="text-gray-600">${item.produk_order} - ${item.order}</p>
+                            <p class="text-gray-600">${item.produk_order} - <span class="bg-red-600 text-white px-2 rounded">${item.order}</span></p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-red-500 font-bold text-sm">
+                        <div class="text-green-500 font-bold text-sm">
                             Rp ${parseFloat(item.jumlah).toLocaleString('id-ID')}
                         </div>
                         <div class="text-gray-500 text-xs">
