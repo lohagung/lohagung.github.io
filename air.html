@@ -13,7 +13,7 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <nav class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
+    <nav id="navbar" class="bg-teal-700 p-4 flex items-center justify-between mb-6 w-full fixed top-0 left-0 z-10">
         <div class="flex items-center">
             <img alt="Logo perusahaan" class="rounded-full mr-4" height="50" src="https://storage.googleapis.com/a1aa/image/CPI8hT51tTIeMyXOQMxlaL4c7tG9WWP700o4ZDgFH7VC1YEKA.jpg" width="50"/>
             <span class="text-white text-xl font-bold md:block">Admin</span>
@@ -37,51 +37,85 @@
                     <span class="hidden md:block">Tambah</span>
                 </a>
             </li>
+            <li>
+                <a class="text-white hover:underline flex items-center" href="?setting">
+                    <i class="fas fa-cog mr-2"></i>
+                    <span class="hidden md:block">Setting</span>
+                </a>
+            </li>
         </ul>
     </nav>
     <div class="container mx-auto p-4 mt-20 max-w-4xl">
         <div id="dashboard">
-            <h2 class="text-3xl font-semibold mb-6 text-gray-200">YOUSHE<span class="text-red-500 ml-1 text-sm">water</span></h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                <div class="bg-gradient-to-r from-green-700 to-green-500 shadow-lg rounded-lg p-6 flex items-center">
-                    <div class="p-4 bg-green-800 rounded-full">
-                        <i class="fas fa-dollar-sign text-green-200 text-3xl"></i>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-semibold text-gray-200">YOUSHE<span class="text-red-500 ml-1 text-sm">water</span></h2>
+                <div class="flex space-x-4">
+                    <a href="?data" class="text-white hover:underline">
+                        <i class="fas fa-database text-2xl"></i>
+                    </a>
+                    <a href="?setting" class="text-white hover:underline">
+                        <i class="fas fa-cog text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 md:grid-cols-2 lg:grid-cols-2">
+                <div class="bg-gradient-to-r from-green-700 to-green-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-green-800 rounded-full">
+                        <i class="fas fa-dollar-sign text-green-200 text-xl md:text-3xl"></i>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-200">Total Penjualan</h3>
-                        <div class="text-2xl font-bold text-green-200" id="dashboard-total-penjualan">Rp 0</div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Total Penjualan</h3>
+                        <div class="text-md md:text-2xl font-bold text-green-200" id="dashboard-total-penjualan">Rp 0</div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-yellow-700 to-yellow-500 shadow-lg rounded-lg p-6 flex items-center">
-                    <div class="p-4 bg-yellow-800 rounded-full">
-                        <i class="fas fa-calendar-day text-yellow-200 text-3xl"></i>
+                <div class="bg-gradient-to-r from-yellow-700 to-yellow-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-yellow-800 rounded-full">
+                        <i class="fas fa-calendar-day text-yellow-200 text-xl md:text-3xl"></i>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-200">Penjualan Hari Ini</h3>
-                        <div class="text-2xl font-bold text-yellow-200" id="dashboard-penjualan-harian">Rp 0</div>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-r from-blue-700 to-blue-500 shadow-lg rounded-lg p-6 flex items-center">
-                    <div class="p-4 bg-blue-800 rounded-full">
-                        <i class="fas fa-star text-blue-200 text-3xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-200">Produk Terlaris</h3>
-                        <div class="text-2xl font-bold text-blue-200" id="dashboard-produk-terlaris">-</div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Penjualan Hari Ini</h3>
+                        <div class="text-md md:text-2xl font-bold text-yellow-200" id="dashboard-penjualan-harian">Rp 0</div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-red-700 to-red-500 shadow-lg rounded-lg p-6 flex items-center">
-                    <div class="p-4 bg-red-800 rounded-full">
-                        <i class="fas fa-boxes text-red-200 text-3xl"></i>
+                <div class="bg-gradient-to-r from-orange-700 to-orange-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-orange-800 rounded-full">
+                        <i class="fas fa-calendar-week text-orange-200 text-xl md:text-3xl"></i>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-semibold text-gray-200">Stok Tersisa (Liter)</h3>
-                        <div class="text-2xl font-bold text-red-200" id="dashboard-stok-tersisa">0</div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Penjualan Mingguan</h3>
+                        <div class="text-md md:text-2xl font-bold text-orange-200" id="dashboard-penjualan-mingguan">Rp 0</div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-purple-700 to-purple-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-purple-800 rounded-full">
+                        <i class="fas fa-calendar-alt text-purple-200 text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Penjualan Bulanan</h3>
+                        <div class="text-md md:text-2xl font-bold text-purple-200" id="dashboard-penjualan-bulanan">Rp 0</div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-blue-700 to-blue-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-blue-800 rounded-full">
+                        <i class="fas fa-star text-blue-200 text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Produk Terlaris</h3>
+                        <div class="text-md md:text-2xl font-bold text-blue-200" id="dashboard-produk-terlaris">-</div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-red-700 to-red-500 shadow-lg rounded-lg p-3 md:p-6 flex items-center">
+                    <div class="p-2 md:p-4 bg-red-800 rounded-full">
+                        <i class="fas fa-boxes text-red-200 text-xl md:text-3xl"></i>
+                    </div>
+                    <div class="ml-2 md:ml-4">
+                        <h3 class="text-xs md:text-lg font-semibold text-gray-200">Stok Tersisa (Liter)</h3>
+                        <div class="text-md md:text-2xl font-bold text-red-200" id="dashboard-stok-tersisa">0</div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-800 shadow-lg rounded-lg p-6 mt-4">
-                <h3 class="text-xl font-semibold mb-4 text-gray-200">Produk Terjual</h3>
+                <h3 class="text-lg md:text-xl font-semibold mb-4 text-gray-200">Produk Terjual</h3>
                 <ul id="dashboard-produk-terjual" class="space-y-4">
                     <!-- List of sold products will be inserted here dynamically -->
                 </ul>
@@ -128,10 +162,14 @@
                     </div>
                 </span>
             </div>
+            <div class="flex justify-center mb-4">
+                <input type="date" id="filter-date" class="px-3 py-2 border rounded bg-gray-700 text-white">
+            </div>
             <h2 class="text-2xl font-semibold mb-4">Data Penjualan</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2" id="data-grid">
                 <!-- Data will be inserted here dynamically -->
             </div>
+            <div class="text-center text-gray-400 mt-4 hidden" id="no-data-message"></div>
         </div>
         <div class="hidden" id="tambah-penjualan">
             <div class="bg-gray-800 shadow-md rounded-lg p-6">
@@ -230,11 +268,13 @@
             if (dataPage) {
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('data-penjualan').classList.remove('hidden');
+                document.getElementById('navbar').classList.remove('hidden');
                 loadLocalData();
                 fetchData();
             } else if (tambahPage) {
                 document.getElementById('dashboard').classList.add('hidden');
                 document.getElementById('tambah-penjualan').classList.remove('hidden');
+                document.getElementById('navbar').classList.remove('hidden');
                 setInitialStock();
                 const floatingIcon = document.getElementById('floating-icon');
                 floatingIcon.href = "?data";
@@ -242,10 +282,12 @@
                 floatingIcon.classList.add('bg-yellow-500');
                 floatingIcon.innerHTML = '<i class="fas fa-chart-line"></i>';
             } else {
+                document.getElementById('navbar').classList.add('hidden');
                 loadDashboardData();
             }
 
-            document.getElementById('add-data-form').addEventListener('submit', function(e) {
+            
+document.getElementById('add-data-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 addData();
             });
@@ -270,6 +312,11 @@
                     icon.classList.add('fa-eye');
                 }
             });
+
+            document.getElementById('filter-date').addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                filterDataByDate(selectedDate);
+            });
         });
 
         function loadLocalData() {
@@ -291,7 +338,7 @@
                 });
         }
 
-        function renderData(data) {
+        function renderData(data, filterDate = null) {
             const dataGrid = document.getElementById('data-grid');
             dataGrid.innerHTML = '';
             let totalJumlah = 0;
@@ -303,13 +350,35 @@
             const today = new Date();
             const todayDate = today.getDate();
             const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+            let filteredData = data;
 
-            // Reverse the data array to show the latest data on top
-            data.reverse().forEach(item => {
+            if (filterDate) {
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.tgl);
+                    return itemDate.getDate() === filterDate.getDate() &&
+                           itemDate.getMonth() === filterDate.getMonth() &&
+                           itemDate.getFullYear() === filterDate.getFullYear();
+                });
+            } else {
+                filteredData = data.filter(item => {
+                    const itemDate = new Date(item.tgl);
+                    return itemDate.getDate() === todayDate &&
+                           itemDate.getMonth() === todayMonth &&
+                           itemDate.getFullYear() === todayYear;
+                });
+            }
+
+            if (filteredData.length === 0) {
+                const noDataMessage = document.getElementById('no-data-message');
+                noDataMessage.innerText = `Tidak ada data pada tanggal ${filterDate ? filterDate.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : today.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+                noDataMessage.classList.remove('hidden');
+            } else {
+                document.getElementById('no-data-message').classList.add('hidden');
+            }
+
+            filteredData.reverse().forEach(item => {
                 const itemDate = new Date(item.tgl);
-                const itemDay = itemDate.getDate();
-                const itemMonth = itemDate.getMonth();
-
                 const card = document.createElement('div');
                 card.classList.add('bg-gray-800', 'shadow-md', 'rounded-lg', 'p-4', 'flex', 'items-center', 'justify-between', 'text-xs');
                 card.innerHTML = `
@@ -332,22 +401,19 @@
                 dataGrid.appendChild(card);
                 totalJumlah += parseFloat(item.jumlah);
 
-                if (itemDay === todayDate && itemMonth === todayMonth) {
-                    totalHarian += parseFloat(item.jumlah);
-                    if (item.produk_order === "Air Isi Ulang 19l") {
-                        totalAir19l += parseInt(item.order);
-                    } else if (item.produk_order === "Air Isi Ulang 15l") {
-                        totalAir15l += parseInt(item.order);
-                    } else if (item.produk_order === "AQUA") {
-                        totalAqua += parseInt(item.order);
-                    } else if (item.produk_order === "GAS") {
-                        totalGas += parseInt(item.order);
-                    }
+                if (item.produk_order === "Air Isi Ulang 19l") {
+                    totalAir19l += parseInt(item.order);
+                } else if (item.produk_order === "Air Isi Ulang 15l") {
+                    totalAir15l += parseInt(item.order);
+                } else if (item.produk_order === "AQUA") {
+                    totalAqua += parseInt(item.order);
+                } else if (item.produk_order === "GAS") {
+                    totalGas += parseInt(item.order);
                 }
             });
 
             document.getElementById('total-jumlah').innerText = `Rp ${totalJumlah.toLocaleString('id-ID')}`;
-            document.getElementById('total-harian').innerText = `Rp ${totalHarian.toLocaleString('id-ID')}`;
+            document.getElementById('total-harian').innerText = `Rp ${totalJumlah.toLocaleString('id-ID')}`;
             document.getElementById('total-air-19l').innerText = `${totalAir19l}`;
             document.getElementById('total-air-15l').innerText = `${totalAir15l}`;
             document.getElementById('total-aqua').innerText = `${totalAqua}`;
@@ -416,7 +482,7 @@
                 submitButton.disabled = true;
                 submitButton.classList.add('bg-gray-500');
                 submitButton.classList.remove('bg-blue-500');
-                
+
                 notif.classList.remove('hidden');
             } else {
                 submitButton.disabled = false;
@@ -461,6 +527,8 @@
                         const penjualanData = data.data;
                         let totalPenjualan = 0;
                         let penjualanHarian = 0;
+                        let penjualanMingguan = 0;
+                        let penjualanBulanan = 0;
                         let produkTerlaris = '';
                         let stokTersisa = 0;
                         const produkCount = {};
@@ -468,6 +536,7 @@
                         const today = new Date();
                         const todayDate = today.getDate();
                         const todayMonth = today.getMonth();
+                        const todayYear = today.getFullYear();
 
                         penjualanData.forEach(item => {
                             totalPenjualan += parseFloat(item.jumlah);
@@ -475,9 +544,20 @@
                             const itemDate = new Date(item.tgl);
                             const itemDay = itemDate.getDate();
                             const itemMonth = itemDate.getMonth();
+                            const itemYear = itemDate.getFullYear();
 
-                            if (itemDay === todayDate && itemMonth === todayMonth) {
+                            if (itemDay === todayDate && itemMonth === todayMonth && itemYear === todayYear) {
                                 penjualanHarian += parseFloat(item.jumlah);
+                            }
+
+                            const oneWeekAgo = new Date();
+                            oneWeekAgo.setDate(todayDate - 7);
+                            if (itemDate >= oneWeekAgo && itemDate <= today) {
+                                penjualanMingguan += parseFloat(item.jumlah);
+                            }
+
+                            if (itemMonth === todayMonth && itemYear === todayYear) {
+                                penjualanBulanan += parseFloat(item.jumlah);
                             }
 
                             if (!produkCount[item.produk_order]) {
@@ -492,6 +572,8 @@
 
                         document.getElementById('dashboard-total-penjualan').innerText = `Rp ${totalPenjualan.toLocaleString('id-ID')}`;
                         document.getElementById('dashboard-penjualan-harian').innerText = `Rp ${penjualanHarian.toLocaleString('id-ID')}`;
+                        document.getElementById('dashboard-penjualan-mingguan').innerText = `Rp ${penjualanMingguan.toLocaleString('id-ID')}`;
+                        document.getElementById('dashboard-penjualan-bulanan').innerText = `Rp ${penjualanBulanan.toLocaleString('id-ID')}`;
                         document.getElementById('dashboard-produk-terlaris').innerText = produkTerlaris;
                         document.getElementById('dashboard-stok-tersisa').innerText = stokTersisa;
 
@@ -499,7 +581,7 @@
                         produkTerjualList.innerHTML = '';
                         Object.keys(produkCount).forEach(produk => {
                             const listItem = document.createElement('li');
-                            listItem.classList.add('flex', 'items-center', 'justify-between', 'bg-gray-700', 'p-4', 'rounded-lg');
+                            listItem.classList.add('flex', 'items-center', 'justify-between', 'bg-gray-700', 'p-4', 'rounded-lg', 'cursor-pointer');
                             listItem.innerHTML = `
                                 <div class="flex items-center">
                                     <i class="fas fa-box mr-2 text-gray-400"></i>
@@ -507,10 +589,70 @@
                                 </div>
                                 <span class="text-xl font-bold text-gray-200">${produkCount[produk]}</span>
                             `;
+                            listItem.addEventListener('click', () => showProductDetails(produk, listItem));
                             produkTerjualList.appendChild(listItem);
                         });
                     }
                 });
+        }
+
+        function filterDataByDate(selectedDate) {
+            const localData = localStorage.getItem('penjualanData');
+            if (localData) {
+                const data = JSON.parse(localData);
+                renderData(data, selectedDate);
+            }
+        }
+
+        function showProductDetails(produk, listItem) {
+            const localData = localStorage.getItem('penjualanData');
+            if (localData) {
+                const data = JSON.parse(localData);
+                const productData = data.filter(item => item.produk_order === produk);
+                let totalHarian = 0;
+                let totalMingguan = 0;
+                let totalBulanan = 0;
+
+                const today = new Date();
+                const todayDate = today.getDate();
+                const todayMonth = today.getMonth();
+                const todayYear = today.getFullYear();
+
+                productData.forEach(item => {
+                    const itemDate = new Date(item.tgl);
+                    const itemDay = itemDate.getDate();
+                    const itemMonth = itemDate.getMonth();
+                    const itemYear = itemDate.getFullYear();
+
+                    if (itemDay === todayDate && itemMonth === todayMonth && itemYear === todayYear) {
+                        totalHarian += parseFloat(item.jumlah);
+                    }
+
+                    const oneWeekAgo = new Date();
+                    oneWeekAgo.setDate(todayDate - 7);
+                    if (itemDate >= oneWeekAgo && itemDate <= today) {
+                        totalMingguan += parseFloat(item.jumlah);
+                    }
+
+                    if (itemMonth === todayMonth && itemYear === todayYear) {
+                        totalBulanan += parseFloat(item.jumlah);
+                    }
+                });
+
+                const existingDetails = document.querySelector('.product-details');
+                if (existingDetails) {
+                    existingDetails.remove();
+                }
+
+                const details = document.createElement('div');
+                details.classList.add('product-details', 'bg-gray-700', 'p-4', 'rounded-lg', 'mt-2');
+                details.innerHTML = `
+                    <p class="text-gray-200">Harian: Rp ${totalHarian.toLocaleString('id-ID')}</p>
+                    <p class="text-gray-200">Mingguan: Rp ${totalMingguan.toLocaleString('id-ID')}</p>
+                    <p class="text-gray-200">Bulanan: Rp ${totalBulanan.toLocaleString('id-ID')}</p>
+                `;
+                listItem.appendChild(details);
+            }
         }
     </script>
 </body>
