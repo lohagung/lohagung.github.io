@@ -207,7 +207,9 @@
 
         previewToggleBtn.addEventListener('click', () => {
             const htmlContent = editor.value;
-            previewContent.innerHTML = htmlContent;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            previewContent.innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
             previewContainer.classList.remove('hidden');
             document.querySelector('.editor-container').classList.add('hidden');
         });
