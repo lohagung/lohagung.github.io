@@ -222,6 +222,16 @@
             const startIndex = findResults[currentIndex];
             editor.focus();
             editor.setSelectionRange(startIndex, startIndex + findValue.length);
+            scrollToHighlight(startIndex);
+        }
+
+        function scrollToHighlight(startIndex) {
+            const editorElement = editor;
+            const textBeforeHighlight = editor.value.substring(0, startIndex);
+            const linesBeforeHighlight = textBeforeHighlight.split('\n').length;
+            const lineHeight = parseInt(window.getComputedStyle(editorElement).lineHeight);
+            const scrollPosition = (linesBeforeHighlight - 1) * lineHeight - editorElement.clientHeight / 2;
+            editorElement.scrollTop = scrollPosition;
         }
     </script>
 </body>
