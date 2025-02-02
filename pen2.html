@@ -116,6 +116,19 @@
         let findResults = [];
         let currentIndex = -1;
 
+        // Load editor content from localStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedContent = localStorage.getItem('editorContent');
+            if (savedContent) {
+                editor.value = savedContent;
+            }
+        });
+
+        // Save editor content to localStorage on input
+        editor.addEventListener('input', () => {
+            localStorage.setItem('editorContent', editor.value);
+        });
+
         findReplaceToggleBtn.addEventListener('click', () => {
             findReplaceContainer.classList.toggle('hidden');
         });
@@ -152,6 +165,7 @@
             const editorContent = editor.value;
             const newContent = editorContent.split(findValue).join(replaceValue);
             editor.value = newContent;
+            localStorage.setItem('editorContent', newContent); // Save updated content to localStorage
         });
 
         openFileBtn.addEventListener('click', () => {
@@ -164,6 +178,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     editor.value = e.target.result;
+                    localStorage.setItem('editorContent', e.target.result); // Save loaded content to localStorage
                 };
                 reader.readAsText(file);
             }
@@ -192,9 +207,7 @@
 
         previewToggleBtn.addEventListener('click', () => {
             const htmlContent = editor.value;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            previewContent.src = url;
+            previewContent.srcdoc = htmlContent;
             previewContainer.classList.remove('hidden');
             document.querySelector('.editor-container').classList.add('hidden');
         });
