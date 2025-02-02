@@ -223,6 +223,7 @@
             editor.focus();
             editor.setSelectionRange(startIndex, startIndex + findValue.length);
             scrollToHighlight(startIndex);
+            updateFindCount();
         }
 
         function scrollToHighlight(startIndex) {
@@ -232,6 +233,10 @@
             const lineHeight = parseInt(window.getComputedStyle(editorElement).lineHeight);
             const scrollPosition = (linesBeforeHighlight - 1) * lineHeight - editorElement.clientHeight / 2;
             editorElement.scrollTop = scrollPosition;
+        }
+
+        function updateFindCount() {
+            findCount.textContent = `(${findResults.length} matches, ${currentIndex + 1} of ${findResults.length})`;
         }
     </script>
 </body>
