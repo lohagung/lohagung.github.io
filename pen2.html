@@ -87,7 +87,7 @@
                 <button id="closePreviewBtn" class="close-btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                     <i class="fas fa-times"></i>
                 </button>
-                <iframe id="previewContent" class="w-full h-full border-none"></iframe>
+                <div id="preview" class="w-full h-full"></div>
             </div>
         </div>
     </div>
@@ -110,7 +110,7 @@
         const findCount = document.getElementById('findCount');
         const previewToggleBtn = document.getElementById('previewToggleBtn');
         const previewContainer = document.getElementById('previewContainer');
-        const previewContent = document.getElementById('previewContent');
+        const previewContent = document.getElementById('preview');
         const closePreviewBtn = document.getElementById('closePreviewBtn');
 
         let findResults = [];
@@ -207,7 +207,7 @@
 
         previewToggleBtn.addEventListener('click', () => {
             const htmlContent = editor.value;
-            previewContent.srcdoc = htmlContent;
+            previewContent.innerHTML = htmlContent;
             previewContainer.classList.remove('hidden');
             document.querySelector('.editor-container').classList.add('hidden');
         });
