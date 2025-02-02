@@ -1,0 +1,215 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor with Find, Replace, Open File, Select All, and Full-Screen Web Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .container {
+            height: 100%;
+        }
+        .editor-container {
+            height: calc(100% - 4rem);
+        }
+        .preview-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 50;
+            overflow-y: auto;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-roboto">
+    <div class="container mx-auto p-4 flex flex-col">
+        <div class="bg-white shadow-md rounded-lg p-6 flex flex-col flex-grow">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Text Editor</h1>
+                <div class="flex space-x-2">
+                    <button id="openFileBtn" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                    <button id="selectAllBtn" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button id="findReplaceToggleBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button id="previewToggleBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="editor-container flex-grow">
+                <textarea id="editor" class="w-full h-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+            <div id="findReplaceContainer" class="mt-4 hidden">
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="flex-1">
+                        <label for="findText" class="block text-sm font-medium text-gray-700">Find <span id="findCount" class="text-gray-500"></span></label>
+                        <input type="text" id="findText" class="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex-1">
+                        <label for="replaceText" class="block text-sm font-medium text-gray-700">Replace</label>
+                        <input type="text" id="replaceText" class="mt-1 block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex space-x-2">
+                        <button id="prevBtn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button id="nextBtn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="findBtn" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Find</button>
+                        <button id="replaceBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Replace</button>
+                    </div>
+                </div>
+            </div>
+            <div id="previewContainer" class="preview-container hidden">
+                <button id="closePreviewBtn" class="close-btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    <i class="fas fa-times"></i>
+                </button>
+                <iframe id="previewContent" class="w-full h-full border-none"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" class="hidden">
+
+    <script>
+        const findReplaceToggleBtn = document.getElementById('findReplaceToggleBtn');
+        const findReplaceContainer = document.getElementById('findReplaceContainer');
+        const findBtn = document.getElementById('findBtn');
+        const replaceBtn = document.getElementById('replaceBtn');
+        const editor = document.getElementById('editor');
+        const findText = document.getElementById('findText');
+        const replaceText = document.getElementById('replaceText');
+        const openFileBtn = document.getElementById('openFileBtn');
+        const fileInput = document.getElementById('fileInput');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const findCount = document.getElementById('findCount');
+        const previewToggleBtn = document.getElementById('previewToggleBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewContent = document.getElementById('previewContent');
+        const closePreviewBtn = document.getElementById('closePreviewBtn');
+
+        let findResults = [];
+        let currentIndex = -1;
+
+        findReplaceToggleBtn.addEventListener('click', () => {
+            findReplaceContainer.classList.toggle('hidden');
+        });
+
+        findBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const findValue = findText.value;
+            const editorContent = editor.value;
+            findResults = [];
+            currentIndex = -1;
+
+            if (findValue) {
+                let startIndex = 0;
+                while ((startIndex = editorContent.indexOf(findValue, startIndex)) !== -1) {
+                    findResults.push(startIndex);
+                    startIndex += findValue.length;
+                }
+
+                findCount.textContent = `(${findResults.length} matches)`;
+
+                if (findResults.length > 0) {
+                    currentIndex = 0;
+                    highlightResult();
+                } else {
+                    alert('Text not found');
+                }
+            }
+        });
+
+        replaceBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const findValue = findText.value;
+            const replaceValue = replaceText.value;
+            const editorContent = editor.value;
+            const newContent = editorContent.split(findValue).join(replaceValue);
+            editor.value = newContent;
+        });
+
+        openFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editor.value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        selectAllBtn.addEventListener('click', () => {
+            editor.focus();
+            editor.select();
+        });
+
+        prevBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (findResults.length > 0) {
+                currentIndex = (currentIndex - 1 + findResults.length) % findResults.length;
+                highlightResult();
+            }
+        });
+
+        nextBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (findResults.length > 0) {
+                currentIndex = (currentIndex + 1) % findResults.length;
+                highlightResult();
+            }
+        });
+
+        previewToggleBtn.addEventListener('click', () => {
+            const htmlContent = editor.value;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            previewContent.src = url;
+            previewContainer.classList.remove('hidden');
+            document.querySelector('.editor-container').classList.add('hidden');
+        });
+
+        closePreviewBtn.addEventListener('click', () => {
+            previewContainer.classList.add('hidden');
+            document.querySelector('.editor-container').classList.remove('hidden');
+        });
+
+        function highlightResult() {
+            const findValue = findText.value;
+            const startIndex = findResults[currentIndex];
+            editor.focus();
+            editor.setSelectionRange(startIndex, startIndex + findValue.length);
+        }
+    </script>
+</body>
+</html>
