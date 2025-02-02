@@ -17,21 +17,6 @@
         .editor-container {
             height: calc(100% - 4rem);
         }
-        .preview-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 50;
-            overflow-y: auto;
-        }
-        .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-        }
     </style>
 </head>
 <body class="bg-gray-100 font-roboto">
@@ -83,12 +68,6 @@
                     </div>
                 </div>
             </div>
-            <div id="previewContainer" class="preview-container hidden">
-                <button id="closePreviewBtn" class="close-btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div id="preview" class="w-full h-full"></div>
-            </div>
         </div>
     </div>
 
@@ -109,9 +88,6 @@
         const nextBtn = document.getElementById('nextBtn');
         const findCount = document.getElementById('findCount');
         const previewToggleBtn = document.getElementById('previewToggleBtn');
-        const previewContainer = document.getElementById('previewContainer');
-        const previewContent = document.getElementById('preview');
-        const closePreviewBtn = document.getElementById('closePreviewBtn');
 
         let findResults = [];
         let currentIndex = -1;
@@ -121,6 +97,12 @@
             const savedContent = localStorage.getItem('editorContent');
             if (savedContent) {
                 editor.value = savedContent;
+            }
+
+            // Check if the URL has the preview query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('preview')) {
+                showPreview();
             }
         });
 
@@ -206,18 +188,15 @@
         });
 
         previewToggleBtn.addEventListener('click', () => {
-            const htmlContent = editor.value;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            previewContent.innerHTML = `<iframe src="${url}" class="w-full h-full border-none"></iframe>`;
-            previewContainer.classList.remove('hidden');
-            document.querySelector('.editor-container').classList.add('hidden');
+            window.open(window.location.pathname + '?preview', '_blank');
         });
 
-        closePreviewBtn.addEventListener('click', () => {
-            previewContainer.classList.add('hidden');
-            document.querySelector('.editor-container').classList.remove('hidden');
-        });
+        function showPreview() {
+            const htmlContent = localStorage.getItem('editorContent');
+            if (htmlContent) {
+                document.body.innerHTML = htmlContent;
+            }
+        }
 
         function highlightResult() {
             const findValue = findText.value;
