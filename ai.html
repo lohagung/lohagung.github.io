@@ -143,7 +143,7 @@
       newItem.innerHTML = `
         <img alt="Generated content image" class="w-24 h-24 rounded-lg" height="100" src="${imageUrl}" width="100"/>
         <div>
-          <a href="?artikel=${encodeURIComponent(query)}" class="text-base md:text-lg font-semibold text-blue-600 hover:underline">${truncateText(content, 60)}</a>
+          <a href="?artikel=${sanitizeURLParam(decodeURIComponent(query))}" class="text-base md:text-lg font-semibold text-blue-600 hover:underline">${truncateText(content, 60)}</a>
           <div class="text-xs text-gray-600 hidden md:block">${snippet}</div>
           <div class="text-sm text-red-600">Generated <span class="text-gray-500">just now</span></div>
         </div>
@@ -160,10 +160,10 @@
 
     function getRandomImageUrl() {
       const randomImageUrls = [
-        "https://placekitten.com/1000/1000",
+        "https://source.unsplash.com/random/1000x1000",
         "https://picsum.photos/1000",
         "https://loremflickr.com/1000/1000",
-        "https://baconmockup.com/1000/1000",
+        "https://placekitten.com/1000/1000",
         "https://placebear.com/1000/1000"
       ];
       return randomImageUrls[Math.floor(Math.random() * randomImageUrls.length)];
@@ -211,16 +211,42 @@
       newsArtikel.innerHTML = ''; // Clear existing content
       const imageUrl = getRandomImageUrl();
       const snippet = truncateText(content, 180);
+      const title = query.replace(/-/g, ' ');
+
+      document.title = title;
 
       const newItem = document.createElement('div');
       newItem.className = 'bg-white p-4 rounded-lg shadow w-full max-w-6xl mx-auto';
       newItem.innerHTML = `
         <img alt="Cover image for the article" class="w-full h-64 object-cover rounded-lg mb-4" src="${imageUrl}"/>
-        <h1 class="text-2xl font-bold mb-2 text-center uppercase">${query}</h1>
+        <h1 class="text-2xl font-bold mb-2 text-center uppercase">${title}</h1>
         <blockquote class="text-center italic text-gray-600 mb-4">"${snippet}"</blockquote>
         <div class="text-base mb-4">${formatContent(content)}</div>
+        <h2 class="text-xl font-semibold mb-2">Artikel Terkait</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${generateRelatedArticles(content, query)}
+        </div>
       `;
       newsArtikel.appendChild(newItem);
+    }
+
+    function generateRelatedArticles(content, query) {
+      const sentences = content.split('. ');
+      const relatedArticles = [];
+      for (let i = 0; i < 5; i++) {
+        const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
+        relatedArticles.push(`
+          <div class="bg-white p-4 rounded-lg shadow flex space-x-4">
+            <img alt="Related article image ${i + 1}" class="w-24 h-24 rounded-lg" height="100" src="${getRandomImageUrl()}" width="100"/>
+            <div>
+              <a href="?artikel=${encodeURIComponent(randomSentence)}" class="text-base md:text-lg font-semibold text-blue-600 hover:underline">${truncateText(randomSentence, 60)}</a>
+              <div class="text-xs text-gray-600 hidden md:block">${truncateText(randomSentence, 100)}</div>
+              <div class="text-sm text-red-600">Generated <span class="text-gray-500">just now</span></div>
+            </div>
+          </div>
+        `);
+      }
+      return relatedArticles.join('');
     }
 
     function formatContent(content) {
@@ -249,6 +275,30 @@
         loadStoredContent();
       }
     }
+function sanitizeURLParam(param) {
+    return decodeURIComponent(param) // Decode jika sudah di-encode
+        .toLowerCase()
+        .replace(/[%\/'".,\s]+/g, "-") // Mengganti karakter spesial dengan "-"
+        .replace(/-+/g, "-")           // Menghindari "-" berulang
+        .replace(/^-|-$/g, "");        // Menghapus "-" di awal & akhir
+}
+
+// Contoh penggunaan dengan encodeURIComponent
+let randomSentence = "Saya sedang masak 100% enak!";
+let query = "Apa kabar? Bagaimana harimu!";
+
+let url1 = `?artikel=${encodeURIComponent(randomSentence)}`;
+let url2 = `?artikel=${encodeURIComponent(query)}`;
+
+console.log(url1); // Output: ?artikel=Saya%20sedang%20masak%20100%25%20enak%21
+console.log(url2); // Output: ?artikel=Apa%20kabar%3F%20Bagaimana%20harimu%21
+
+// Mengubahnya menjadi format aman untuk URL
+let safeUrl1 = sanitizeURLParam(decodeURIComponent(randomSentence));
+let safeUrl2 = sanitizeURLParam(decodeURIComponent(query));
+
+console.log(safeUrl1); // Output: saya-sedang-masak-100-enak
+console.log(safeUrl2); // Output: apa-kabar-bagaimana-harimu
   </script>
 </body>
 </html>
