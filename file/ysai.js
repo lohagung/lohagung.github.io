@@ -1,4 +1,20 @@
-    function toggleSearch() {
+// Tambahkan CSS ke dalam JavaScript
+        const style = document.createElement("style");
+        style.innerHTML = `
+            html { height: 100%; margin: 0; }
+            .content-wrapper { flex-grow: 1; }
+            .code-block { position: relative; background-color: #1e293b; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; color: #f8fafc; font-family: 'Fira Code', monospace; }
+            .copy-button { position: absolute; top: 0.5rem; right: 0.5rem; background-color: #3b82f6; border: none; border-radius: 0.25rem; padding: 0.25rem 0.5rem; cursor: pointer; color: #f8fafc; }
+            blockquote { background-color: #f0f4f8; border-left: 4px solid #d1d5db; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem; }
+            .code-line { display: block; width: 100%; height: 2px; background-color: #d1d5db; margin: 1rem 0; }
+            pre { background-color: #1e293b; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: 'Fira Code', monospace; margin-bottom: 1rem; margin-top: 1rem; }
+            code { background-color: teal; color: #f8fafc; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Fira Code', monospace; }
+            p { margin-bottom: 1rem; }
+            strong { margin-top: 1rem; display: block; }
+        `;
+        document.head.appendChild(style);
+
+function toggleSearch() {
       const searchBar = document.getElementById('searchBar');
       const bannerAd = document.getElementById('bannerAd');
       searchBar.classList.toggle('hidden');
