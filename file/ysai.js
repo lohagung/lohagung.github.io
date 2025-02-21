@@ -117,11 +117,10 @@
       const newItem = document.createElement('div');
       newItem.className = 'bg-white p-4 rounded-lg shadow w-full max-w-6xl mx-auto';
       newItem.innerHTML = `
-        <img alt="Cover image for the article" class="w-full h-64 object-cover rounded-lg mb-4" src="${imageUrl}"/>
+        <img alt="${title}" class="w-full h-74 object-cover rounded-lg mb-4" src="${imageUrl}"/>
         <h1 class="text-2xl font-bold mb-2 text-center uppercase">${title}</h1>
         <blockquote class="text-center italic text-gray-600 mb-4">"${snippet}"</blockquote>
         <div class="text-base mb-4">${formatContent(content)}</div>
-        <h2 class="text-xl font-semibold mb-2">Artikel Terkait</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           ${generateRelatedArticles(content, query)}
         </div>
