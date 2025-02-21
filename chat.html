@@ -62,10 +62,6 @@
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
     const converter = new showdown.Converter();
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadMessages();
-    });
-
     async function sendMessage() {
         let userInput = document.getElementById("userInput").value;
         if (!userInput.trim()) return;
@@ -118,23 +114,6 @@
 
         messagesDiv.appendChild(messageElem);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        saveMessage(sender, text);
-    }
-
-    function saveMessage(sender, text) {
-        let messages = JSON.parse(localStorage.getItem("messages")) || [];
-        messages.push({ sender, text });
-        localStorage.setItem("messages", JSON.stringify(messages));
-    }
-
-    function loadMessages() {
-        let messagesDiv = document.getElementById("messages");
-        messagesDiv.innerHTML = ""; // Clear existing messages to prevent duplication
-        let messages = JSON.parse(localStorage.getItem("messages")) || [];
-        messages.forEach(message => {
-            appendMessage(message.sender, message.text);
-        });
     }
   </script>
 </body>
