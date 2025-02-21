@@ -1,0 +1,150 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Chat AI
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+  <style>
+   body { font-family: 'Roboto', sans-serif; }
+   pre {
+     background-color: #f5f5f5;
+     padding: 1rem;
+     border-radius: 0.5rem;
+     overflow-x: auto;
+   }
+   code {
+     background-color: #e0e0e0;
+     padding: 0.2rem 0.4rem;
+     border-radius: 0.3rem;
+   }
+   p + p {
+     margin-top: 0.5rem; /* Tailwind's mt-2 equivalent */
+   }
+   b + p {
+     margin-top: 0.75rem; /* Tailwind's mt-3 equivalent */
+   }
+  </style>
+ </head>
+ <body class="flex justify-center items-center h-screen bg-gray-100">
+  <div class="w-full max-w-md bg-white flex flex-col h-full">
+   <!-- Header -->
+   <div class="flex items-center justify-between p-4 bg-green-600 text-white">
+    <div class="flex items-center">
+     <img alt="Profile picture of the user" class="rounded-full mr-3" height="40" src="https://storage.googleapis.com/a1aa/image/5Q-4mE_BjV7OBoWGWA_REHB-CYGyUiEMaXsAb44J5wQ.jpg" width="40"/>
+     <div>
+      <h1 class="text-lg font-semibold">
+       Chat AI
+      </h1>
+      <p class="text-sm">
+       Online
+      </p>
+     </div>
+    </div>
+    <div class="flex space-x-4">
+     <i class="fas fa-video">
+     </i>
+     <i class="fas fa-phone">
+     </i>
+     <i class="fas fa-ellipsis-v">
+     </i>
+    </div>
+   </div>
+   <!-- Messages -->
+   <div class="flex-1 overflow-y-auto p-4" id="messages">
+    <!-- Messages will be appended here -->
+   </div>
+   <!-- Input -->
+   <div class="flex items-center p-4 border-t border-gray-300">
+    <input class="flex-1 p-2 border border-gray-300 rounded-full" id="userInput" placeholder="Tulis pesan..." type="text"/>
+    <button class="ml-2 p-2 bg-green-600 text-white rounded-full" onclick="sendMessage()">
+     <i class="fas fa-paper-plane">
+     </i>
+    </button>
+   </div>
+  </div>
+  <script>
+   const API_KEY = "AIzaSyAnPO90a0Q2nF4SrxGV07EnGfYh-PQwHyw"; 
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    const converter = new showdown.Converter();
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadMessages();
+    });
+
+    async function sendMessage() {
+        let userInput = document.getElementById("userInput").value;
+        if (!userInput.trim()) return;
+
+        appendMessage("user", userInput);
+        document.getElementById("userInput").value = ""; 
+
+        try {
+            let response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: userInput }] }] })
+            });
+
+            let data = await response.json();
+            let aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, saya tidak bisa menjawab saat ini.";
+            appendMessage("ai", aiReply);
+        } catch (error) {
+            appendMessage("ai", "Terjadi kesalahan, coba lagi nanti.");
+        }
+    }
+
+    function appendMessage(sender, text) {
+        let messagesDiv = document.getElementById("messages");
+        let messageElem = document.createElement("div");
+        let profileImg = document.createElement("img");
+        profileImg.className = "rounded-full w-8 h-8 mr-2";
+        profileImg.width = 32;
+        profileImg.height = 32;
+
+        if (sender === "user") {
+            messageElem.className = "flex items-end justify-end mb-2";
+            profileImg.src = "https://placehold.co/32x32";
+            profileImg.alt = "Profile picture of the user";
+            let messageContent = document.createElement("div");
+            messageContent.className = "p-2 rounded-lg max-w-[calc(100%-3rem)] bg-green-500 text-white self-end rounded-br-none";
+            messageContent.innerHTML = converter.makeHtml(text);
+            messageElem.appendChild(messageContent);
+            messageElem.appendChild(profileImg);
+        } else {
+            messageElem.className = "flex items-start mb-2";
+            profileImg.src = "https://placehold.co/32x32";
+            profileImg.alt = "Profile picture of AI responder";
+            let messageContent = document.createElement("div");
+            messageContent.className = "p-2 rounded-lg max-w-[calc(100%-3rem)] bg-gray-200 self-start rounded-bl-none";
+            messageContent.innerHTML = converter.makeHtml(text);
+            messageElem.appendChild(profileImg);
+            messageElem.appendChild(messageContent);
+        }
+
+        messagesDiv.appendChild(messageElem);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        saveMessage(sender, text);
+    }
+
+    function saveMessage(sender, text) {
+        let messages = JSON.parse(localStorage.getItem("messages")) || [];
+        messages.push({ sender, text });
+        localStorage.setItem("messages", JSON.stringify(messages));
+    }
+
+    function loadMessages() {
+        let messages = JSON.parse(localStorage.getItem("messages")) || [];
+        messages.forEach(message => {
+            appendMessage(message.sender, message.text);
+        });
+    }
+  </script>
+ </body>
+</html>
