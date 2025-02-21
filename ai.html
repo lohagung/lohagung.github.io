@@ -239,7 +239,7 @@
           <div class="bg-white p-4 rounded-lg shadow flex space-x-4">
             <img alt="Related article image ${i + 1}" class="w-24 h-24 rounded-lg" height="100" src="${getRandomImageUrl()}" width="100"/>
             <div>
-              <a href="?artikel=${encodeURIComponent(randomSentence)}" class="text-base md:text-lg font-semibold text-blue-600 hover:underline">${truncateText(randomSentence, 60)}</a>
+              <a href="?artikel=${sanitizeURLParam(decodeURIComponent(truncateText(randomSentence, 120)))}" class="text-base md:text-lg font-semibold text-blue-600 hover:underline">${truncateText(randomSentence, 60)}</a>
               <div class="text-xs text-gray-600 hidden md:block">${truncateText(randomSentence, 100)}</div>
               <div class="text-sm text-red-600">Generated <span class="text-gray-500">just now</span></div>
             </div>
