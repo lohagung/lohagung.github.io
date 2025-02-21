@@ -133,7 +133,7 @@ function toggleSearch() {
       const newItem = document.createElement('div');
       newItem.className = 'bg-white p-4 rounded-lg shadow w-full max-w-6xl mx-auto';
       newItem.innerHTML = `
-        <img alt="Cover image for the article" class="w-full h-64 object-cover rounded-lg mb-4" src="${imageUrl}"/>
+        <img alt="Cover image for the article" class="w-full h-94 object-cover rounded-lg mb-4" src="${imageUrl}"/>
         <h1 class="text-2xl font-bold mb-2 text-center uppercase">${title}</h1>
         <blockquote class="text-center italic text-gray-600 mb-4">"${snippet}"</blockquote>
         <div class="text-base mb-4">${formatContent(content)}</div>
@@ -148,7 +148,7 @@ function toggleSearch() {
     function generateRelatedArticles(content, query) {
       const sentences = content.split('. ');
       const relatedArticles = [];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 4; i++) {
         const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
         relatedArticles.push(`
           <div class="bg-white p-4 rounded-lg shadow flex space-x-4">
