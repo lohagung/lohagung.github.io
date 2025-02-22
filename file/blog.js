@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const GEMINI_API_KEY = 'AIzaSyAnPO90a0Q2nF4SrxGV07EnGfYh-PQwHyw';
 const BLOGGER_API_KEY = 'AIzaSyCVxytTOozO9H3Sv_pQReCYUZ6SWyI_wkQ';
-const BLOG_ID = 'n6550260102335539072';
+const BLOG_ID = '6550260102335539072';
 
 async function generateArticle(title) {
     const geminiResponse = await axios.post(
