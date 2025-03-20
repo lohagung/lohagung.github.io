@@ -14,11 +14,17 @@
         transform: scale(1.6);
         transform-origin: top left;
       }
+      .lg-space-x-12 > * + * {
+        margin-left: 3rem;
+      }
+      .lg-space-y-12 > * + * {
+        margin-top: 3rem;
+      }
     }
   </style>
  </head>
  <body class="bg-gray-200 flex items-center justify-center min-h-screen py-10 overflow-x-hidden">
-  <div class="flex flex-col items-center space-y-6 scale-1-6 lg:scale-1-6">
+  <div class="flex flex-col items-center space-y-6 scale-1-6 lg:scale-1-6 lg:space-y-12 lg-space-x-12 lg-space-y-12">
    <div class="text-center flex flex-col items-center space-y-3">
     <div class="flex items-center space-x-3">
      <img alt="Logo of organization 1" class="w-12 h-12" src="/file/logola6.png"/>
@@ -37,7 +43,7 @@
     <div class="mb-6">
     </div>
    </div>
-   <div class="flex space-x-3">
+   <div class="flex space-x-3 lg:space-x-12">
     <div class="bg-white rounded-lg shadow-lg p-3 relative min-w-[180px]">
      <div class="absolute top-0 left-0 w-8 h-8 bg-red-500 rounded-tr-lg rounded-bl-lg flex items-center justify-center text-white text-sm font-bold">
       1
@@ -75,7 +81,7 @@
      </div>
     </div>
    </div>
-   <div class="flex space-x-3">
+   <div class="flex space-x-3 lg:space-x-12">
     <div class="bg-white rounded-lg shadow-lg p-3 relative min-w-[180px]">
      <div class="absolute top-0 left-0 w-8 h-8 bg-green-500 rounded-tr-lg rounded-bl-lg flex items-center justify-center text-white text-sm font-bold">
       3
@@ -113,7 +119,7 @@
      </div>
     </div>
    </div>
-   <div class="flex space-x-3">
+   <div class="flex space-x-3 lg:space-x-12">
     <div class="bg-white rounded-lg shadow-lg p-3 relative min-w-[180px]">
      <div class="absolute top-0 left-0 w-8 h-8 bg-purple-500 rounded-tr-lg rounded-bl-lg flex items-center justify-center text-white text-sm font-bold">
       5
@@ -151,7 +157,7 @@
      </div>
     </div>
    </div>
-   <div class="flex space-x-3">
+   <div class="flex space-x-3 lg:space-x-12">
     <div class="bg-white rounded-lg shadow-lg p-3 relative min-w-[180px]">
      <div class="absolute top-0 left-0 w-8 h-8 bg-indigo-500 rounded-tr-lg rounded-bl-lg flex items-center justify-center text-white text-sm font-bold">
       7
@@ -195,7 +201,7 @@
      </div>
     </div>
    </div>
-   <div class="flex space-x-3">
+   <div class="flex space-x-3 lg:space-x-12">
     <div class="bg-white rounded-lg shadow-lg p-3 relative min-w-[180px]">
      <div class="absolute top-0 left-0 w-8 h-8 bg-teal-500 rounded-tr-lg rounded-bl-lg flex items-center justify-center text-white text-sm font-bold">
       9
