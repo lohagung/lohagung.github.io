@@ -12,10 +12,28 @@
    document.addEventListener('DOMContentLoaded', function() {
       const showMoreButton = document.getElementById('show-more-button');
       const hiddenProfiles = document.querySelectorAll('.hidden-profile');
+      const closeAnnouncementButton = document.getElementById('close-announcement');
 
       showMoreButton.addEventListener('click', function() {
         hiddenProfiles.forEach(profile => profile.classList.remove('hidden'));
         showMoreButton.classList.add('hidden');
+      });
+
+      closeAnnouncementButton.addEventListener('click', function() {
+        document.getElementById('announcement').classList.add('hidden');
+      });
+
+      const profileImages = document.querySelectorAll('.profile-img');
+      profileImages.forEach(img => {
+        img.addEventListener('error', function() {
+          this.dataset.originalSrc = this.src;
+          this.src = '/logo.png';
+        });
+        img.addEventListener('load', function() {
+          if (this.src === '/logo.png' && this.dataset.originalSrc) {
+            this.src = this.dataset.originalSrc;
+          }
+        });
       });
     });
   </script>
@@ -46,7 +64,10 @@
    <div class="pt-20 pb-16">
     <!-- Announcement Section -->
     <div class="p-4">
-     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg shadow-md">
+     <div id="announcement" class="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg shadow-md">
+      <button id="close-announcement" class="absolute top-0 right-0 mt-2 mr-2 text-red-500">
+       <i class="fas fa-times"></i>
+      </button>
       <h2 class="text-xl font-bold">
        Pengumuman
       </h2>
@@ -84,7 +105,7 @@
        Arisan
       </p>
      </div>
-     <div class="flex flex-col items-center">
+     <a class="flex flex-col items-center" href="/keamanan.html?jadwalronda">
       <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
        <i class="fas fa-shield-alt text-white">
        </i>
@@ -92,7 +113,7 @@
       <p class="text-sm mt-2">
        Ronda
       </p>
-     </div>
+     </a>
      <div class="flex flex-col items-center">
       <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
        <i class="fas fa-money-bill-wave text-white">
@@ -120,7 +141,7 @@
        Sosial
       </p>
      </div>
-     <div class="flex flex-col items-center">
+     <a class="flex flex-col items-center" href="/keamanan.html">
       <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
        <i class="fas fa-ad text-white">
        </i>
@@ -128,7 +149,7 @@
       <p class="text-sm mt-2">
        Keamanan
       </p>
-     </div>
+     </a>
     </div>
     <!-- PENGURUS RT Section -->
     <div class="p-4">
@@ -137,7 +158,7 @@
      </h2>
      <div class="grid grid-cols-2 gap-6 mt-4">
       <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-blue-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Ketua RT" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/a11.jpg"/>
+       <img alt="Profile picture of Ketua RT" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a11.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          BAYU ADI NUGROHO
@@ -148,10 +169,10 @@
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-purple-400 to-pink-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Penasehat RT" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/a9.jpg"/>
+       <img alt="Profile picture of Penasehat RT" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a9.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
-         ARIYANTO 
+         ARIYANTO
         </h3>
         <p class="text-sm text-gray-200 text-center">
          Penasehat RT
@@ -159,7 +180,7 @@
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-red-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Sekretaris" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/a7.jpg"/>
+       <img alt="Profile picture of Sekretaris" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a7.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          ARIF FAJAR SANTOSO
@@ -170,7 +191,7 @@
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-blue-400 to-indigo-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Bendahara" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/c7.jpg"/>
+       <img alt="Profile picture of Bendahara" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/c7.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          BUDI SETIAWAN
@@ -181,40 +202,40 @@
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-teal-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Jimpitan" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/b7.jpg"/>
+       <img alt="Profile picture of Jimpitan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/b7.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
-        M.DICKY
+         M.DICKY
         </h3>
         <p class="text-sm text-gray-200 text-center">
-        Seksi Jimpitan
+         Seksi Jimpitan
         </p>
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-pink-400 to-red-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Sosial" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/b9.jpg"/>
+       <img alt="Profile picture of Sosial" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/b9.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          THOMAS HENDRA
         </h3>
         <p class="text-sm text-gray-200 text-center">
-        Seksi Sosial
+         Seksi Sosial
         </p>
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-indigo-400 to-purple-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Keamanan" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/ra1.jpg"/>
+       <img alt="Profile picture of Keamanan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/ra1.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
-        WAHYUDI
+         WAHYUDI
         </h3>
         <p class="text-sm text-gray-200 text-center">
-        Seksi Keamanan
+         Seksi Keamanan
         </p>
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Keamanan 2" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/a12.jpg"/>
+       <img alt="Profile picture of Keamanan 2" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a12.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          HARI SUSANTO
@@ -225,18 +246,18 @@
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-teal-400 to-green-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Kebersihan" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/a4b.jpg"/>
+       <img alt="Profile picture of Kebersihan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a4b.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          EKO SANTOSO
         </h3>
         <p class="text-sm text-gray-200 text-center">
-        Seksi Kebersihan
+         Seksi Kebersihan
         </p>
        </div>
       </div>
       <div class="relative flex flex-col items-center bg-gradient-to-r from-red-400 to-pink-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Kebersihan 2" class="w-16 h-16 rounded-full object-cover absolute -top-8" src="/file/kavc9.jpg"/>
+       <img alt="Profile picture of Kebersihan 2" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/kavc9.jpg"/>
        <div class="mt-8">
         <h3 class="text-lg font-bold text-center text-white">
          HERU
