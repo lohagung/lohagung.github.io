@@ -1,1 +1,110 @@
-in
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>RT 09/RW 23</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      const menuButton = document.getElementById('menu-button');
+      const menuOverlay = document.getElementById('menu-overlay');
+      const menu = document.getElementById('menu');
+
+      menuButton.addEventListener('click', function() {
+        menuOverlay.classList.remove('hidden');
+        menu.classList.remove('-translate-x-full');
+      });
+
+      menuOverlay.addEventListener('click', function() {
+        menu.classList.add('-translate-x-full');
+        setTimeout(() => {
+          menuOverlay.classList.add('hidden');
+        }, 300);
+      });
+
+      menu.addEventListener('click', function(event) {
+        event.stopPropagation();
+      });
+    });
+  </script>
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
+      <div class="flex items-center">
+        <i id="menu-button" class="fas fa-bars text-xl text-white cursor-pointer"></i>
+        <div class="ml-4">
+          <h1 class="text-lg font-bold text-white">RT 09/RW 23</h1>
+          <p class="text-sm text-gray-200">Perum Loh Agung 6 &amp; Kavling</p>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <i class="fas fa-bell text-xl text-white mr-4"></i>
+        <img alt="Profile picture" class="w-8 h-8 rounded-full object-cover" src="/logo.png"/>
+      </div>
+    </div>
+    <div class="pt-20 pb-16">
+      <!-- Content Section -->
+      <div class="p-4">
+        <h2 class="text-xl font-bold text-center mb-12">Selamat Datang di RT 09/RW 23</h2>
+        <p class="text-center">Perum Loh Agung 6 & Kavling</p>
+      </div>
+    </div>
+    <!-- Footer Navigation -->
+    <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
+      <i class="fas fa-home text-xl text-gray-500"></i>
+      <i class="fas fa-calendar-alt text-xl text-gray-500"></i>
+      <i class="fas fa-bullhorn text-xl text-blue-500"></i>
+      <i class="fas fa-user text-xl text-gray-500"></i>
+    </div>
+  </div>
+
+  <!-- Menu Overlay -->
+  <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-20"></div>
+
+  <!-- Side Menu -->
+  <div id="menu" class="fixed inset-y-0 left-0 w-64 bg-white shadow-md transform -translate-x-full transition-transform duration-300 z-30">
+    <div class="p-4 text-center">
+      <img src="/logo.png" alt="Logo of RT 09/RW 23" class="w-16 h-16 mx-auto mb-2"/>
+      <h2 class="text-lg font-bold uppercase">RT 09/RW 23</h2>
+      <hr class="my-4"/>
+    </div>
+    <ul class="p-4">
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-bullhorn text-gray-700 mr-2"></i>
+        <a href="/info" class="text-gray-700 hover:text-gray-900">Informasi</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-user-tie text-gray-700 mr-2"></i>
+        <a href="/pengurus.html" class="text-gray-700 hover:text-gray-900">Profil RT</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-calendar-alt text-gray-700 mr-2"></i>
+        <a href="/arisan.html" class="text-gray-700 hover:text-gray-900">Arisan</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-shield-alt text-gray-700 mr-2"></i>
+        <a href="/keamanan.html?jadwalronda" class="text-gray-700 hover:text-gray-900">Ronda</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-money-bill-wave text-gray-700 mr-2"></i>
+        <a href="/bendahara.html" class="text-gray-700 hover:text-gray-900">Bendahara</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-hand-holding-heart text-gray-700 mr-2"></i>
+        <a href="/jimpitan.html" class="text-gray-700 hover:text-gray-900">Jimpitan</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-praying-hands text-gray-700 mr-2"></i>
+        <a href="/sosial.html" class="text-gray-700 hover:text-gray-900">Sosial</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-ad text-gray-700 mr-2"></i>
+        <a href="/keamanan.html" class="text-gray-700 hover:text-gray-900">Keamanan</a>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
