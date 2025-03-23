@@ -3,298 +3,333 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>
-   LOH AGUNG
+   RT 09/RW 23
   </title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <meta http-equiv="refresh" content="0;url=https://la6.my.id/keamanan.html">
-  <link rel="icon" href="/logo.png" type="image/jpeg"/>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"/>
-  <style>
-   body {
-            font-family: 'Roboto', sans-serif;
-            transition: background 3s ease;
-        }
-
-        @keyframes gradient {
-            0% {
-                background: linear-gradient(to right, #ff7e5f, #feb47b);
-            }
-            33% {
-                background: linear-gradient(to right, #6a11cb, #2575fc);
-            }
-            66% {
-                background: linear-gradient(to right, #ff4b1f, #1fddff);
-            }
-            100% {
-                background: linear-gradient(to right, #ff7e5f, #feb47b);
-            }
-        }
-
-        body {
-            animation: gradient 9s infinite;
-        }
-
-        .zoom-on-click img {
-            transition: transform 0.3s ease;
-        }
-
-        .zoom-on-click:active img {
-            transform: scale(1.1);
-        }
-
-        .hover-bendahara:hover {
-            background-color: #ffeb3b;
-        }
-
-        .hover-jimpitan:hover {
-            background-color: #4caf50;
-        }
-
-        .hover-keamanan:hover {
-            background-color: #f44336;
-        }
-
-        .hover-selokan:hover {
-            background-color: #2196f3;
-        }
-
-        .hover-suratundangan:hover {
-            background-color: #9c27b0;
-        }
-
-        .hover-lainnya:hover {
-            background-color: #e91e63;
-        }
-
-        .hover-arisan:hover {
-            background-color: #ff9800;
-        }
-
-        .title-bendahara {
-            background-color: #ffeb3b;
-            border-radius: 5px;
-            color: #000;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-jimpitan {
-            background-color: #4caf50;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-keamanan {
-            background-color: #f44336;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-selokan {
-            background-color: #2196f3;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-suratundangan {
-            background-color: #9c27b0;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-lainnya {
-            background-color: #e91e63;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .title-arisan {
-            background-color: #ff9800;
-            border-radius: 5px;
-            color: #fff;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .tutorial-popup {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 300px;
-            z-index: 1000;
-        }
-
-        .tutorial-popup h3 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .tutorial-popup p {
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        .tutorial-popup button {
-            background: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .tutorial-popup button:hover {
-            background: #45a049;
-        }
-  </style>
- </head>
- <!-- body class="flex flex-col items-center justify-center min-h-screen" onclick="handleClick()">
-  <div class="container mx-auto p-4">
-   <div class="flex flex-col items-center mb-8 text-center">
-    <img alt="Logo of the application" class="w-24 h-24 rounded-full" height="96" src="/logo.png" width="96"/>
-    <h1 class="text-3xl font-bold text-white mt-4">
-     Manajemen Data RT
-    </h1>
-    <h2 class="text-lg text-white mt-2">
-     Tools untuk mempermudah mengelola Data RT
-    </h2>
-   </div>
-   <div class="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-8">
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-bendahara" href="/bendahara.html">
-     <img alt="Icon representing Bendahara with a financial theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/7SeuAoMvr6QtK6tMblg3CaFCNpemjPM0Th1kAfayID66fIvPB.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-bendahara">
-      Bendahara
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-jimpitan" href="/jimpitan.html">
-     <img alt="Icon representing Jimpitan with a community collection theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/k1gi7F7zFGalDpz9ELqfd4OVcyxy3o9AcNCyeEFS4GY6Py7TA.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-jimpitan">
-      Jimpitan
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-keamanan" href="/dendaronda.html">
-     <img alt="Icon representing Keamanan with a security theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/exTKq6Na3egQjURghp6MOmETFfDtfbAnBMeujifxaaf27H59JA.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-keamanan">
-      Keamanan
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-selokan" href="/selokan.html">
-     <img alt="Icon representing Selokan with a drainage system theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/XVDeTSPkvp2KRSep5LKnnEVNxtXqjfffsdVoovirLJXyfj8eJA.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-selokan">
-      Selokan
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-suratundangan" href="/suratundanganrapat.html">
-     <img alt="Icon representing Surat Undangan with a meeting invitation theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/69kKfbFJequ9Q0RglYPuiSeBZG2JTGqpSKKbCKC1ecDlfReeJA.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-suratundangan">
-      Surat
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-arisan" href="/arisan.html">
-     <img alt="Icon representing Arisan with a social gathering theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="https://storage.googleapis.com/a1aa/image/IlFQuLsfz4VMO6VCFS9HUcQ2HCLwPvjUT7y3MJHJlXWePy7TA.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-arisan">
-      Arisan
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-absenronda" href="/absenronda.html">
-     <img alt="Icon representing Absen Ronda with a night watch attendance theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="/file/absenronda.JPG" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-absenronda">
-      AbsenV1
-     </h2>
-    </a>
-    <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-absenronda" href="/absenkelompok.html">
-     <img alt="Icon representing Absen Ronda with a night watch attendance theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="/file/absenkelompok.JPG" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-absenronda">
-      AbsenV2
-     </h2>
-    </a>
-        <a class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transform hover:scale-105 transition-transform duration-300 zoom-on-click hover-absenronda" href="/tabeljimpitan.html">
-     <img alt="Icon representing Absen Ronda with a night watch attendance theme" class="w-16 h-16 mb-4 rounded-full" height="64" src="/file/tabeljim.jpg" width="64"/>
-     <h2 class="text-xl font-bold mb-2 title-absenronda">
-      TabJimp
-     </h2>
-    </a>
-   </div>
-  </div>
-  <footer class="mt-8 text-white">
-   @2024 Oleh YOUSHE
-  </footer>
-  <div class="tutorial-popup hidden" id="tutorial-popup">
-   <h3>
-    Tutorial Penggunaan
-   </h3>
-   <p>
-    Selamat datang di aplikasi Manajemen Data RT. Berikut adalah beberapa langkah untuk memulai:
-   </p>
-   <ul class="list-disc list-inside">
-    <li>
-     Klik pada menu Bendahara untuk mengelola keuangan RT.
-    </li>
-    <li>
-     Klik pada menu Jimpitan untuk mengelola jimpitan warga.
-    </li>
-    <li>
-     Klik pada menu Keamanan untuk mengelola denda ronda.
-    </li>
-    <li>
-     Klik pada menu Selokan untuk mengelola iuran dan pengeluaran selokan.
-    </li>
-    <li>
-     Klik pada menu Surat untuk mengelola surat undangan rapat.
-    </li>
-    <li>
-     Klik pada menu Arisan untuk mengelola kegiatan arisan.
-    </li>
-    <li>
-     Klik pada menu Lainnya untuk fitur lainnya akan ditambahkan menyusul..
-    </li>
-   </ul>
-   <button onclick="closeTutorial()">
-    Tutup
-   </button>
-  </div>
-  <script>
-   document.addEventListener('DOMContentLoaded', function() {
-            if (!localStorage.getItem('tutorialShown')) {
-                document.getElementById('tutorial-popup').classList.remove('hidden');
-                localStorage.setItem('tutorialShown', 'true');
-            }
-        });
-
-        function closeTutorial() {
-            document.getElementById('tutorial-popup').classList.add('hidden');
-        }
-
-let clickCount = 0;
-        function handleClick() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                clickCount++;
-                if (clickCount >= 10) {
-                    document.exitFullscreen();
-                    clickCount = 0;
-                }
-            }
-        }
+  <script src="https://cdn.tailwindcss.com">
   </script>
- </body -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <script>
+   document.addEventListener('DOMContentLoaded', async function() {
+      const showMoreButton = document.getElementById('show-more-button');
+      const hiddenProfiles = document.querySelectorAll('.hidden-profile');
+      const closeAnnouncementButton = document.getElementById('close-announcement');
+      const nextAnnouncementButton = document.getElementById('next-announcement');
+      const prevAnnouncementButton = document.getElementById('prev-announcement');
+
+      let currentAnnouncementIndex = 0;
+      let announcements = [];
+
+      showMoreButton.addEventListener('click', function() {
+        hiddenProfiles.forEach(profile => profile.classList.remove('hidden'));
+        showMoreButton.classList.add('hidden');
+      });
+
+      closeAnnouncementButton.addEventListener('click', function() {
+        document.getElementById('announcement').classList.add('hidden');
+      });
+
+      nextAnnouncementButton.addEventListener('click', function() {
+        if (announcements.length > 0) {
+          currentAnnouncementIndex = (currentAnnouncementIndex + 1) % Math.min(announcements.length, 3);
+          updateAnnouncement();
+        }
+      });
+
+      prevAnnouncementButton.addEventListener('click', function() {
+        if (announcements.length > 0) {
+          currentAnnouncementIndex = (currentAnnouncementIndex - 1 + Math.min(announcements.length, 3)) % Math.min(announcements.length, 3);
+          updateAnnouncement();
+        }
+      });
+
+      const profileImages = document.querySelectorAll('.profile-img');
+      profileImages.forEach(img => {
+        img.addEventListener('error', function() {
+          this.dataset.originalSrc = this.src;
+          this.src = '/logo.png';
+        });
+        img.addEventListener('load', function() {
+          if (this.src === '/logo.png' && this.dataset.originalSrc) {
+            this.src = this.dataset.originalSrc;
+          }
+        });
+      });
+
+      // Fetch data from Google Sheets
+      const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/1Qw0SRi6bR58vmz6fTdv9Wm2YQ4PlMZOfsZBxmHyi5HY/values/pengumuman?key=AIzaSyAjDxHHEvzLicx3-7HHGsFCmXFdhKtypN4`);
+      const data = await response.json();
+      const rows = data.values;
+      if (rows.length > 0) {
+        announcements = rows.reverse().map(row => ({ title: row[0], content: row[1] }));
+        updateAnnouncement();
+      }
+
+      function updateAnnouncement() {
+        const announcement = announcements[currentAnnouncementIndex];
+        document.getElementById('announcement-title').innerText = announcement.title;
+        document.getElementById('announcement-content').innerText = announcement.content;
+      }
+    });
+  </script>
+ </head>
+ <body class="bg-gray-100">
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+   <!-- Header -->
+   <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
+    <div class="flex items-center">
+     <i class="fas fa-bars text-xl text-white">
+     </i>
+     <div class="ml-4">
+      <h1 class="text-lg font-bold text-white">
+       RT 09/RW 23
+      </h1>
+      <p class="text-sm text-gray-200">
+       Perum Loh Agung 6 &amp; Kavling
+      </p>
+     </div>
+    </div>
+    <div class="flex items-center">
+     <i class="fas fa-bell text-xl text-white mr-4">
+     </i>
+     <img src="/logo.png" alt="Profile picture" class="w-8 h-8 rounded-full object-cover"/>
+    </div>
+   </div>
+   <div class="pt-20 pb-16">
+    <!-- Announcement Section -->
+    <div class="p-4">
+     <div class="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg shadow-md" id="announcement">
+      <button class="absolute top-0 right-0 mt-2 mr-2 text-red-500" id="close-announcement">
+       <i class="fas fa-times">
+       </i>
+      </button>
+      <h2 class="text-xl font-bold" id="announcement-title">
+       Pengumuman
+      </h2>
+      <p class="text-sm mt-2" id="announcement-content">
+       Loading...
+      </p>
+      <div class="absolute bottom-2 right-2 flex space-x-2">
+       <button class="text-gray-500" id="prev-announcement">
+        <i class="fas fa-chevron-left">
+        </i>
+       </button>
+       <button class="text-gray-500" id="next-announcement">
+        <i class="fas fa-chevron-right">
+        </i>
+       </button>
+      </div>
+     </div>
+    </div>
+    <!-- Icons Section -->
+    <div class="grid grid-cols-4 gap-4 p-4">
+     <div class="flex flex-col items-center">
+      <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-bullhorn text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Informasi
+      </p>
+     </div>
+     <a class="flex flex-col items-center" href="/pengurus.html">
+      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-user-tie text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Profil RT
+      </p>
+     </a>
+     <div class="flex flex-col items-center">
+      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-calendar-alt text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Arisan
+      </p>
+     </div>
+     <a class="flex flex-col items-center" href="/keamanan.html?jadwalronda">
+      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-shield-alt text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Ronda
+      </p>
+     </a>
+     <div class="flex flex-col items-center">
+      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-money-bill-wave text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Bendahara
+      </p>
+     </div>
+     <div class="flex flex-col items-center">
+      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-hand-holding-heart text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Jimpitan
+      </p>
+     </div>
+     <div class="flex flex-col items-center">
+      <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-praying-hands text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Sosial
+      </p>
+     </div>
+     <a class="flex flex-col items-center" href="/keamanan.html">
+      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+       <i class="fas fa-ad text-white">
+       </i>
+      </div>
+      <p class="text-sm mt-2">
+       Keamanan
+      </p>
+     </a>
+    </div>
+    <!-- PENGURUS RT Section -->
+    <div class="p-4">
+     <h2 class="text-xl font-bold text-center mb-12">
+      PENGURUS RT
+     </h2>
+     <div class="grid grid-cols-2 gap-6 mt-4">
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-blue-500 p-4 rounded-lg shadow-md mb-6">
+       <img alt="Profile picture of Ketua RT" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a11.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Bayu Adi Nugroho
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Ketua RT
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-purple-400 to-pink-500 p-4 rounded-lg shadow-md mb-6">
+       <img alt="Profile picture of Penasehat RT" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a9.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Ariyanto
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Penasehat RT
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-red-500 p-4 rounded-lg shadow-md mb-6">
+       <img alt="Profile picture of Sekretaris" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a7.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Arif Fajar Santoso
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Sekretaris
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-blue-400 to-indigo-500 p-4 rounded-lg shadow-md mb-6">
+       <img alt="Profile picture of Bendahara" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/c7.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Budi Setiawan
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Bendahara
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-teal-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Jimpitan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/b7.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         M. Dicky
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Jimpitan
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-pink-400 to-red-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Sosial" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/b9.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Thomas Hendra
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Sosial
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-indigo-400 to-purple-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Keamanan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/ra1.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Wahyudi
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Keamanan
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Keamanan 2" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a12.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Hari Susanto
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Keamanan 2
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-teal-400 to-green-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Kebersihan" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/a4b.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Eko Santoso
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Kebersihan
+        </p>
+       </div>
+      </div>
+      <div class="relative flex flex-col items-center bg-gradient-to-r from-red-400 to-pink-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
+       <img alt="Profile picture of Kebersihan 2" class="profile-img w-16 h-16 rounded-full object-cover absolute -top-8 p-1 bg-white border border-gray-300" src="/file/kavc9.jpg"/>
+       <div class="mt-8">
+        <h3 class="text-base font-semibold text-center text-white capitalize">
+         Heru
+        </h3>
+        <p class="text-sm text-gray-200 text-center">
+         Seksi Kebersihan 2
+        </p>
+       </div>
+      </div>
+     </div>
+     <div class="text-center mt-4">
+      <button class="text-blue-500" id="show-more-button">
+       Tampilkan Semua
+      </button>
+     </div>
+    </div>
+   </div>
+   <!-- Footer Navigation -->
+   <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
+    <i class="fas fa-home text-xl text-gray-500">
+    </i>
+    <i class="fas fa-calendar-alt text-xl text-gray-500">
+    </i>
+    <i class="fas fa-bullhorn text-xl text-blue-500">
+    </i>
+    <i class="fas fa-user text-xl text-gray-500">
+    </i>
+   </div>
+  </div>
+ </body>
 </html>
