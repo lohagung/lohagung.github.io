@@ -1,15 +1,13 @@
 <html lang="en">
- <head>
+<head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-   RT 09/RW 23
-  </title>
-  <script src="https://cdn.tailwindcss.com">
-  </script>
+  <title>RT 09/RW 23</title>
+  <link href="/logo.png" rel="icon" type="image/jpeg"/>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <script>
-   document.addEventListener('DOMContentLoaded', async function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       const showMoreButton = document.getElementById('show-more-button');
       const hiddenProfiles = document.querySelectorAll('.hidden-profile');
       const closeAnnouncementButton = document.getElementById('close-announcement');
@@ -71,265 +69,188 @@
       }
     });
   </script>
- </head>
- <body class="bg-gray-100">
+  <style>
+    .profile-card:hover {
+      background-color: orange;
+    }
+    .icon-card:hover .icon-bg {
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
   <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-   <!-- Header -->
-   <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
-    <div class="flex items-center">
-     <i class="fas fa-bars text-xl text-white">
-     </i>
-     <div class="ml-4">
-      <h1 class="text-lg font-bold text-white">
-       RT 09/RW 23
-      </h1>
-      <p class="text-sm text-gray-200">
-       Perum Loh Agung 6 &amp; Kavling
-      </p>
-     </div>
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
+      <div class="flex items-center">
+        <i class="fas fa-bars text-xl text-white"></i>
+        <div class="ml-4">
+          <h1 class="text-lg font-bold text-white">RT 09/RW 23</h1>
+          <p class="text-sm text-gray-200">Perum Loh Agung 6 &amp; Kavling</p>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <i class="fas fa-bell text-xl text-white mr-4"></i>
+        <img alt="Profile picture" class="w-8 h-8 rounded-full object-cover" src="/logo.png"/>
+      </div>
     </div>
-    <div class="flex items-center">
-     <i class="fas fa-bell text-xl text-white mr-4">
-     </i>
-     <img alt="Profile picture" class="w-8 h-8 rounded-full object-cover" src="/logo.png"/>
+    <div class="pt-20 pb-16">
+      <!-- Announcement Section -->
+      <div class="p-4">
+        <div class="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg shadow-md" id="announcement">
+          <button class="absolute top-0 right-0 mt-2 mr-2 text-red-500" id="close-announcement">
+            <i class="fas fa-times"></i>
+          </button>
+          <h2 class="text-xl font-bold" id="announcement-title">Pengumuman</h2>
+          <p class="text-sm mt-2" id="announcement-content">Loading...</p>
+          <div class="absolute bottom-2 right-2 flex space-x-2">
+            <button class="text-gray-500" id="prev-announcement">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="text-gray-500" id="next-announcement">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Icons Section -->
+      <div class="grid grid-cols-4 gap-4 p-4">
+        <a class="flex flex-col items-center icon-card" href="/pengumuman.html">
+          <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-bullhorn text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Informasi</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/pengurus.html">
+          <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-user-tie text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Profil RT</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/arisan.html">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-calendar-alt text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Arisan</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/keamanan.html?jadwalronda">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-shield-alt text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Ronda</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/bendahara.html">
+          <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-money-bill-wave text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Bendahara</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/jimpitan.html">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-hand-holding-heart text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Jimpitan</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/sosial.html">
+          <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-praying-hands text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Sosial</p>
+        </a>
+        <a class="flex flex-col items-center icon-card" href="/keamanan.html">
+          <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center icon-bg">
+            <i class="fas fa-ad text-white"></i>
+          </div>
+          <p class="text-sm mt-2">Keamanan</p>
+        </a>
+      </div>
+      <!-- PENGURUS RT Section -->
+      <div class="p-4">
+        <h2 class="text-xl font-bold text-center mb-12">PENGURUS RT</h2>
+        <div class="grid grid-cols-2 gap-6 mt-4">
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-blue-500 p-4 rounded-lg shadow-md mb-6 profile-card">
+            <img alt="Profile picture of Ketua RT" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a11.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Bayu Adi Nugroho</h3>
+              <p class="text-sm text-gray-200 text-center">Ketua RT</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-purple-400 to-pink-500 p-4 rounded-lg shadow-md mb-6 profile-card">
+            <img alt="Profile picture of Penasehat RT" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a9.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Ariyanto</h3>
+              <p class="text-sm text-gray-200 text-center">Penasehat RT</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-red-500 p-4 rounded-lg shadow-md mb-6 profile-card">
+            <img alt="Profile picture of Sekretaris" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a7.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Arif Fajar Santoso</h3>
+              <p class="text-sm text-gray-200 text-center">Sekretaris</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-blue-400 to-indigo-500 p-4 rounded-lg shadow-md mb-6 profile-card">
+            <img alt="Profile picture of Bendahara" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/c7.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Budi Setiawan</h3>
+              <p class="text-sm text-gray-200 text-center">Bendahara</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-teal-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Jimpitan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/b7.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">M. Dicky</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Jimpitan</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-pink-400 to-red-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Sosial" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/b9.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Thomas Hendra</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Sosial</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-indigo-400 to-purple-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Keamanan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/ra1.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Wahyudi</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Keamanan</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Keamanan 2" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a12.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Hari Susanto</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Keamanan 2</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-teal-400 to-green-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Kebersihan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a4b.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Eko Santoso</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Kebersihan</p>
+            </div>
+          </div>
+          <div class="relative flex flex-col items-center bg-gradient-to-r from-red-400 to-pink-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden profile-card">
+            <img alt="Profile picture of Kebersihan 2" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/kavc9.jpg"/>
+            <div class="mt-10">
+              <h3 class="text-base font-semibold text-center text-white capitalize">Heru</h3>
+              <p class="text-sm text-gray-200 text-center">Seksi Kebersihan 2</p>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <button class="text-blue-500" id="show-more-button">Tampilkan Semua</button>
+        </div>
+      </div>
     </div>
-   </div>
-   <div class="pt-20 pb-16">
-    <!-- Announcement Section -->
-    <div class="p-4">
-     <div class="relative bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded-lg shadow-md" id="announcement">
-      <button class="absolute top-0 right-0 mt-2 mr-2 text-red-500" id="close-announcement">
-       <i class="fas fa-times">
-       </i>
-      </button>
-      <h2 class="text-xl font-bold" id="announcement-title">
-       Pengumuman
-      </h2>
-      <p class="text-sm mt-2" id="announcement-content">
-       Loading...
-      </p>
-      <div class="absolute bottom-2 right-2 flex space-x-2">
-       <button class="text-gray-500" id="prev-announcement">
-        <i class="fas fa-chevron-left">
-        </i>
-       </button>
-       <button class="text-gray-500" id="next-announcement">
-        <i class="fas fa-chevron-right">
-        </i>
-       </button>
-      </div>
-     </div>
+    <!-- Footer Navigation -->
+    <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
+      <i class="fas fa-home text-xl text-gray-500"></i>
+      <i class="fas fa-calendar-alt text-xl text-gray-500"></i>
+      <i class="fas fa-bullhorn text-xl text-blue-500"></i>
+      <i class="fas fa-user text-xl text-gray-500"></i>
     </div>
-    <!-- Icons Section -->
-    <div class="grid grid-cols-4 gap-4 p-4">
-     <div class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-bullhorn text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Informasi
-      </p>
-     </div>
-     <a class="flex flex-col items-center" href="/pengurus.html">
-      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-user-tie text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Profil RT
-      </p>
-     </a>
-     <div class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-calendar-alt text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Arisan
-      </p>
-     </div>
-     <a class="flex flex-col items-center" href="/keamanan.html?jadwalronda">
-      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-shield-alt text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Ronda
-      </p>
-     </a>
-     <div class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-money-bill-wave text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Bendahara
-      </p>
-     </div>
-     <div class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-hand-holding-heart text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Jimpitan
-      </p>
-     </div>
-     <div class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-praying-hands text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Sosial
-      </p>
-     </div>
-     <a class="flex flex-col items-center" href="/keamanan.html">
-      <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-       <i class="fas fa-ad text-white">
-       </i>
-      </div>
-      <p class="text-sm mt-2">
-       Keamanan
-      </p>
-     </a>
-    </div>
-    <!-- PENGURUS RT Section -->
-    <div class="p-4">
-     <h2 class="text-xl font-bold text-center mb-12">
-      PENGURUS RT
-     </h2>
-     <div class="grid grid-cols-2 gap-6 mt-4">
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-blue-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Ketua RT" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a11.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Bayu Adi Nugroho
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Ketua RT
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-purple-400 to-pink-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Penasehat RT" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a9.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Ariyanto
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Penasehat RT
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-red-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Sekretaris" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a7.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Arif Fajar Santoso
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Sekretaris
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-blue-400 to-indigo-500 p-4 rounded-lg shadow-md mb-6">
-       <img alt="Profile picture of Bendahara" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/c7.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Budi Setiawan
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Bendahara
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-green-400 to-teal-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Jimpitan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/b7.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         M. Dicky
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Jimpitan
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-pink-400 to-red-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Sosial" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/b9.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Thomas Hendra
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Sosial
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-indigo-400 to-purple-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Keamanan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/ra1.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Wahyudi
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Keamanan
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Keamanan 2" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a12.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Hari Susanto
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Keamanan 2
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-teal-400 to-green-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Kebersihan" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/a4b.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Eko Santoso
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Kebersihan
-        </p>
-       </div>
-      </div>
-      <div class="relative flex flex-col items-center bg-gradient-to-r from-red-400 to-pink-500 p-4 rounded-lg shadow-md mb-6 hidden-profile hidden">
-       <img alt="Profile picture of Kebersihan 2" class="profile-img w-20 h-20 rounded-full object-cover absolute -top-10 p-1 bg-white border border-gray-300" src="/file/kavc9.jpg"/>
-       <div class="mt-10">
-        <h3 class="text-base font-semibold text-center text-white capitalize">
-         Heru
-        </h3>
-        <p class="text-sm text-gray-200 text-center">
-         Seksi Kebersihan 2
-        </p>
-       </div>
-      </div>
-     </div>
-     <div class="text-center mt-4">
-      <button class="text-blue-500" id="show-more-button">
-       Tampilkan Semua
-      </button>
-     </div>
-    </div>
-   </div>
-   <!-- Footer Navigation -->
-   <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
-    <i class="fas fa-home text-xl text-gray-500">
-    </i>
-    <i class="fas fa-calendar-alt text-xl text-gray-500">
-    </i>
-    <i class="fas fa-bullhorn text-xl text-blue-500">
-    </i>
-    <i class="fas fa-user text-xl text-gray-500">
-    </i>
-   </div>
   </div>
- </body>
+</body>
 </html>
