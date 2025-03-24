@@ -1,15 +1,12 @@
 <html lang="en">
- <head>
+<head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-  JADWAL ARISAN DAN RAPAT RT 09/RW 23
-  </title>
-  <script src="https://cdn.tailwindcss.com">
-  </script>
+  <title>RT 09/RW 23</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <script>
-   document.addEventListener('DOMContentLoaded', async function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       const menuButton = document.getElementById('menu-button');
       const menuOverlay = document.getElementById('menu-overlay');
       const menu = document.getElementById('menu');
@@ -37,161 +34,129 @@
 
       const listContainer = document.getElementById('list-container');
       const specialContainer = document.getElementById('special-container');
+      const uniqueNames = new Set();
+
       values.forEach((row, index) => {
         if (index === 0) return; // Skip header row
         const [name, block, month, jatah] = row;
-        const listItem = document.createElement('div');
-        listItem.className = 'flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow mb-0';
-        listItem.innerHTML = `
-          <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 bg-teal-500 text-white flex items-center justify-center rounded-full">
-              <i class="fas fa-user"></i>
-            </div>
-            <div>
-              <p class="font-bold">${name}</p>
-              <p class="text-gray-600">${block}</p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-4">
-            <p class="font-bold">${month}</p>
-          </div>
-        `;
-        listContainer.appendChild(listItem);
 
-        if (jatah && jatah.toLowerCase().includes('tempat')) {
-          specialContainer.innerHTML = `
-            <p class="font-bold">${name}</p>
-            <p class="text-gray-600">${block}</p>
+        if (!uniqueNames.has(name)) {
+          uniqueNames.add(name);
+          const listItem = document.createElement('div');
+          listItem.className = 'flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow mb-0';
+          listItem.innerHTML = `
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-teal-500 text-white flex items-center justify-center rounded-full">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <p class="font-bold">${name}</p>
+                <p class="text-gray-600">${block}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <p class="font-bold">${month}</p>
+            </div>
           `;
+          listContainer.appendChild(listItem);
+
+          if (jatah && jatah.toLowerCase().includes('tempat')) {
+            specialContainer.innerHTML = `
+              <div class="relative">
+                <span class="absolute -top-4 -right-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-bl">Tuan Rumah</span>
+                <p class="text-2xl font-bold">${name}</p>
+                <p class="text-xl text-gray-600">${block}</p>
+              </div>
+            `;
+          }
         }
       });
     });
   </script>
- </head>
- <body class="bg-gray-100">
+</head>
+<body class="bg-gray-100">
   <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-   <!-- Header -->
-   <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
-    <div class="flex items-center">
-     <i class="fas fa-bars text-xl text-white cursor-pointer" id="menu-button">
-     </i>
-     <div class="ml-4">
-      <h1 class="text-lg font-bold text-white">
-       RT 09/RW 23
-      </h1>
-      <p class="text-sm text-gray-200">
-       Perum Loh Agung 6 &amp; Kavling
-      </p>
-     </div>
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 fixed top-0 left-0 right-0 z-10 shadow-md">
+      <div class="flex items-center">
+        <i class="fas fa-bars text-xl text-white cursor-pointer" id="menu-button"></i>
+        <div class="ml-4">
+          <h1 class="text-lg font-bold text-white">RT 09/RW 23</h1>
+          <p class="text-sm text-gray-200">Perum Loh Agung 6 &amp; Kavling</p>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <i class="fas fa-bell text-xl text-white mr-4"></i>
+        <img alt="Profile picture" class="w-8 h-8 rounded-full object-cover" height="32" src="https://storage.googleapis.com/a1aa/image/9tbUI5UVHYPXn1LT8iNbiC0cj3QzJ_UW0EKUNBsPiyQ.jpg" width="32"/>
+      </div>
     </div>
-    <div class="flex items-center">
-     <i class="fas fa-bell text-xl text-white mr-4">
-     </i>
-     <img alt="Profile picture" class="w-8 h-8 rounded-full object-cover" height="32" src="https://storage.googleapis.com/a1aa/image/9tbUI5UVHYPXn1LT8iNbiC0cj3QzJ_UW0EKUNBsPiyQ.jpg" width="32"/>
+    <div class="pt-20 pb-16">
+      <!-- Content Section -->
+      <div class="p-4">
+        <h2 class="text-xl font-bold text-center mb-2">JADWAL ARISAN &amp; RAPAT RT</h2>
+        <p class="text-center">Perum Loh Agung 6 &amp; Kavling</p>
+        <div class="text-center text-xl p-4 bg-gradient-to-r from-teal-100 via-teal-200 to-teal-300 rounded-lg mt-4" id="special-container">
+          <!-- Special item will be appended here by JavaScript -->
+        </div>
+      </div>
+      <!-- New Section with List -->
+      <div class="p-4">
+        <div id="list-container" class="grid grid-cols-1 gap-4">
+          <!-- List items will be appended here by JavaScript -->
+        </div>
+      </div>
     </div>
-   </div>
-   <div class="pt-20 pb-16">
-    <!-- Content Section -->
-    <div class="p-4">
-     <h2 class="text-xl font-bold text-center mb-2">
-      JADWAL ARISAN &amp; RAPAT RT
-     </h2>
-     <p class="text-center">
-      Perum Loh Agung 6 &amp; Kavling
-     </p>
-     <div class="text-center text-xl" id="special-container">
-      <!-- Special item will be appended here by JavaScript -->
-     </div>
+    <!-- Footer Navigation -->
+    <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
+      <i class="fas fa-home text-xl text-gray-500"></i>
+      <i class="fas fa-calendar-alt text-xl text-gray-500"></i>
+      <i class="fas fa-bullhorn text-xl text-blue-500"></i>
+      <i class="fas fa-user text-xl text-gray-500"></i>
     </div>
-    <!-- New Section with List -->
-    <div class="p-4">
-     <div id="list-container" class="grid grid-cols-1 gap-4">
-      <!-- List items will be appended here by JavaScript -->
-     </div>
-    </div>
-   </div>
-   <!-- Footer Navigation -->
-   <div class="flex justify-around items-center p-4 bg-white border-t fixed bottom-0 left-0 right-0 z-10 shadow-md">
-    <i class="fas fa-home text-xl text-gray-500">
-    </i>
-    <i class="fas fa-calendar-alt text-xl text-gray-500">
-    </i>
-    <i class="fas fa-bullhorn text-xl text-blue-500">
-    </i>
-    <i class="fas fa-user text-xl text-gray-500">
-    </i>
-   </div>
   </div>
   <!-- Menu Overlay -->
-  <div class="fixed inset-0 bg-black bg-opacity-50 hidden z-20" id="menu-overlay">
-  </div>
+  <div class="fixed inset-0 bg-black bg-opacity-50 hidden z-20" id="menu-overlay"></div>
   <!-- Side Menu -->
   <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-md transform -translate-x-full transition-transform duration-300 z-30" id="menu">
-   <div class="p-4 text-center">
-    <img alt="Logo of RT 09/RW 23" class="w-16 h-16 mx-auto mb-2" height="64" src="https://storage.googleapis.com/a1aa/image/ZFWh_W-3e41-hC7M3jVpT78QDTXTBjFRnhxdKjkKgM4.jpg" width="64"/>
-    <h2 class="text-lg font-bold uppercase">
-     RT 09/RW 23
-    </h2>
-    <hr class="my-4"/>
-   </div>
-   <ul class="p-4">
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-bullhorn text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/pengumuman.html">
-      Informasi
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-user-tie text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/pengurus.html">
-      Profil RT
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-calendar-alt text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/arisan.html">
-      Arisan
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-shield-alt text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/keamanan.html?jadwalronda">
-      Ronda
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-money-bill-wave text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/bendahara.html">
-      Bendahara
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-hand-holding-heart text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/jimpitan.html">
-      Jimpitan
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-praying-hands text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/sosial.html">
-      Sosial
-     </a>
-    </li>
-    <li class="mb-4 flex items-center">
-     <i class="fas fa-ad text-gray-700 mr-2">
-     </i>
-     <a class="text-gray-700 hover:text-gray-900" href="/keamanan.html">
-      Keamanan
-     </a>
-    </li>
-   </ul>
+    <div class="p-4 text-center">
+      <img alt="Logo of RT 09/RW 23" class="w-16 h-16 mx-auto mb-2" height="64" src="https://storage.googleapis.com/a1aa/image/ZFWh_W-3e41-hC7M3jVpT78QDTXTBjFRnhxdKjkKgM4.jpg" width="64"/>
+      <h2 class="text-lg font-bold uppercase">RT 09/RW 23</h2>
+      <hr class="my-4"/>
+    </div>
+    <ul class="p-4">
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-bullhorn text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/pengumuman.html">Informasi</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-user-tie text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/pengurus.html">Profil RT</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-calendar-alt text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/arisan.html">Arisan</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-shield-alt text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/keamanan.html?jadwalronda">Ronda</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-money-bill-wave text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/bendahara.html">Bendahara</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-hand-holding-heart text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/jimpitan.html">Jimpitan</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-praying-hands text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/sosial.html">Sosial</a>
+      </li>
+      <li class="mb-4 flex items-center">
+        <i class="fas fa-ad text-gray-700 mr-2"></i>
+        <a class="text-gray-700 hover:text-gray-900" href="/keamanan.html">Keamanan</a>
+      </li>
+    </ul>
   </div>
- </body>
-       </html>
+</body>
+</html>
