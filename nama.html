@@ -1,0 +1,280 @@
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Absen Namamu Warna-warni dengan Nama Terbaru Besar dan Nomor Urut</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {},
+      },
+    }
+  </script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background 1s ease;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    #nameList::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    #nameList {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+  </style>
+</head>
+<body class="dark:bg-gray-900 bg-gray-50 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+  <div class="w-full max-w-3xl bg-gray-800 dark:bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col">
+    <h1 class="text-2xl font-semibold mb-6 text-center text-white">Cari Tahu Arti Namamu</h1>
+
+    <div id="latestNameContainer" class="mb-2"></div>
+    <div id="nameDescription" class="mb-6 text-gray-300 text-center min-h-[3rem] px-4 select-text break-words"></div>
+
+    <ul id="nameList" class="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto border border-gray-700 rounded-md p-3 bg-gray-700 dark:bg-gray-800">
+      <!-- List starts empty -->
+    </ul>
+
+    <form id="nameForm" class="mt-6">
+      <input
+        type="text"
+        id="nameInput"
+        placeholder="Masukkan nama baru dan tekan Enter"
+        class="w-full border border-gray-600 dark:border-gray-500 rounded-md px-4 py-2 bg-gray-900 dark:bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+        aria-label="Input nama baru"
+        autocomplete="off"
+      />
+    </form>
+
+    <div id="totalNames" class="mt-3 text-right text-gray-300 text-sm select-none">Total nama: 0</div>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyCcKNhrjm-e1OWItrcQzPRgPbvUw0gnKWw";
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+    const form = document.getElementById('nameForm');
+    const input = document.getElementById('nameInput');
+    const list = document.getElementById('nameList');
+    const latestNameContainer = document.getElementById('latestNameContainer');
+    const totalNames = document.getElementById('totalNames');
+    const nameDescription = document.getElementById('nameDescription');
+
+    const colors = [
+      'bg-red-600',
+      'bg-green-600',
+      'bg-blue-600',
+      'bg-yellow-600',
+      'bg-purple-600',
+      'bg-pink-600',
+      'bg-indigo-600',
+      'bg-teal-600',
+      'bg-orange-600',
+      'bg-cyan-600',
+    ];
+
+    const gradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+      'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
+      'linear-gradient(135deg, #fbc7aa 0%, #f8b500 100%)',
+      'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
+      'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
+      'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+      'linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%)',
+      'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+      'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)'
+    ];
+
+    // Load data from localStorage
+    function loadData() {
+      const data = localStorage.getItem('absenNamamuData');
+      if (!data) return { latestName: '', names: [] };
+      try {
+        return JSON.parse(data);
+      } catch {
+        return { latestName: '', names: [] };
+      }
+    }
+
+    // Save data to localStorage
+    function saveData(latestName, names) {
+      localStorage.setItem('absenNamamuData', JSON.stringify({ latestName, names }));
+    }
+
+    // Function to update the latest name display (no number)
+    function updateLatestName(name) {
+      latestNameContainer.innerHTML = '';
+      if (!name) return;
+      const div = document.createElement('div');
+      div.textContent = name;
+      div.className = 'text-white text-3xl font-bold px-6 py-4 rounded shadow-lg bg-gradient-to-r from-blue-700 to-indigo-700 text-center';
+      latestNameContainer.appendChild(div);
+    }
+
+    // Function to create a list item with number and color
+    function createListItem(name, index) {
+      const li = document.createElement('li');
+      li.className = `text-white px-3 py-2 rounded shadow-sm ${colors[(index - 1) % colors.length]}`;
+      const span = document.createElement('span');
+      span.className = 'font-semibold mr-2';
+      span.textContent = index + '.';
+      li.appendChild(span);
+      li.appendChild(document.createTextNode(name));
+      return li;
+    }
+
+    // Function to update total names count
+    function updateTotalNames() {
+      const count = list.children.length + (latestNameContainer.dataset.prevName && latestNameContainer.dataset.prevName !== '' ? 1 : 0);
+      totalNames.textContent = `Total nama: ${count}`;
+    }
+
+    // Function to render the list and latest name from data
+    function renderData(latestName, names) {
+      latestNameContainer.dataset.prevName = latestName || '';
+      updateLatestName(latestName);
+
+      list.innerHTML = '';
+      names.forEach((name, i) => {
+        const li = createListItem(name, i + 1);
+        list.appendChild(li);
+      });
+
+      updateTotalNames();
+      if (latestName) fetchNameDescription(latestName);
+      else nameDescription.textContent = '';
+    }
+
+    // Function to speak the name with male Indonesian voice
+    function speakName(name) {
+      if (!('speechSynthesis' in window)) return;
+      const utterance = new SpeechSynthesisUtterance(name);
+      utterance.lang = 'id-ID';
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          speakName(name);
+        };
+        return;
+      }
+
+      // Find male Indonesian voice, prefer "Ardhi" or similar
+      let voice = voices.find(v => v.lang.toLowerCase().startsWith('id') && v.name.toLowerCase().includes('ardhi') && v.gender === 'male');
+      if (!voice) {
+        voice = voices.find(v => v.lang.toLowerCase().startsWith('id') && v.gender === 'male');
+      }
+      if (!voice) {
+        voice = voices.find(v => v.lang.toLowerCase().startsWith('id'));
+      }
+      if (voice) {
+        utterance.voice = voice;
+      }
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Background gradient cycling
+    let gradientIndex = 0;
+    function cycleBackground() {
+      document.body.style.background = gradients[gradientIndex];
+      gradientIndex = (gradientIndex + 1) % gradients.length;
+    }
+
+    // Fetch description from Gemini API using provided script style
+    async function fetchNameDescription(name) {
+      nameDescription.textContent = 'Memuat deskripsi...';
+      const prompt = `apa arti ${name} secara singkat (langsung keartinya) tidak usah di beri rujukan link`;
+      const requestBody = {
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          nameDescription.textContent = 'Gagal memuat deskripsi.';
+          return;
+        }
+
+        const data = await response.json();
+        const description = data.candidates?.[0]?.content?.parts?.[0]?.text || "Deskripsi tidak tersedia.";
+        nameDescription.textContent = description;
+      } catch (error) {
+        nameDescription.textContent = "Gagal memuat deskripsi.";
+      }
+    }
+
+    // Initialize app
+    window.addEventListener('DOMContentLoaded', () => {
+      const data = loadData();
+      renderData(data.latestName, data.names);
+      cycleBackground();
+      setInterval(cycleBackground, 5000);
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = input.value.trim();
+      if (!name) return;
+
+      let prevName = latestNameContainer.dataset.prevName || '';
+      let names = Array.from(list.children).map(li => li.textContent.replace(/^\d+\.\s*/, ''));
+
+      // Add previous latest name back to list if exists and not empty
+      if (prevName !== '') {
+        names.push(prevName);
+      }
+
+      // Update latest name
+      latestNameContainer.dataset.prevName = name;
+      updateLatestName(name);
+
+      // Remove the new latest name from list if it exists (should not, but just in case)
+      names = names.filter(n => n !== name);
+
+      // Save data
+      saveData(name, names);
+
+      // Render list with updated names
+      list.innerHTML = '';
+      names.forEach((n, i) => {
+        const li = createListItem(n, i + 1);
+        list.appendChild(li);
+      });
+
+      updateTotalNames();
+
+      // Speak the latest name
+      speakName(name);
+
+      // Fetch and show description
+      fetchNameDescription(name);
+
+      input.value = '';
+      input.focus();
+      list.scrollTop = list.scrollHeight;
+    });
+  </script>
+</body>
+</html>
