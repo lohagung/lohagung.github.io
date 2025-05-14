@@ -1,0 +1,171 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Text Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    .neon-text {
+      font-family: 'Pacifico', cursive;
+      font-weight: 300;
+      font-size: 6rem;
+      color: #00ff00;
+      text-shadow:
+        0 0 5px #00ff00,
+        0 0 10px #00ff00,
+        0 0 20px #00ff00,
+        0 0 40px #00ff00;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+      user-select: none;
+      white-space: nowrap;
+      word-break: normal;
+      display: inline-block;
+      padding: 0 0.25rem;
+    }
+    @media (max-width: 640px) {
+      .neon-text {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-black min-h-screen flex flex-col items-center justify-center p-4 space-y-8">
+  <div id="neonText" class="neon-text text-center select-none">React</div>
+
+  <form id="customizerForm" class="w-full max-w-md bg-gray-900 bg-opacity-70 rounded-lg p-6 space-y-6 text-white">
+    <div>
+      <label for="textInput" class="block mb-1 font-semibold">Text</label>
+      <input type="text" id="textInput" value="React" class="w-full rounded-md px-3 py-2 text-black" maxlength="30" />
+    </div>
+
+    <div>
+      <label for="fontColor" class="block mb-1 font-semibold">Font Color</label>
+      <input type="color" id="fontColor" value="#00ff00" class="w-16 h-10 p-0 border-0 cursor-pointer" />
+    </div>
+
+    <div>
+      <label for="outlineColor" class="block mb-1 font-semibold">Outline Color</label>
+      <input type="color" id="outlineColor" value="#00ff00" class="w-16 h-10 p-0 border-0 cursor-pointer" />
+    </div>
+
+    <div>
+      <label for="glowIntensity" class="block mb-1 font-semibold">Glow Intensity</label>
+      <input type="range" id="glowIntensity" min="0" max="60" value="40" class="w-full" />
+    </div>
+
+    <button type="button" id="downloadBtn" class="w-full bg-green-600 hover:bg-green-700 transition rounded-md py-2 font-semibold flex items-center justify-center space-x-2">
+      <i class="fas fa-download"></i><span>Download PNG</span>
+    </button>
+  </form>
+
+  <script>
+    const neonText = document.getElementById('neonText');
+    const textInput = document.getElementById('textInput');
+    const fontColorInput = document.getElementById('fontColor');
+    const outlineColorInput = document.getElementById('outlineColor');
+    const glowIntensityInput = document.getElementById('glowIntensity');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    function updateNeon() {
+      const text = textInput.value || ' ';
+      const fontColor = fontColorInput.value;
+      const outlineColor = outlineColorInput.value;
+      const glow = parseInt(glowIntensityInput.value, 10);
+
+      neonText.textContent = text;
+
+      neonText.style.color = fontColor;
+      neonText.style.textShadow = 
+        `0 0 2px ${outlineColor}, ` +
+        `0 0 4px ${outlineColor}, ` +
+        `0 0 5px ${fontColor}, ` +
+        `0 0 10px ${fontColor}, ` +
+        `0 0 20px ${fontColor}, ` +
+        `0 0 ${glow}px ${fontColor}`;
+    }
+
+    function downloadImage() {
+      const text = neonText.textContent;
+      const fontColor = fontColorInput.value;
+      const outlineColor = outlineColorInput.value;
+      const glow = parseInt(glowIntensityInput.value, 10);
+
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Set font size and family same as neonText
+      const fontSize = window.innerWidth <= 640 ? 56 : 96; // 3.5rem or 6rem approx
+      const fontFamily = "'Pacifico', cursive";
+      const fontWeight = 300;
+
+      ctx.font = `${fontWeight} ${fontSize}px Pacifico, cursive`;
+
+      // Measure text width and height
+      const textMetrics = ctx.measureText(text);
+      const textWidth = Math.ceil(textMetrics.width);
+      const textHeight = Math.ceil(fontSize * 1.2);
+
+      // Add padding for glow
+      const padding = glow + 40;
+
+      canvas.width = textWidth + padding * 2;
+      canvas.height = textHeight + padding * 2;
+
+      // Set black background transparent
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'left';
+      ctx.font = `${fontWeight} ${fontSize}px Pacifico, cursive`;
+      ctx.fillStyle = fontColor;
+
+      // Create neon glow effect using shadow layers
+      // Outline shadows
+      ctx.shadowColor = outlineColor;
+      ctx.shadowBlur = 2;
+      ctx.fillText(text, padding, padding);
+      ctx.shadowBlur = 4;
+      ctx.fillText(text, padding, padding);
+
+      // Glow shadows
+      ctx.shadowColor = fontColor;
+      ctx.shadowBlur = 5;
+      ctx.fillText(text, padding, padding);
+      ctx.shadowBlur = 10;
+      ctx.fillText(text, padding, padding);
+      ctx.shadowBlur = 20;
+      ctx.fillText(text, padding, padding);
+      ctx.shadowBlur = glow;
+      ctx.fillText(text, padding, padding);
+
+      // Draw solid text on top (no shadow)
+      ctx.shadowColor = 'transparent';
+      ctx.fillStyle = fontColor;
+      ctx.fillText(text, padding, padding);
+
+      // Create PNG and trigger download
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `neon-text.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    textInput.addEventListener('input', updateNeon);
+    fontColorInput.addEventListener('input', updateNeon);
+    outlineColorInput.addEventListener('input', updateNeon);
+    glowIntensityInput.addEventListener('input', updateNeon);
+    downloadBtn.addEventListener('click', downloadImage);
+
+    updateNeon();
+  </script>
+</body>
+</html>
