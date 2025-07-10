@@ -25,6 +25,16 @@
       display: flex;
       flex-direction: column;
     }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .button-group button {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
     input, button, textarea {
       width: 100%;
       padding: 10px;
@@ -67,6 +77,9 @@
       textarea {
         height: 300px;
       }
+      .button-group {
+        flex-direction: row;
+      }
     }
     
     @media (max-width: 480px) {
@@ -75,6 +88,9 @@
       }
       iframe {
         max-width: 100%;
+      }
+      .button-group {
+        flex-direction: column;
       }
     }
   </style>
@@ -89,7 +105,13 @@
     
     <div class="control-section">
       <input type="text" id="urlInput" placeholder="Masukkan URL Video TikTok" value="https://www.tiktok.com/@ohheyytiara/video/7507627595626794248" />
-      <button onclick="putarDanTranskrip()">Putar dan Transkrip</button>
+      
+      <div class="button-group">
+        <button onclick="putarDanTranskrip()">Putar dan Transkrip</button>
+        <button onclick="stopRecognition()">Stop Mic</button>
+        <button onclick="copyTranscript()">Copy Text</button>
+      </div>
+      
       <textarea id="output" placeholder="Hasil transkripsi suara akan muncul di sini..." readonly></textarea>
       <div id="status" class="loading"></div>
       <div id="error" class="error"></div>
@@ -187,6 +209,51 @@
       } catch (e) {
         showError("Gagal memulai pengenalan suara: " + e.message);
         isProcessing = false;
+      }
+    }
+    
+    function stopRecognition() {
+      if (recognition && isProcessing) {
+        recognition.stop();
+        isProcessing = false;
+        showStatus("Transkripsi dihentikan");
+      } else {
+        showStatus("Tidak ada transkripsi yang sedang berjalan");
+      }
+    }
+    
+    function copyTranscript() {
+      const output = document.getElementById('output');
+      const text = output.value.trim();
+      
+      if (!text) {
+        showError("Tidak ada teks untuk disalin");
+        return;
+      }
+      
+      // Coba salin teks ke clipboard
+      output.select();
+      output.setSelectionRange(0, 99999); // Untuk perangkat mobile
+      
+      try {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            showStatus("Teks berhasil disalin ke clipboard!");
+            setTimeout(() => {
+              document.getElementById('status').textContent = "";
+            }, 2000);
+          })
+          .catch(err => {
+            showError("Gagal menyalin teks: " + err);
+            // Fallback untuk browser yang tidak mendukung clipboard API
+            document.execCommand('copy');
+            showStatus("Teks berhasil disalin ke clipboard!");
+            setTimeout(() => {
+              document.getElementById('status').textContent = "";
+            }, 2000);
+          });
+      } catch (err) {
+        showError("Gagal menyalin teks: " + err);
       }
     }
     
