@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transkrip Video TikTok</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .video-section {
+      width: 100%;
+    }
+    .control-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    input, button, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    iframe {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 9/16;
+      border: none;
+      max-width: 315px;
+      max-height: 570px;
+    }
+    textarea {
+      height: 200px;
+      min-height: 150px;
+      resize: vertical;
+    }
+    .error {
+      color: red;
+    }
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+      }
+      .video-section {
+        flex: 0 0 40%;
+      }
+      .control-section {
+        flex: 0 0 60%;
+      }
+      textarea {
+        height: 300px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        margin: 10px;
+      }
+      iframe {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>🎥 Pemutar + Transkrip Video TikTok</h2>
+  
+  <div class="container">
+    <div class="video-section">
+      <div id="player"></div>
+    </div>
+    
+    <div class="control-section">
+      <input type="text" id="urlInput" placeholder="Masukkan URL Video TikTok" value="https://www.tiktok.com/@ohheyytiara/video/7507627595626794248" />
+      <button onclick="putarDanTranskrip()">Putar dan Transkrip</button>
+      <textarea id="output" placeholder="Hasil transkripsi suara akan muncul di sini..." readonly></textarea>
+      <div id="status" class="loading"></div>
+      <div id="error" class="error"></div>
+    </div>
+  </div>
+  
+  <script>
+    let recognition;
+    let finalTranscript = "";
+    let isProcessing = false;
+    
+    function putarDanTranskrip() {
+      const rawUrl = document.getElementById('urlInput').value.trim();
+      const match = rawUrl.match(/video\/(\d+)/);
+      
+      if (!match) {
+        showError("Masukkan URL video TikTok yang valid!");
+        return;
+      }
+      
+      if (isProcessing) {
+        showError("Proses sedang berjalan, tunggu hingga selesai!");
+        return;
+      }
+      
+      isProcessing = true;
+      showStatus("Memproses video... (mungkin perlu beberapa detik)");
+      
+      const videoId = match[1];
+      const embedUrl = `https://www.tiktok.com/embed/${videoId}`;
+      
+      document.getElementById('player').innerHTML = `<iframe src="${embedUrl}" scrolling="no" allow="autoplay; encrypted-media" frameborder="0"></iframe>`;
+      
+      // Reset output
+      finalTranscript = "";
+      document.getElementById('output').value = "";
+      document.getElementById('error').textContent = "";
+      
+      // Tunggu beberapa detik agar video dimuat sebelum mulai transkripsi
+      setTimeout(() => {
+        startRecognition();
+      }, 3000);
+    }
+    
+    function startRecognition() {
+      // Periksa dukungan browser
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showError("Browser Anda tidak mendukung fitur pengenalan suara. Coba gunakan Chrome atau Edge.");
+        isProcessing = false;
+        return;
+      }
+      
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'id-ID';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      
+      recognition.onresult = function(event) {
+        let interimTranscript = "";
+        
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i][0].transcript;
+          
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + " ";
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        
+        document.getElementById('output').value = finalTranscript + interimTranscript;
+      };
+      
+      recognition.onerror = function(event) {
+        showError("Error pengenalan suara: " + event.error);
+        console.error("Speech recognition error:", event.error);
+        isProcessing = false;
+      };
+      
+      recognition.onend = function() {
+        // Jika pengenalan berhenti secara tidak sengaja, coba mulai lagi
+        if (isProcessing) {
+          try {
+            recognition.start();
+          } catch (e) {
+            showError("Gagal memulai ulang pengenalan suara: " + e.message);
+            isProcessing = false;
+          }
+        }
+      };
+      
+      try {
+        recognition.start();
+        showStatus("Transkripsi aktif... Berbicaralah dengan jelas di dekat mikrofon");
+      } catch (e) {
+        showError("Gagal memulai pengenalan suara: " + e.message);
+        isProcessing = false;
+      }
+    }
+    
+    function showStatus(message) {
+      document.getElementById('status').textContent = message;
+    }
+    
+    function showError(message) {
+      document.getElementById('error').textContent = message;
+      isProcessing = false;
+    }
+  </script>
+</body>
+</html>
