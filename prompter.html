@@ -72,6 +72,12 @@
         font-size: 16px;
       }
     }
+
+    /* Tombol selain #play disembunyikan saat fullscreen aktif */
+    body.fullscreen #controls a:not(#play),
+    body.fullscreen #speed-input {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -98,7 +104,7 @@
     let intVal;
     let scrollPosition = 0;
 
-    // Simpan teks ke localStorage
+    // Simpan teks
     player.addEventListener('input', () => {
       localStorage.setItem('content', player.innerHTML);
     });
@@ -141,21 +147,22 @@
       e.preventDefault();
       const elem = document.documentElement;
       if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-          elem.msRequestFullscreen();
-        }
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    });
+
+    // Toggle kelas body.fullscreen
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        document.body.classList.add('fullscreen');
+      } else {
+        document.body.classList.remove('fullscreen');
       }
     });
 
