@@ -198,7 +198,8 @@ a#menu-link{
      <div class="mb-4 flex items-center space-x-4">
       <div>
         <select class="block w-full bg-white border border-gray-300 rounded py-2 px-3 shadow leading-tight focus:outline-none focus:shadow-outline" id="month-select">
-		<option value="Agustus">Agustus 2025</option>
+		<>
+			<option value="September">September</option>
           <option value="Juli">Juli 2025</option>
           <option value="Juni">Juni 2025</option>
           <option value="Mei">Mei 2025</option>
@@ -206,10 +207,8 @@ a#menu-link{
           <option value="Maret">Maret 2025</option>
           <option value="Februari">Februari 2025</option>
           <option value="Januari">Januari 2025</option>
-
-         
-          <!--option value="September">September</option>
-          <option value="Oktober">Oktober</option>
+                  
+          <!--option value="Oktober">Oktober</option>
           <option value="November">November</option>
           <option value="Desember">Desember</option-->
 
@@ -575,7 +574,7 @@ a#menu-link{
     });
 
     // Initial fetch for default month
-    fetchData('Agustus');
+    fetchData('September');
 
     // Search functionality
     document.getElementById('search-icon').addEventListener('click', () => {
