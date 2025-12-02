@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambil Frame Terakhir Video</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #1c1e21;
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: block;
+            padding: 12px 20px;
+            background-color: #e4e6eb;
+            color: #333;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        .file-input-label:hover {
+            background-color: #d8dadf;
+        }
+        #captureBtn {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+        #captureBtn:hover {
+            background-color: #0056b3;
+        }
+        #captureBtn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            font-style: italic;
+            color: #555;
+            min-height: 20px;
+        }
+        video, canvas {
+            display: none; /* Elemen video dan canvas disembunyikan */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Ambil Frame Terakhir Video</h1>
+        
+        <!-- Elemen untuk memilih file video -->
+        <div class="file-input-wrapper">
+            <input type="file" id="videoInput" accept="video/*">
+            <label for="videoInput" class="file-input-label" id="fileLabel">
+                Pilih File Video...
+            </label>
+        </div>
+
+        <!-- Tombol untuk memproses -->
+        <button id="captureBtn" disabled>Ambil & Unduh Frame Terakhir</button>
+
+        <!-- Elemen pemrosesan (disembunyikan) -->
+        <video id="videoPlayer"></video>
+        <canvas id="captureCanvas"></canvas>
+
+        <!-- Area untuk menampilkan status -->
+        <p id="status">Status: Silakan pilih file video.</p>
+    </div>
+
+    <script>
+        // Mendapatkan referensi ke elemen-elemen HTML
+        const videoInput = document.getElementById('videoInput');
+        const fileLabel = document.getElementById('fileLabel');
+        const captureBtn = document.getElementById('captureBtn');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const canvas = document.getElementById('captureCanvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+
+        // Event listener saat file video dipilih
+        videoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Membuat URL untuk file video dan memuatnya di elemen video
+                const videoURL = URL.createObjectURL(file);
+                videoPlayer.src = videoURL;
+                
+                // Mengupdate nama file pada label dan status
+                fileLabel.textContent = file.name;
+                status.textContent = 'Status: Memuat video...';
+                captureBtn.disabled = true;
+
+                // Event listener saat metadata video (durasi, ukuran) sudah dimuat
+                videoPlayer.addEventListener('loadedmetadata', function() {
+                    status.textContent = 'Status: Video siap. Klik tombol untuk mengambil frame.';
+                    captureBtn.disabled = false;
+                }, { once: true }); // Hanya dijalankan sekali
+
+                // Event listener jika terjadi error saat memuat video
+                videoPlayer.addEventListener('error', function() {
+                    status.textContent = 'Status: Error! Tidak dapat memuat video.';
+                    alert('File yang dipilih bukan video yang valid atau rusak.');
+                    captureBtn.disabled = true;
+                }, { once: true });
+            }
+        });
+
+        // Event listener saat tombol "Ambil Frame" diklik
+        captureBtn.addEventListener('click', function() {
+            if (videoPlayer.src) {
+                captureBtn.disabled = true;
+                status.textContent = 'Status: Mencari frame terakhir...';
+
+                // Pindahkan waktu video ke 0.1 detik sebelum video berakhir
+                // Menggunakan -0.1 untuk menghindari frame hitam di akhir beberapa video
+                videoPlayer.currentTime = videoPlayer.duration - 0.1;
+            }
+        });
+
+        // Event listener saat video selesai di-seek (pindah waktu)
+        videoPlayer.addEventListener('seeked', function() {
+            status.textContent = 'Status: Mengambil frame...';
+
+            // Mengatur ukuran canvas agar sama dengan ukuran video
+            canvas.width = videoPlayer.videoWidth;
+            canvas.height = videoPlayer.videoHeight;
+
+            // Menggambar frame saat ini dari video ke canvas
+            ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+
+            // Mengubah gambar dari canvas menjadi format data URL (JPEG)
+            canvas.toBlob(function(blob) {
+                status.textContent = 'Status: Menyiapkan unduhan...';
+                
+                // Membuat URL untuk blob gambar
+                const imageUrl = URL.createObjectURL(blob);
+                
+                // Membuat link untuk mengunduh gambar
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                
+                // Menentukan nama file unduhan
+                const originalFileName = videoInput.files[0].name;
+                const fileNameWithoutExt = originalFileName.substring(0, originalFileName.lastIndexOf('.')) || originalFileName;
+                a.download = `${fileNameWithoutExt}_last_frame.jpg`;
+                
+                // Simulasi klik link untuk memulai unduhan
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Membersihkan URL yang sudah tidak terpakai
+                URL.revokeObjectURL(imageUrl);
+
+                status.textContent = 'Status: Selesai! Gambar seharusnya sudah terunduh.';
+                captureBtn.disabled = false;
+            }, 'image/jpeg', 0.95); // Kualitas JPEG 95%
+        });
+    </script>
+
+</body>
+</html>
