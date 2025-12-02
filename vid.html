@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambil Frame Terakhir Video</title>
+    <title>Ambil Frame Terakhir Video (Otomatis)</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -50,27 +50,6 @@
         .file-input-label:hover {
             background-color: #d8dadf;
         }
-        /* Tombol utama untuk mengambil frame */
-        #captureBtn {
-            width: 100%;
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-bottom: 20px;
-        }
-        #captureBtn:hover {
-            background-color: #0056b3;
-        }
-        #captureBtn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
         #status {
             font-style: italic;
             color: #555;
@@ -97,11 +76,11 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        /* Gaya untuk Tombol Unduh baru */
+        /* Gaya untuk Tombol Unduh */
         #downloadBtn {
             width: 100%;
             padding: 10px 18px;
-            background-color: #28a745; /* Warna hijau untuk menandakan aksi unduh */
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 6px;
@@ -128,9 +107,6 @@
             </label>
         </div>
 
-        <!-- Tombol untuk memproses (sekarang hanya untuk mengambil frame) -->
-        <button id="captureBtn" disabled>Ambil Frame Terakhir</button>
-
         <!-- Elemen pemrosesan (disembunyikan) -->
         <video id="videoPlayer"></video>
         <canvas id="captureCanvas"></canvas>
@@ -150,13 +126,12 @@
         // Mendapatkan referensi ke elemen-elemen HTML
         const videoInput = document.getElementById('videoInput');
         const fileLabel = document.getElementById('fileLabel');
-        const captureBtn = document.getElementById('captureBtn');
         const videoPlayer = document.getElementById('videoPlayer');
         const canvas = document.getElementById('captureCanvas');
         const ctx = canvas.getContext('2d');
         const status = document.getElementById('status');
 
-        // Referensi ke elemen pratinjau baru
+        // Referensi ke elemen pratinjau
         const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
         const downloadBtn = document.getElementById('downloadBtn');
@@ -165,53 +140,62 @@
         let capturedImageBlob = null;
         let previewImageUrl = null;
 
+        // Fungsi untuk mereset state pratinjau
+        function resetPreview() {
+            previewContainer.style.display = 'none';
+            downloadBtn.disabled = true;
+            previewImage.src = '';
+            
+            // Bersihkan URL objek lama untuk mencegah memory leak
+            if (previewImageUrl) {
+                URL.revokeObjectURL(previewImageUrl);
+                previewImageUrl = null;
+            }
+            capturedImageBlob = null;
+        }
+
         // Event listener saat file video dipilih
         videoInput.addEventListener('change', function() {
-            // Reset dan sembunyikan pratinjau lama jika ada
-            resetPreview();
-
             const file = this.files[0];
             if (file) {
+                // Reset dan sembunyikan pratinjau lama jika ada
+                resetPreview();
+
+                // Membuat URL untuk file video dan memuatnya di elemen video
                 const videoURL = URL.createObjectURL(file);
                 videoPlayer.src = videoURL;
                 
+                // Mengupdate nama file pada label dan status
                 fileLabel.textContent = file.name;
                 status.textContent = 'Status: Memuat video...';
-                captureBtn.disabled = true;
 
+                // Event listener saat metadata video (durasi, ukuran) sudah dimuat
                 videoPlayer.addEventListener('loadedmetadata', function() {
-                    status.textContent = 'Status: Video siap. Klik tombol untuk mengambil frame.';
-                    captureBtn.disabled = false;
-                }, { once: true });
+                    status.textContent = 'Status: Mengambil frame terakhir secara otomatis...';
+                    // Pindahkan waktu video ke 0.1 detik sebelum video berakhir
+                    videoPlayer.currentTime = videoPlayer.duration - 0.1;
+                }, { once: true }); // Hanya dijalankan sekali
 
+                // Event listener jika terjadi error saat memuat video
                 videoPlayer.addEventListener('error', function() {
                     status.textContent = 'Status: Error! Tidak dapat memuat video.';
                     alert('File yang dipilih bukan video yang valid atau rusak.');
-                    captureBtn.disabled = true;
                 }, { once: true });
-            }
-        });
-
-        // Event listener saat tombol "Ambil Frame" diklik
-        captureBtn.addEventListener('click', function() {
-            if (videoPlayer.src) {
-                // Reset pratinjau sebelum mengambil yang baru
-                resetPreview();
-                
-                captureBtn.disabled = true;
-                status.textContent = 'Status: Mencari frame terakhir...';
-                videoPlayer.currentTime = videoPlayer.duration - 0.1;
             }
         });
 
         // Event listener saat video selesai di-seek (pindah waktu)
         videoPlayer.addEventListener('seeked', function() {
-            status.textContent = 'Status: Mengambil frame...';
+            status.textContent = 'Status: Frame berhasil diambil. Menampilkan pratinjau.';
 
+            // Mengatur ukuran canvas agar sama dengan ukuran video
             canvas.width = videoPlayer.videoWidth;
             canvas.height = videoPlayer.videoHeight;
+
+            // Menggambar frame saat ini dari video ke canvas
             ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
 
+            // Mengubah gambar dari canvas menjadi format data URL (JPEG)
             canvas.toBlob(function(blob) {
                 // Simpan blob untuk digunakan saat mengunduh
                 capturedImageBlob = blob;
@@ -224,12 +208,11 @@
                 previewContainer.style.display = 'block';
                 downloadBtn.disabled = false;
                 
-                status.textContent = 'Status: Preview siap. Klik tombol unduh untuk menyimpan.';
-                captureBtn.disabled = false;
-            }, 'image/jpeg', 0.95);
+                status.textContent = 'Status: Pratinjau siap. Klik tombol unduh untuk menyimpan.';
+            }, 'image/jpeg', 0.95); // Kualitas JPEG 95%
         });
 
-        // Event listener baru untuk tombol unduh
+        // Event listener untuk tombol unduh
         downloadBtn.addEventListener('click', function() {
             if (capturedImageBlob) {
                 status.textContent = 'Status: Menyiapkan unduhan...';
@@ -252,20 +235,6 @@
                 status.textContent = 'Status: Selesai! Gambar seharusnya sudah terunduh.';
             }
         });
-
-        // Fungsi untuk mereset state pratinjau
-        function resetPreview() {
-            previewContainer.style.display = 'none';
-            downloadBtn.disabled = true;
-            previewImage.src = '';
-            
-            // Bersihkan URL objek lama untuk mencegah memory leak
-            if (previewImageUrl) {
-                URL.revokeObjectURL(previewImageUrl);
-                previewImageUrl = null;
-            }
-            capturedImageBlob = null;
-        }
     </script>
 
 </body>
