@@ -50,6 +50,7 @@
         .file-input-label:hover {
             background-color: #d8dadf;
         }
+        /* Tombol utama untuk mengambil frame */
         #captureBtn {
             width: 100%;
             padding: 12px 20px;
@@ -74,9 +75,43 @@
             font-style: italic;
             color: #555;
             min-height: 20px;
+            margin-top: 15px;
         }
         video, canvas {
             display: none; /* Elemen video dan canvas disembunyikan */
+        }
+
+        /* Gaya untuk Container Pratinjau */
+        #previewContainer {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: none; /* Awalnya disembunyikan */
+        }
+        #previewImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        /* Gaya untuk Tombol Unduh baru */
+        #downloadBtn {
+            width: 100%;
+            padding: 10px 18px;
+            background-color: #28a745; /* Warna hijau untuk menandakan aksi unduh */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #downloadBtn:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -93,12 +128,19 @@
             </label>
         </div>
 
-        <!-- Tombol untuk memproses -->
-        <button id="captureBtn" disabled>Ambil & Unduh Frame Terakhir</button>
+        <!-- Tombol untuk memproses (sekarang hanya untuk mengambil frame) -->
+        <button id="captureBtn" disabled>Ambil Frame Terakhir</button>
 
         <!-- Elemen pemrosesan (disembunyikan) -->
         <video id="videoPlayer"></video>
         <canvas id="captureCanvas"></canvas>
+
+        <!-- Container untuk pratinjau dan tombol unduh -->
+        <div id="previewContainer">
+            <p>Pratinjau Frame Terakhir:</p>
+            <img id="previewImage" src="" alt="Pratinjau Frame">
+            <button id="downloadBtn">Unduh Gambar</button>
+        </div>
 
         <!-- Area untuk menampilkan status -->
         <p id="status">Status: Silakan pilih file video.</p>
@@ -114,26 +156,34 @@
         const ctx = canvas.getContext('2d');
         const status = document.getElementById('status');
 
+        // Referensi ke elemen pratinjau baru
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Variabel untuk menyimpan blob gambar dan URL pratinjau
+        let capturedImageBlob = null;
+        let previewImageUrl = null;
+
         // Event listener saat file video dipilih
         videoInput.addEventListener('change', function() {
+            // Reset dan sembunyikan pratinjau lama jika ada
+            resetPreview();
+
             const file = this.files[0];
             if (file) {
-                // Membuat URL untuk file video dan memuatnya di elemen video
                 const videoURL = URL.createObjectURL(file);
                 videoPlayer.src = videoURL;
                 
-                // Mengupdate nama file pada label dan status
                 fileLabel.textContent = file.name;
                 status.textContent = 'Status: Memuat video...';
                 captureBtn.disabled = true;
 
-                // Event listener saat metadata video (durasi, ukuran) sudah dimuat
                 videoPlayer.addEventListener('loadedmetadata', function() {
                     status.textContent = 'Status: Video siap. Klik tombol untuk mengambil frame.';
                     captureBtn.disabled = false;
-                }, { once: true }); // Hanya dijalankan sekali
+                }, { once: true });
 
-                // Event listener jika terjadi error saat memuat video
                 videoPlayer.addEventListener('error', function() {
                     status.textContent = 'Status: Error! Tidak dapat memuat video.';
                     alert('File yang dipilih bukan video yang valid atau rusak.');
@@ -145,11 +195,11 @@
         // Event listener saat tombol "Ambil Frame" diklik
         captureBtn.addEventListener('click', function() {
             if (videoPlayer.src) {
+                // Reset pratinjau sebelum mengambil yang baru
+                resetPreview();
+                
                 captureBtn.disabled = true;
                 status.textContent = 'Status: Mencari frame terakhir...';
-
-                // Pindahkan waktu video ke 0.1 detik sebelum video berakhir
-                // Menggunakan -0.1 untuk menghindari frame hitam di akhir beberapa video
                 videoPlayer.currentTime = videoPlayer.duration - 0.1;
             }
         });
@@ -158,41 +208,64 @@
         videoPlayer.addEventListener('seeked', function() {
             status.textContent = 'Status: Mengambil frame...';
 
-            // Mengatur ukuran canvas agar sama dengan ukuran video
             canvas.width = videoPlayer.videoWidth;
             canvas.height = videoPlayer.videoHeight;
-
-            // Menggambar frame saat ini dari video ke canvas
             ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
 
-            // Mengubah gambar dari canvas menjadi format data URL (JPEG)
             canvas.toBlob(function(blob) {
+                // Simpan blob untuk digunakan saat mengunduh
+                capturedImageBlob = blob;
+
+                // Buat URL untuk pratinjau dan tampilkan gambar
+                previewImageUrl = URL.createObjectURL(blob);
+                previewImage.src = previewImageUrl;
+                
+                // Tampilkan container pratinjau dan tombol unduh
+                previewContainer.style.display = 'block';
+                downloadBtn.disabled = false;
+                
+                status.textContent = 'Status: Preview siap. Klik tombol unduh untuk menyimpan.';
+                captureBtn.disabled = false;
+            }, 'image/jpeg', 0.95);
+        });
+
+        // Event listener baru untuk tombol unduh
+        downloadBtn.addEventListener('click', function() {
+            if (capturedImageBlob) {
                 status.textContent = 'Status: Menyiapkan unduhan...';
                 
-                // Membuat URL untuk blob gambar
-                const imageUrl = URL.createObjectURL(blob);
-                
-                // Membuat link untuk mengunduh gambar
+                const downloadUrl = URL.createObjectURL(capturedImageBlob);
                 const a = document.createElement('a');
-                a.href = imageUrl;
+                a.href = downloadUrl;
                 
-                // Menentukan nama file unduhan
                 const originalFileName = videoInput.files[0].name;
                 const fileNameWithoutExt = originalFileName.substring(0, originalFileName.lastIndexOf('.')) || originalFileName;
                 a.download = `${fileNameWithoutExt}_last_frame.jpg`;
                 
-                // Simulasi klik link untuk memulai unduhan
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 
-                // Membersihkan URL yang sudah tidak terpakai
-                URL.revokeObjectURL(imageUrl);
+                // Bersihkan URL sementara
+                URL.revokeObjectURL(downloadUrl);
 
                 status.textContent = 'Status: Selesai! Gambar seharusnya sudah terunduh.';
-                captureBtn.disabled = false;
-            }, 'image/jpeg', 0.95); // Kualitas JPEG 95%
+            }
         });
+
+        // Fungsi untuk mereset state pratinjau
+        function resetPreview() {
+            previewContainer.style.display = 'none';
+            downloadBtn.disabled = true;
+            previewImage.src = '';
+            
+            // Bersihkan URL objek lama untuk mencegah memory leak
+            if (previewImageUrl) {
+                URL.revokeObjectURL(previewImageUrl);
+                previewImageUrl = null;
+            }
+            capturedImageBlob = null;
+        }
     </script>
 
 </body>
