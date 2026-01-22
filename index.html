@@ -3,13 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Generated App</title>
+        <title>LA6</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-                body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+                body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100vh; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: #f1f1f1; }
                 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
@@ -20,23 +20,58 @@
                 .prose iframe { width: 100%; border-radius: 8px; }
                 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-                #app-container { max-width: 480px; margin: 0 auto; background-color: #f9fafb; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); padding-bottom: 80px; overflow-x: hidden; }
-                #sheet-content { min-height: 300px; }
-                .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
-                .editor-shortcut:hover { background-color: #dbeafe; }
-            
+                .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height:    20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* LAYOUT FIX: Flexbox untuk mempertahankan Fixed Navbar */
+    #app-container { 
+        width: 100%; 
+        height: 100%; 
+        max-width: 480px; 
+        margin: 0 auto; 
+        background-color: #f9fafb; 
+        position: relative; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden;
+    }
+    
+    #app-canvas { 
+        flex: 1; 
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        position: relative;
+        /* Padding bawah agar konten tidak tertutup navbar */
+        padding-bottom: 80px; 
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Navbar Container Fixed di Bawah */
+    #bottom-nav-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        width: 100%;
+    }
+
+    #sheet-content { min-height: 300px; }
+    
+    .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
+    .editor-shortcut:hover { background-color: #dbeafe; }
+    
         </style>
     </head>
     <body>
         <div id="app-container">
             <div id="app-canvas"></div>
-            <div id="bottom-nav-container" class="fixed bottom-
-
-0 left-0 right-0 z-50 pointer-events-none"></div>
+            <!-- Bottom Nav Container (Fixed) -->
+            <div id="bottom-nav-container"></div>
         </div>
 
+        <!-- MODALS -->
         <div id="about-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm z-[200]">
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col">
                 <div class="p-6"><h3 class="text-lg font-bold text-center mb-2" id="about-title">Tentang</h3><div id="about-content" class="text-sm text-gray-600 text-center leading-relaxed"></div></div>
@@ -65,7 +100,7 @@
                 return 'Rp ' + parseInt(numberString).toLocaleString('en-US');
             }
 
-            const appData = {"components":[{"id":"1768772944321536","type":"header","data":{"title":"LA6 & Kavling","subtitle":"RT 09","showAvatar":true,"avatarType":"custom","customAvatarUrl":"https://avatars.githubusercontent.com/u/61934361?v=4","colorEnd":"black","gradientEnabled":true,"gradientStart":"black","gradientEnd":"teal-800","aboutContent":"Oleh"}},{"id":"176877294432428","type":"hero","data":{"label":"Saldo RT 09","amount":"Rp 54,500,000","colorFrom":"blue-600","colorTo":"blue-800","sheetLink":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetName":"Saldo","sheetRowIndex":8,"sheetColIndex":"1","dataSource":"sheet"}},{"id":"1768772944326634","type":"grid-menu","data":{"cols":"grid-cols-4","items":[{"label":"Bendahara","icon":"wallet","color":"bg-purple-500","action":"sheet","content":"<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Kas","sheetName":"Kas","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Sampah","sheetName":"Sampah","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Konsumsi","sheetName":"Konsumsi","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Arisan","sheetName":"Arisan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Jimpitan","icon":"banknote","color":"bg-orange-500","action":"sheet","content":"<h3>Profil Pengurus</h3><p>Data struktur RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Jimpitan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Sosial","icon":"heart","color":"bg-green-500","action":"sheet","content":"<h3>Laporan Keuangan</h3><p>Rincian kas RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Sosial","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Keamanan","icon":"lock","color":"bg-red-500","action":"sheet","content":"<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Keamanan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Data Warga","icon":"users","color":"bg-green-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Ronda","icon":"clock","color":"bg-red-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Arisan","icon":"calendar","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Pengurus RT","icon":"user","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"PKK","icon":"heart","color":"bg-blue-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Dawis","icon":"sun","color":"bg-purple-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Kerja Bakti","icon":"coffee","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Lainya..","icon":"list","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""}]}},{"id":"1768772944329940","type":"list-transaksi","data":{"title":"Aktivitas Warga","items":[{"title":"Iuran Sampah","sub":"Kebersihan","right":"-Rp 25,000","colorIcon":"bg-red-100 text-red-600","icon":"trash-2"},{"title":"Jimpitan Warga","sub":"Kas Rutin","right":"+Rp 150,000","colorIcon":"bg-green-100 text-green-600","icon":"coins"},{"title":"Sumbangan Sosial","sub":"Bantuan","right":"-Rp 50,000","colorIcon":"bg-red-100 text-red-600","icon":"heart"}]}},{"id":"1768772944331","type":"navbar","data":{"items":[{"label":"Beranda","icon":"home","active":true,"linkType":"home"},{"label":"Laporan","icon":"file-text","active":false,"linkType":"grid","linkTarget":{"compId":"1768772944326634","itemIndex":2}},{"label":"Akun","icon":"user","active":false,"linkType":"home"}],"bgType":"gradient","gradientStart":"black","gradientEnd":"teal-800"}},{"id":"1768967821241747","type":"org-structure","data":{"title":"Struktur Organisasi","members":[{"name":"Bayu Adi Nugroho","role":"Ketua RT","photo":"https://la6.my.id/file/a11.jpg","content":""},{"name":"Ariyanto","role":"Penasehat RT","photo":"https://la6.my.id/file/a9.jpg","content":""},{"name":"Arif Fajar Santoso","role":"Sekretaris","photo":"https://la6.my.id/file/a7.jpg","content":""},{"name":"Budi Setiawan","role":"Bendahara","photo":"https://la6.my.id/file/c7.jpg","content":""},{"name":"M. Dicky","role":"Seksi Jimpitan","photo":"https://la6.my.id/file/b7.jpg","content":""},{"name":"Thomas Hendra","role":"Seksi Sosial","photo":"https://la6.my.id/file/b9.jpg","content":""},{"name":"Wahyudi","role":"Seksi Keamanan","photo":"https://la6.my.id/file/ra1.jpg","content":""},{"name":"Hari Susanto","role":"Seksi Keamanan 2","photo":"https://la6.my.id/file/a12.jpg","content":""},{"name":"Eko Santoso","role":"Seksi Kebersihan","photo":"https://la6.my.id/file/a4b.jpg","content":""},{"name":"Heru","role":"Seksi Kebersihan 2","photo":"https://la6.my.id/file/kavc9.jpg","content":""}]}},{"id":"1768818148870564","type":"button","data":{"label":"Klik Disini","color":"bg-blue-600","width":"w-full","icon":"mouse-pointer-2"}}]};
+            const appData = {"components":[{"id":"1768772944321536","type":"header","data":{"title":"LA6 & Kavling","subtitle":"RT 09","showAvatar":true,"avatarType":"custom","customAvatarUrl":"https://avatars.githubusercontent.com/u/61934361?v=4","colorEnd":"black","gradientEnabled":true,"gradientStart":"black","gradientEnd":"teal-800","aboutContent":"Dibuat oleh: YOUSHE"}},{"id":"176877294432428","type":"hero","data":{"label":"Saldo RT 09","amount":"Rp 54,500,000","colorFrom":"blue-600","colorTo":"blue-800","sheetLink":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetName":"Saldo","sheetRowIndex":8,"sheetColIndex":"1","dataSource":"sheet"}},{"id":"1768772944326634","type":"grid-menu","data":{"cols":"grid-cols-4","items":[{"label":"Bendahara","icon":"wallet","color":"bg-purple-500","action":"sheet","content":"<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Kas","sheetName":"Kas","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Sampah","sheetName":"Sampah","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Konsumsi","sheetName":"Konsumsi","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Arisan","sheetName":"Arisan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Jimpitan","icon":"banknote","color":"bg-orange-500","action":"sheet","content":"<h3>Profil Pengurus</h3><p>Data struktur RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Jimpitan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Sosial","icon":"heart","color":"bg-green-500","action":"sheet","content":"<h3>Laporan Keuangan</h3><p>Rincian kas RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Sosial","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Keamanan","icon":"lock","color":"bg-red-500","action":"sheet","content":"<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Keamanan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Data Warga","icon":"users","color":"bg-green-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Ronda","icon":"clock","color":"bg-red-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Arisan","icon":"calendar","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Pengurus RT","icon":"user","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"PKK","icon":"heart","color":"bg-blue-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Dawis","icon":"sun","color":"bg-purple-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Kerja Bakti","icon":"coffee","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Lainya..","icon":"list","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""}]}},{"id":"1768772944329940","type":"list-transaksi","data":{"title":"Aktivitas Warga","items":[{"title":"Iuran Sampah","sub":"Kebersihan","right":"-Rp 25,000","colorIcon":"bg-red-100 text-red-600","icon":"trash-2"},{"title":"Jimpitan Warga","sub":"Kas Rutin","right":"+Rp 150,000","colorIcon":"bg-green-100 text-green-600","icon":"coins"},{"title":"Sumbangan Sosial","sub":"Bantuan","right":"-Rp 50,000","colorIcon":"bg-red-100 text-red-600","icon":"heart"}]}},{"id":"1768772944331","type":"navbar","data":{"items":[{"label":"Beranda","icon":"home","active":true,"linkType":"home"},{"label":"Laporan","icon":"file-text","active":false,"linkType":"grid","linkTarget":{"compId":"1768772944326634","itemIndex":2}},{"label":"Akun","icon":"user","active":false,"linkType":"home"}],"bgType":"gradient","gradientStart":"black","gradientEnd":"teal-800"}},{"id":"1768967821241747","type":"org-structure","data":{"title":"Struktur Organisasi","members":[{"name":"Bayu Adi Nugroho","role":"Ketua RT","photo":"https://la6.my.id/file/a11.jpg","content":""},{"name":"Ariyanto","role":"Penasehat RT","photo":"https://la6.my.id/file/a9.jpg","content":""},{"name":"Arif Fajar Santoso","role":"Sekretaris","photo":"https://la6.my.id/file/a7.jpg","content":""},{"name":"Budi Setiawan","role":"Bendahara","photo":"https://la6.my.id/file/c7.jpg","content":""},{"name":"M. Dicky","role":"Seksi Jimpitan","photo":"https://la6.my.id/file/b7.jpg","content":""},{"name":"Thomas Hendra","role":"Seksi Sosial","photo":"https://la6.my.id/file/b9.jpg","content":""},{"name":"Wahyudi","role":"Seksi Keamanan","photo":"https://la6.my.id/file/ra1.jpg","content":""},{"name":"Hari Susanto","role":"Seksi Keamanan 2","photo":"https://la6.my.id/file/a12.jpg","content":""},{"name":"Eko Santoso","role":"Seksi Kebersihan","photo":"https://la6.my.id/file/a4b.jpg","content":""},{"name":"Heru","role":"Seksi Kebersihan 2","photo":"https://la6.my.id/file/kavc9.jpg","content":""}]}},{"id":"1768818148870564","type":"button","data":{"label":"Klik Disini","color":"bg-blue-600","width":"w-full","icon":"mouse-pointer-2"}}]};
             let isEditMode = false; 
             let previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null };
             window.previewSheetRows = []; window.previewSheetHeaders = []; window.userProfileFallback = 'https://via.placeholder.com/40';
@@ -82,6 +117,9 @@
                 if(comp.data.avatarType === 'custom' && comp.data.customAvatarUrl) avatarSrc = comp.data.customAvatarUrl;
                 let containerClass = "px-6 py-4 flex justify-between items-center shadow-sm";
                 let textClass = "text-gray-800"; let subtitleClass = "text-xs text-gray-500"; let iconColorClass = "text-gray-600";
+                
+                // REVERTED: Removed the fixed top-0 logic. Now it behaves like previous version.
+                
                 if (comp.data.gradientEnabled) { containerClass += ` bg-gradient-to-l from-${comp.data.gradientStart} to-${comp.data.gradientEnd}`; textClass = "text-white"; subtitleClass = "text-xs text-white/80"; iconColorClass = "text-white"; }
                 const aboutClickAttr = !isEdit ? `onclick="openAboutModal('${comp.id}')"` : '';
                 return `<div class="${containerClass}"><div class="flex items-center gap-3">${comp.data.showAvatar?`<div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white/20"><img src="${avatarSrc}" class="w-full h-full object-cover"></div>`:''}<div><p class="${subtitleClass}">${comp.data.subtitle}</p><h1 class="text-lg font-bold ${textClass}">${comp.data.title}</h1></div></div><i data-lucide="info" class="w-5 h-5 ${iconColorClass} cursor-pointer" ${aboutClickAttr}></i></div>`;
@@ -355,7 +393,7 @@
             const headerComp = appData.components.find(c => c.type === 'header');
             let fallbackAvatar = 'https://via.placeholder.com/40';
             if (headerComp && headerComp.data) {
-                if (headerComp.data.avatarType === 'custom' && headerComp                .data.customAvatarUrl) { fallbackAvatar = headerComp.data.customAvatarUrl; } 
+                if (headerComp.data.avatarType === 'custom' && headerComp.data.customAvatarUrl) { fallbackAvatar = headerComp.data.customAvatarUrl; } 
                 else { fallbackAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${headerComp.id}`; }
             }
             window.userProfileFallback = fallbackAvatar;
