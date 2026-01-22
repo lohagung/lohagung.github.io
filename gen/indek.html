@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart UI Generator v21.2 - Pro (Org Structure Update)</title>
+    <!-- Tailwind CSS (via CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (via CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #f3f4f6; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Phone Frame & Canvas (Editor Mode) */
+        .phone-frame { width: 380px; height: 750px; border: 12px solid #1e293b; border-radius: 40px; overflow: hidden; position: relative; background: #f3f4f6; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transition: all 0.3s; display: flex; flex-direction: column; }
+        
+        /* Responsive Phone Frame */
+        @media (max-width: 640px) {
+            .phone-frame { width: 100%; height: 100%; border: none; border-radius: 0; }
+            .drop-zone { padding-bottom: 80px; }
+        }
+
+        /* =========================================
+           LIVE APP MODE (FULL SCREEN & NO PADDING)
+           ========================================= */
+        body.is-live-app {
+            background-color: #ffffff;
+        }
+        
+        body.is-live-app nav,                
+        body.is-live-app #sidebar-left,     
+        body.is-live-app #sidebar-right,    
+        body.is-live-app #status-bar-mock {
+            display: none !important;
+        }
+
+        body.is-live-app main {
+            padding: 0 !important;
+            background-color: transparent;
+        }
+
+        body.is-live-app .phone-frame {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #f9fafb;
+            position: relative;
+        }
+
+        body.is-live-app #bottom-nav-container {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            width: 100% !important;
+            max-width: none !important;
+            z-index: 50;
+            pointer-events: auto;
+        }
+        /* ========================================= */
+
+        .drop-zone { min-height: 100%; padding-bottom: 100px; }
+        .drop-zone.drag-over { background-color: #e0f2fe; border: 2px dashed #3b82f6; }
+        
+        /* Builder Components */
+        .builder-component { position: relative; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .builder-component:hover { border: 2px dashed #94a3b8; }
+        .builder-component.selected { border: 2px solid #2563eb; background-color: rgba(37, 99, 235, 0.05); }
+        
+        /* Draggables (Desktop) */
+        .draggable-item { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; user-select: none; }
+        .draggable-item:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transform: translateY(-1px); }
+        .draggable-item:active { cursor: grabbing; transform: scale(0.95); }
+        
+        /* Property Inputs */
+        .prop-group { margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .prop-label { font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 4px; display: block; }
+        .prop-input, .prop-select, .prop-textarea { width: 100%; font-size: 0.875rem; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; transition: border-color 0.2s; }
+        .prop-input:focus, .prop-select:focus, .prop-textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); }
+        
+        /* Modals & Bottom Sheets */
+        #icon-modal, #magic-modal, #submenu-modal, #sheet-config-modal, #content-editor-modal, #sheet-detail-modal, #share-modal, #shortcut-modal { background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+        
+        /* Mobile Bottom Sheet Library */
+        #mobile-library-modal { transition: transform 0.3s ease-out; }
+        #mobile-library-modal.hidden { transform: translateY(100%); }
+        #mobile-library-modal.flex { transform: translateY(0); }
+
+        /* Mobile Right Sidebar (Properties) as Bottom Sheet */
+        @media (max-width: 768px) {
+            #sidebar-right {
+                position: fixed; bottom: 0; left: 0; right: 0; 
+                width: 100%; height: 85vh; z-[60]; 
+                border-top: 1px solid #e2e8f0; border-radius: 20px 20px 0 0;
+                transform: translateY(110%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            }
+            #sidebar-right.mobile-active { transform: translateY(0); }
+            #sidebar-right.mobile-active { display: flex; }
+        }
+
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Tabs */
+        .config-tab { cursor: pointer; padding: 8px 12px; font-size: 0.8rem; font-weight: 600; border-bottom: 2px solid transparent; color: #64748b; white-space: nowrap; transition: color 0.2s; }
+        .config-tab:hover { color: #475569; }
+        .config-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+        
+        /* Column Reordering Styles */
+        .col-item { transition: background 0.2s, transform 0.2s; cursor: grab; touch-action: none; }
+        .col-item:active { cursor: grabbing; }
+        .col-item.dragging { opacity: 0.4; background: #f0f9ff; border: 2px dashed #3b82f6; border-radius: 6px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Rich Text Editor */
+        .toolbar-btn { padding: 4px 8px; border: 1px solid #e2e8f0; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; color: #475569; transition: all 0.2s; }
+        .toolbar-btn:hover { background: #f1f5f9; color: #1e293b; }
+        .toolbar-btn.active { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        #content-html-input { min-height: 250px; outline: none; line-height: 1.6; }
+        #content-html-input:empty:before { content: attr(placeholder); color: #9ca3af; display: block; }
+        
+        /* Code Editor Mode */
+        .code-editor {
+            font-family: 'Fira Code', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+            resize: none;
+            border: 1px solid #333;
+        }
+
+        /* About Modal */
+        #about-modal {
+            z-index: 200;
+        }
+
+        /* Shortcut Styling inside Editor */
+        .editor-shortcut {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 500;
+            margin: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .editor-shortcut:hover {
+            background-color: #dbeafe;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- Top Bar (HIDDEN in Live App Mode) -->
+    <nav class="h-14 bg-white border-b flex items-center justify-between px-2 md:px-6 shrink-0 z-20 relative">
+        <div class="flex items-center gap-2">
+            <button onclick="toggleMobileLibrary()" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+                <i data-lucide="layout-grid" class="w-6 h-6"></i>
+            </button>
+            <div class="bg-blue-600 text-white p-1 rounded-lg shadow-sm"><i data-lucide="layout-template" class="w-5 h-5"></i></div>
+            <div class="flex flex-col">
+                <h1 class="font-bold text-gray-800 text-sm md:text-lg hidden md:block">Smart UI</h1>
+                <span class="text-[10px] text-gray-400 font-mono hidden md:block">v21.2 Update</span>
+            </div>
+        </div>
+        
+        <!-- Mode Switcher (Icons Only on Mobile) -->
+        <div class="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
+            <button onclick="setEditMode(false)" id="btn-mode-preview" class="px-2 py-1.5 text-xs font-medium rounded-md transition-all text-gray-500 hover:text-gray-700 flex items-center gap-1 md:gap-2"><i data-lucide="play" class="w-4 h-4"></i> <span class="hidden md:inline">Simulator</span></button>
+            <button onclick="setEditMode(true)" id="btn-mode-edit" class="px-2 py-1.5 text-xs font-medium rounded-md transition-all bg-white text-blue-600 shadow-sm flex items-center gap-1 md:gap-2 ring-1 ring-gray-200"><i data-lucide="edit-3" class="w-4 h-4"></i> <span class="hidden md:inline">Editor</span></button>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <!-- SHARE BUTTON -->
+            <button onclick="openShareModal()" class="p-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-colors md:px-3 md:py-2" title="Share"><i data-lucide="share-2" class="w-4 h-4"></i> <span class="hidden md:inline text-sm">Share</span></button>
+
+            <button onclick="openMagicModal()" id="btn-magic" class="hidden md:flex px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 text-white rounded-lg shadow items-center gap-2 transition-transform active:scale-95"><i data-lucide="sparkles" class="w-4 h-4"></i> <span>Magic</span></button>
+            <button onclick="resetCanvas()" id="btn-reset" class="p-2 text-sm text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition-colors md:px-3 md:py-2" title="Reset"><i data-lucide="refresh-cw" class="w-4 h-4"></i> <span class="hidden md:inline text-sm">Reset</span></button>
+            
+            <!-- Export/Import JSON Section -->
+            <div class="hidden md:flex gap-1 border-l border-gray-200 pl-2">
+                <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="handleJSONImport(this)">
+                <button onclick="document.getElementById('import-json-input').click()" class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-colors" title="Import Settings JSON"><i data-lucide="folder-open" class="w-4 h-4"></i></button>
+                <button onclick="exportJSON()" class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-colors" title="Export Settings JSON"><i data-lucide="save" class="w-4 h-4"></i></button>
+            </div>
+
+            <button onclick="downloadCode()" class="p-2 md:px-4 md:py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow flex items-center gap-2 transition-transform active:scale-95"><i data-lucide="download" class="w-4 h-4"></i> <span class="hidden md:inline">HTML</span></button>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex overflow-hidden relative">
+        <!-- Left Sidebar: Library (Desktop Only) -->
+        <aside id="sidebar-left" class="hidden md:flex w-72 bg-white border-r flex-col shrink-0 overflow-hidden transition-all duration-300 z-10">
+            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <h2 class="font-semibold text-gray-700 text-sm">Library</h2>
+                <div class="text-xs text-gray-400">Drag & Drop</div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-20 select-none">
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="header"><i data-lucide="panel-top" class="text-blue-600"></i><span class="text-sm font-medium">Header App</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="hero"><i data-lucide="credit-card" class="text-indigo-600"></i><span class="text-sm font-medium">Kartu Saldo</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="grid-menu"><i data-lucide="layout-grid" class="text-orange-600"></i><span class="text-sm font-medium">Menu Grid</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="org-structure"><i data-lucide="users" class="text-purple-600"></i><span class="text-sm font-medium">Struktur Org</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="list-transaksi"><i data-lucide="list" class="text-green-600"></i><span class="text-sm font-medium">List Data</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="photo-album"><i data-lucide="image" class="text-pink-600"></i><span class="text-sm font-medium">Album Foto</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="video-collection"><i data-lucide="video" class="text-red-600"></i><span class="text-sm font-medium">Koleksi Video</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="image-banner"><i data-lucide="image" class="text-purple-600"></i><span class="text-sm font-medium">Banner Gambar</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="info-card"><i data-lucide="bell" class="text-red-600"></i><span class="text-sm font-medium">Info / Alert</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="text-block"><i data-lucide="type" class="text-gray-600"></i><span class="text-sm font-medium">Teks / Judul</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="button"><i data-lucide="mouse-pointer-2" class="text-blue-600"></i><span class="text-sm font-medium">Tombol Aksi</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="search-bar"><i data-lucide="search" class="text-gray-600"></i><span class="text-sm font-medium">Pencarian</span></div>
+                <div class="draggable-item bg-white p-3 rounded-lg border shadow-sm hover:border-blue-400 flex items-center gap-3" draggable="true" data-type="navbar"><i data-lucide="panel-bottom" class="text-teal-600"></i><span class="text-sm font-medium">Bottom Navbar</span></div>
+            </div>
+        </aside>
+
+        <!-- Center: Canvas -->
+        <main class="flex-1 bg-gray-100 flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+            <div class="phone-frame relative flex flex-col shadow-2xl">
+                <!-- Status Bar Mock -->
+                <div id="status-bar-mock" class="h-6 bg-black w-full shrink-0 z-50 flex justify-between px-4 items-center">
+                    <span class="text-[10px] text-white font-bold">09:41</span>
+                    <div class="flex gap-1"><div class="w-3 h-3 bg-white rounded-full opacity-20"></div><div class="w-3 h-3 bg-white rounded-full opacity-20"></div><i data-lucide="battery" class="w-3 h-3 text-white"></i></div>
+                </div>
+                
+                <!-- App Canvas -->
+                <div id="app-canvas" class="flex-1 overflow-y-auto scrollbar-hide bg-gray-50 relative">
+                    <div class="text-center text-gray-400 mt-32 pointer-events-none empty-placeholder px-10 transition-opacity duration-300">
+                        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce"><i data-lucide="sparkles" class="w-10 h-10 text-purple-300"></i></div><p class="font-bold text-gray-500">Canvas Kosong</p>
+                    </div>
+                </div>
+                
+                <!-- Container for Navbar Component -->
+                <div id="bottom-nav-container" class="bottom-0 left:0 right:0 z-40 pointer-events-none"></div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar: Properties -->
+        <aside id="sidebar-right" class="hidden md:flex w-80 bg-white border-l flex-col shrink-0 transition-all duration-300 z-10">
+            <div class="p-4 border-b bg-gray-50 flex justify-between items-center shrink-0">
+                <h2 class="font-semibold text-gray-700 text-sm">Edit Komponen</h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeMobileProperties()" class="md:hidden text-gray-400 hover:text-gray-600 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <button onclick="deleteSelected()" id="btn-delete" class="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-md hidden transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+            <div id="properties-panel" class="flex-1 p-4 overflow-y-auto">
+                <jiv class="text-center text-gray-400 mt-20">
+                    <i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">Klik komponen untuk edit.</p>
+                </jiv>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MOBILE LIBRARY MODAL (Bottom Sheet) -->
+    <div id="mobile-library-modal" onclick="if(event.target === this) toggleMobileLibrary()" class="fixed inset-0 z-[50] bg-black/50 backdrop-blur-sm hidden flex flex-col justify-end md:hidden">
+        <div class="bg-white rounded-t-2xl p-4 max-h-[60vh] flex flex-col shadow-2xl animate-slide-up" onclick="event.stopPropagation()">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="font-bold text-gray-800">Library</h3>
+                <button onclick="toggleMobileLibrary()" class="p-2 bg-gray-100 rounded-full"><i data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i></button>
+            </div>
+            <div class="grid grid-cols-3 gap-3 overflow-y-auto pb-4">
+                <button onclick="addComponentAndCloseLibrary('header')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-blue-50 active:scale-95 transition-all"><div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i data-lucide="panel-top" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Header</span></button>
+                <button onclick="addComponentAndCloseLibrary('org-structure')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-purple-50 active:scale-95 transition-all"><div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i data-lucide="users" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Struktur</span></button>
+                <button onclick="addComponentAndCloseLibrary('photo-album')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-pink-50 active:scale-95 transition-all"><div class="bg-pink-100 text-pink-600 p-2 rounded-lg"><i data-lucide="image" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Foto</span></button>
+                <button onclick="addComponentAndCloseLibrary('video-collection')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-red-50 active:scale-95 transition-all"><div class="bg-red-100 text-red-600 p-2 rounded-lg"><i data-lucide="video" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Video</span></button>
+                <button onclick="addComponentAndCloseLibrary('navbar')" class="flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-teal-50 active:scale-95 transition-all"><div class="bg-teal-100 text-teal-600 p-2 rounded-lg"><i data-lucide="panel-bottom" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Navbar</span></button>
+                <!-- Mobile JSON Buttons -->
+                <div class="col-span-3 mt-2 border-t pt-2 flex gap-2">
+                     <input type="file" id="import-json-input-mobile" accept=".json" class="hidden" onchange="handleJSONImport(this)">
+                     <button onclick="document.getElementById('import-json-input-mobile').click()" class="flex-1 flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all"><div class="bg-gray-200 text-gray-600 p-2 rounded-lg"><i data-lucide="folder-open" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Load</span></button>
+                     <button onclick="exportJSON()" class="flex-1 flex flex-col items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all"><div class="bg-gray-200 text-gray-600 p-2 rounded-lg"><i data-lucide="save" class="w-5 h-5"></i></div><span class="text-[10px] font-medium text-gray-600">Save</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- ABOUT MODAL -->
+    <div id="about-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm z-[200]">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-center mb-2" id="about-title">Tentang Aplikasi</h3>
+                <div id="about-content" class="text-sm text-gray-600 text-center leading-relaxed"></div>
+            </div>
+            <div class="p-4 border-t flex justify-center">
+                <button onclick="document.getElementById('about-modal').classList.add('hidden')" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div id="share-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
+            <div class="p-4 border-b bg-blue-50 rounded-t-xl flex justify-between items-center">
+                <div><h3 class="font-bold text-blue-900">Bagikan Aplikasi</h3><p class="text-xs text-blue-700">Link versi pendek & dinamis.</p></div>
+                <button onclick="closeShareModal()" class="text-blue-900/50 hover:text-blue-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-3">
+                <div><label class="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Nama Aplikasi</label><input type="text" id="share-app-name" class="prop-input font-mono text-sm" placeholder="Contoh: Warga App"></div>
+                <div><label class="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Link Share</label><div class="relative"><input type="text" id="share-link-input" readonly class="w-full pl-3 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" value=""><button onclick="copyShareLink()" class="absolute right-2 top-2 p-1.5 bg-white border border-gray-200 rounded hover:bg-gray-100 text-blue-600 transition-colors" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button></div></div>
+                <div id="share-feedback" class="mt-2 text-center text-xs font-medium text-green-600 hidden">Link berhasil disalin!</div>
+            </div>
+            <div class="p-4 bg-gray-50 border-t rounded-b-xl"><button onclick="generateShareLink()" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow">Generate Link Baru (Versi Baru)</button></div>
+        </div>
+    </div>
+
+    <!-- Icon Picker Modal -->
+    <div id="icon-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b flex justify-between items-center"><h3 class="font-bold text-gray-800">Pilih Icon</h3><button onclick="closeIconModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="p-2 border-b bg-gray-50"><input type="text" id="icon-search" placeholder="Cari icon..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"></div>
+            <div id="icon-grid" class="p-4 overflow-y-auto grid grid-cols-5 gap-3"></div>
+        </div>
+    </div>
+
+    <!-- Submenu Editor Modal -->
+    <div id="submenu-modal" class="fixed inset-0 z-[80] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b bg-orange-50 rounded-t-xl flex justify-between items-center"><div><h3 class="font-bold text-orange-900">Editor Sub-menu</h3></div><button onclick="closeSubmenuModal()"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="p-4 flex-1 overflow-y-auto bg-gray-50" id="submenu-content"></div>
+            <div class="p-4 border-t bg-white flex gap-2"><button onclick="addSubmenuItem()" class="flex-1 py-2 border border-dashed rounded-lg text-sm font-bold hover:bg-gray-50">+ Item Submenu</button><button onclick="saveSubmenuAndClose()" class="flex-1 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700">Simpan</button></div>
+        </div>
+    </div>
+    
+    <!-- Rich Text Content Editor Modal -->
+    <div id="content-editor-modal" class="fixed inset-0 z-[95] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 flex flex-col max-h-[90vh] h-[90vh]">
+            <div class="p-4 border-b bg-blue-50 rounded-t-xl flex justify-between items-center shrink-0">
+                <div><h3 class="font-bold text-blue-900">Editor Konten</h3><p class="text-xs text-blue-700">Visual atau Code Mode</p></div>
+                <button onclick="closeContentModal()"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <!-- Mode Toggle -->
+            <div class="px-4 py-2 bg-white border-b flex gap-2 shrink-0">
+                <button onclick="setEditorMode('visual')" id="btn-mode-visual" class="flex-1 py-1 text-xs font-bold rounded border transition-colors bg-blue-50 text-blue-600 border-blue-200">Visual</button>
+                <button onclick="setEditorMode('code')" id="btn-mode-code" class="flex-1 py-1 text-xs font-bold rounded border transition-colors text-gray-500 hover:bg-gray-50 border-gray-200">Code</button>
+            </div>
+
+            <!-- Toolbar (Visual Mode) -->
+            <div id="editor-toolbar" class="px-4 py-2 bg-gray-50 border-b flex flex-wrap gap-1 items-center shrink-0 overflow-x-auto no-scrollbar">
+                <button onclick="formatDoc('bold')" class="toolbar-btn font-bold" title="Bold">B</button>
+                <button onclick="formatDoc('italic')" class="toolbar-btn italic" title="Italic">I</button>
+                <button onclick="formatDoc('underline')" class="toolbar-btn underline" title="Underline">U</button>
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                <button onclick="formatDoc('formatBlock', 'H1')" class="toolbar-btn" title="Heading 1">H1</button>
+                <button onclick="formatDoc('formatBlock', 'H2')" class="toolbar-btn" title="Heading 2">H2</button>
+                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                <button onclick="insertImage()" class="toolbar-btn" title="Insert Image URL"><i data-lucide="image" class="w-4 h-4"></i> Img</button>
+                <button onclick="insertVideo()" class="toolbar-btn" title="Insert YouTube Link"><i data-lucide="video" class="w-4 h-4"></i> Video</button>
+                <!-- Shortcut Button -->
+                <button onclick="openShortcutModal()" class="toolbar-btn text-indigo-600 border-indigo-200 hover:bg-indigo-50" title="Insert Menu Shortcut"><i data-lucide="link" class="w-4 h-4"></i> Shortcut</button>
+                <button onclick="formatDoc('removeFormat')" class="toolbar-btn text-red-500" title="Clear Format"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="p-4 flex-1 overflow-y-auto bg-white relative">
+                <!-- Visual Mode -->
+                <div id="visual-editor-container" class="h-full">
+                    <div id="content-html-input" contenteditable="true" class="w-full h-full min-h-[200px] border rounded-lg p-4 text-sm focus:ring-2 focus:ring-blue-500 outline-none overflow-y-auto" placeholder="Mulai mengetik konten anda..."></div>
+                </div>
+                <!-- Code Mode -->
+                <div id="code-editor-container" class="h-full hidden">
+                    <textarea id="code-editor-textarea" class="code-editor" placeholder="<div>HTML Code...</div>"></textarea>
+                    <p class="text-[10px] text-gray-500 mt-1">Supports: HTML, Inline CSS, Inline JS</p>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-white flex justify-end shrink-0"><button onclick="saveContentConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-bold">Simpan Konten</button></div>
+        </div>
+    </div>
+
+    <!-- SHORTCUT MODAL (NEW) -->
+    <div id="shortcut-modal" class="fixed inset-0 z-[96] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b bg-indigo-50 rounded-t-xl flex justify-between items-center">
+                <div><h3 class="font-bold text-indigo-900">Insert Menu Shortcut</h3></div>
+                <button onclick="closeShortcutModal()" class="text-indigo-900/50 hover:text-indigo-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1" id="shortcut-list">
+                <!-- List of available menus will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sheet Detail Modal (Simulator View) -->
+    <div id="sheet-detail-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b bg-blue-50 rounded-t-xl flex justify-between items-center"><div><h3 class="font-bold text-blue-900">Detail Data</h3></div><button onclick="closeSheetDetail()" class="text-blue-900/50 hover:text-blue-900"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <div class="p-4 overflow-y-auto" id="sheet-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- SHEET CONFIG MODAL -->
+    <div id="sheet-config-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl mx-4 flex flex-col max-h-[95vh] h-[90vh]">
+            <div class="p-4 border-b bg-green-50 rounded-t-xl flex justify-between items-center shrink-0">
+                <div><h3 class="font-bold text-green-900">Konfigurasi Google Sheet</h3><p class="text-xs text-green-700">Atur urutan dan visibilitas kolom data</p></div>
+                <button onclick="closeSheetConfigModal()" class="text-green-900/50 hover:text-green-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex items-center gap-2 px-4 pt-2 border-b bg-gray-50 overflow-x-auto no-scrollbar shrink-0" id="sheet-tabs-nav"></div>
+            <div class="flex-1 overflow-hidden flex flex-col" id="sheet-tab-content">
+                <div class="p-4 overflow-y-auto flex-1">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div><label class="text-xs font-bold text-gray-500 block mb-1">Judul Tab</label><input type="text" id="tab-label-input" class="prop-input" placeholder="Contoh: Data Warga"></div>
+                        <div><label class="text-xs font-bold text-gray-500 block mb-1">Nama Sheet (Excel)</label><input type="text" id="sheet-name-input" class="prop-input" placeholder="Contoh: Sheet1"></div>
+                    </div>
+                    <div class="border rounded-lg overflow-hidden flex flex-col mb-4 shadow-sm">
+                        <div class="bg-gray-100 px-3 py-2 flex justify-between items-center border-b">
+                            <span class="text-xs font-bold text-gray-600">Urutan Kolom (Drag to Reorder)</span>
+                            <div class="flex gap-2 items-center">
+                                <button onclick="toggleAllColumns(true)" class="text-[10px] text-blue-600 hover:underline font-medium">Select All</button>
+                                <span class="text-gray-300">|</span>
+                                <button onclick="toggleAllColumns(false)" class="text-[10px] text-blue-600 hover:underline font-medium">Unselect</button>
+                                <button onclick="fetchSheetHeaders()" class="text-xs bg-white border px-2 py-0.5 rounded hover:bg-gray-50 text-green-600 font-bold ml-2 flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Muat Data</button>
+                            </div>
+                        </div>
+                        <div id="sheet-columns-list" class="max-h-48 overflow-y-auto bg-white p-1">
+                            <div class="text-center text-gray-400 py-6 text-xs flex flex-col items-center"><i data-lucide="table" class="w-8 h-8 mb-2 opacity-30"></i>Klik 'Muat Data' untuk melihat kolom.</div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xs font-bold text-gray-500 block mb-1">Tampilan & Fitur</label>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <label class="flex-1 border rounded p-2 flex items-center gap-2 cursor-pointer has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition"><input type="radio" name="layout-type" value="list" class="accent-green-600"><i data-lucide="list" class="w-4 h-4"></i> <span class="text-sm">List</span></label>
+                            <label class="flex-1 border rounded p-2 flex items-center gap-2 cursor-pointer has-[:checked]:border-green-500 has-[:checked]:bg-green-50 transition"><input type="radio" name="layout-type" value="grid" class="accent-green-600"><i data-lucide="layout-grid" class="w-4 h-4"></i> <span class="text-sm">Grid</span></label>
+                        </div>
+                        <div class="flex items-center gap-2 bg-blue-50 p-2 rounded border border-blue-100">
+                            <input type="checkbox" id="config-enable-search" class="w-4 h-4 text-blue-600 accent-blue-600 rounded" onchange="updateConfigSearch(this.checked)">
+                            <label for="config-enable-search" class="text-sm font-semibold text-blue-800 cursor-pointer select-none">Aktifkan Pencarian</label>
+                        </div>
+                    </div>
+                    <div class="border rounded-lg overflow-hidden bg-gray-50">
+                        <div class="bg-gray-200 px-3 py-1 text-[10px] font-bold text-gray-600 uppercase tracking-wider">Preview Hasil</div>
+                        <div id="config-live-preview" class="p-4 min-h-[100px] flex items-center justify-center"><p class="text-gray-400 text-xs italic text-center">Preview akan muncul setelah data dimuat...</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-white flex justify-between gap-2 shrink-0">
+                <button onclick="addConfigTab()" class="text-xs text-blue-600 font-bold px-3 py-2 hover:bg-blue-50 rounded border border-transparent hover:border-blue-200">+ Tab Baru</button>
+                <div class="flex gap-2">
+                    <button onclick="deleteConfigTab()" class="text-xs text-red-500 font-bold px-3 py-2 hover:bg-red-50 rounded">Hapus Tab</button>
+                    <button onclick="saveSheetConfig()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-md text-sm">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Magic Template Modal -->
+    <div id="magic-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 flex flex-col">
+            <div class="p-5 border-b bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-xl text-white">
+                <h3 class="font-bold text-lg">Template Default RT</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-4">Tekan tombol di bawah untuk memuat template komunitas RT lengkap (Header, Saldo, Menu, Transaksi).</p>
+                <button onclick="processMagicPrompt()" id="btn-generate" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">Generate Layout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS & STATE ---
+        const POPULAR_ICONS = ['home','user','settings','info','search','menu','arrow-left','arrow-right','chevron-right','credit-card','wallet','banknote','coins','gift','shopping-bag','shopping-cart','truck','package','heart','star','thumbs-up','message-circle','mail','phone','map-pin','calendar','clock','check-circle','alert-circle','info','help-circle','trash-2','edit','plus','minus','x','image','camera','video','music','mic','file-text','file','folder','grid','list','layout-grid','layout-list','users','shield','lock','unlock','eye','eye-off','sun','moon','zap','activity','bar-chart','pie-chart','trending-up','droplets','coffee','utensils','book','graduation-cap','newspaper','tv','radio'];
+        
+        let appData = { components: [] };
+        let selectedId = null;
+        let isEditMode = true; 
+        let previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null }; 
+        
+        let appName = "AppSaya"; 
+        let appVersion = 0;      
+
+        let currentSheetCompId = null, currentSheetItemIndex = null, tempSheetTabs = [], activeTabIndex = 0, sampleSheetData = [];
+        let currentHeaders = []; 
+
+        let iconPickerCallback = null, currentSubmenuCompId = null, currentSubmenuItemIndex = null, tempSubmenuItems = [];
+        let currentContentCompId = null, currentContentItemIndex = null, currentSubmenuContentIndex = null;
+        // New State for Org Structure Editing
+        let currentOrgCompId = null, currentOrgMemberIndex = null;
+        
+        let draggedType = null; 
+        let editorMode = 'visual'; 
+
+        // --- HELPER: FORMAT RUPIAH ---
+        function formatRupiah(amount) {
+            if (!amount) return 'Rp 0';
+            let numberString = String(amount).replace(/[^0-9]/g, '');
+            if (numberString === '') return 'Rp 0';
+            return 'Rp ' + parseInt(numberString).toLocaleString('en-US');
+        }
+
+        function saveToLocal() { localStorage.setItem('smart_ui_v21_settings', JSON.stringify(appData)); }
+        
+        function loadFromLocal() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#') && hash.includes('=')) {
+                try {
+                    const parts = hash.split('=');
+                    const identifier = parts[0].substring(1); 
+                    const encodedData = parts[1];
+                    const versionMatch = identifier.match(/(.+)v(\d+)$/);
+                    if (versionMatch) { appName = versionMatch[1]; appVersion = parseInt(versionMatch[2]); }
+                    const jsonString = decodeURIComponent(escape(atob(encodedData)));
+                    appData = JSON.parse(jsonString);
+                    document.body.classList.add('is-live-app');
+                    isEditMode = false; 
+                    previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0 };
+                    if(document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => { renderCanvas(); lucide.createIcons(); }); } 
+                    else { renderCanvas(); lucide.createIcons(); }
+                    return; 
+                } catch (e) { console.error("Gagal memuat data dari link share", e); alert("Link share tidak valid atau rusak."); }
+            }
+            const saved = localStorage.getItem('smart_ui_v21_settings');
+            if (saved) { try { appData = JSON.parse(saved); } catch(e) { console.error("Gagal memuat save data", e); } }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            loadFromLocal(); 
+            initDragAndDrop(); 
+            lucide.createIcons(); 
+        });
+
+        function openShareModal() {
+            const nameInput = document.getElementById('share-app-name');
+            nameInput.value = appName;
+            updateShareLinkDisplay(appVersion); 
+            document.getElementById('share-modal').classList.remove('hidden');
+            document.getElementById('share-feedback').classList.add('hidden');
+        }
+        function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); }
+        function generateShareLink() {
+            const nameInput = document.getElementById('share-app-name');
+            let newName = nameInput.value.trim() || appName;
+            newName = newName.replace(/[^a-zA-Z0-9]/g, ''); 
+            appName = newName;
+            appVersion++;
+            updateShareLinkDisplay(appVersion);
+        }
+        function updateShareLinkDisplay(version) {
+            const jsonStr = JSON.stringify(appData);
+            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            const baseUrl = window.location.href.split('#')[0];
+            const identifier = `${appName}v${version}`;
+            const shareUrl = `${baseUrl}#${identifier}=${encoded}`;
+            document.getElementById('share-link-input').value = shareUrl;
+        }
+        function copyShareLink() {
+            const copyText = document.getElementById("share-link-input");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                const feedback = document.getElementById('share-feedback');
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 2000);
+            });
+        }
+        function toggleMobileLibrary() {
+            const modal = document.getElementById('mobile-library-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+        function addComponentAndCloseLibrary(type) { addComponent(type); toggleMobileLibrary(); }
+        function closeMobileProperties() {
+            const sb = document.getElementById('sidebar-right');
+            sb.classList.remove('mobile-active');
+            setTimeout(() => { if (!sb.classList.contains('mobile-active')) sb.style.display = ''; }, 300);
+            selectedId = null; renderCanvas();
+        }
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable-item'); const dropZone = document.getElementById('app-canvas');
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => { 
+                    if(!isEditMode) { e.preventDefault(); return; } 
+                    e.dataTransfer.setData('text/plain', draggable.dataset.type); 
+                    draggable.classList.add('opacity-50'); window.draggedType = draggable.dataset.type; 
+                });
+                draggable.addEventListener('dragend', () => { draggable.classList.remove('opacity-50'); window.draggedType = null; });
+            });
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); if(isEditMode) dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+            dropZone.addEventListener('drop', (e) => { 
+                e.preventDefault(); dropZone.classList.remove('drag-over'); 
+                if (!isEditMode) return; 
+                const type = e.dataTransfer.getData('text/plain') || window.draggedType; 
+                if (type) addComponent(type); 
+            });
+        }
+        function setEditMode(mode) {
+            if(document.body.classList.contains('is-live-app')) return; 
+            isEditMode = mode;
+            document.getElementById('btn-mode-edit').className = isEditMode ? "px-2 py-1.5 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm flex items-center gap-1 md:gap-2 ring-1 ring-gray-200" : "px-2 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:bg-gray-200 flex items-center gap-1 md:gap-2";
+            document.getElementById('btn-mode-preview').className = !isEditMode ? "px-2 py-1.5 text-xs font-medium rounded-md bg-white text-green-600 shadow-sm flex items-center gap-1 md:gap-2 ring-1 ring-gray-200" : "px-2 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:bg-gray-200 flex items-center gap-1 md:gap-2";
+            const sidebars = [document.getElementById('sidebar-left'), document.getElementById('sidebar-right')];
+            sidebars.forEach(sb => { if(isEditMode) sb.classList.remove('opacity-40', 'pointer-events-none'); else sb.classList.add('opacity-40', 'pointer-events-none'); });
+            document.getElementById('btn-magic').disabled = !isEditMode; 
+            document.getElementById('btn-reset').disabled = !isEditMode;
+            previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null }; selectedId = null;
+            closeMobileProperties(); renderCanvas();
+        }
+        function deleteSelected() { 
+            if(!selectedId) return; 
+            if(confirm('Hapus komponen ini?')){ 
+                appData.components = appData.components.filter(c => c.id !== selectedId); 
+                selectedId = null; 
+                const panel = document.getElementById('properties-panel');
+                const btnDelete = document.getElementById('btn-delete');
+                panel.innerHTML = `<div class="text-center text-gray-400 mt-20"><i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i><p class="text-sm">Klik komponen untuk edit.</p></div>`;
+                btnDelete.classList.add('hidden');
+                lucide.createIcons();
+                renderCanvas();
+                saveToLocal(); 
+                closeMobileProperties();
+            } 
+        }
+        function resetCanvas() { 
+            if(confirm('Reset semua desain?')){ 
+                appData.components = []; selectedId = null; 
+                const panel = document.getElementById('properties-panel');
+                const btnDelete = document.getElementById('btn-delete');
+                panel.innerHTML = `<div class="text-center text-gray-400 mt-20"><i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i><p class="text-sm">Klik komponen untuk edit.</p></div>`;
+                btnDelete.classList.add('hidden');
+                lucide.createIcons();
+                renderCanvas();
+                localStorage.removeItem('smart_ui_v21_settings'); 
+            } 
+        }
+        function addComponent(type, overrideData = null) {
+            const id = Date.now().toString() + Math.floor(Math.random() * 1000); let newComponent = { id, type };
+            if (type === 'header') newComponent.data = { title: 'LA6 & Kav', subtitle: 'Warga RT 09', showAvatar: true, avatarType: 'default', customAvatarUrl: '', aboutContent: 'Aplikasi Warga v1.0', gradientEnabled: false, gradientStart: 'teal-800', gradientEnd: 'black' };
+            else if (type === 'image-banner') newComponent.data = { url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=500&h=300&fit=crop', height: 'h-40', rounded: 'rounded-xl' };
+            else if (type === 'search-bar') newComponent.data = { placeholder: 'Cari sesuatu...', bg: 'bg-white' };
+            else if (type === 'button') newComponent.data = { label: 'Klik Disini', color: 'bg-blue-600', width: 'w-full', icon: 'mouse-pointer-2' };
+            else if (type === 'text-block') newComponent.data = { text: 'Judul Bagian', size: 'text-lg', weight: 'font-bold', color: 'text-gray-800', align: 'text-left' };
+            else if (type === 'hero') newComponent.data = { 
+                label: 'Total Saldo', amount: 'Rp 54500000', colorFrom: 'blue-600', colorTo: 'blue-800',
+                dataSource: 'manual',
+                sheetLink: '',
+                sheetName: '',
+                sheetColIndex: 0,
+                sheetRowIndex: 2
+            };
+            else if (type === 'grid-menu') newComponent.data = { cols: 'grid-cols-4', items: [{ label: 'Menu 1', icon: 'zap', color: 'bg-blue-500', action:'content', submenu: [], link: '', content:'', sheetConfig: null }] };
+            else if (type === 'list-transaksi') newComponent.data = { title: 'Daftar Terbaru', items: [{ title: 'Item 1', sub: 'Keterangan', right: 'Info', colorIcon: 'bg-blue-100 text-blue-600', icon: 'info' }, { title: 'Item 2', sub: 'Keterangan', right: 'Info', colorIcon: 'bg-green-100 text-green-600', icon: 'check-circle' }] };
+            else if (type === 'navbar') { 
+                appData.components = appData.components.filter(c => c.type !== 'navbar'); 
+                newComponent.data = { 
+                    items: [{ label: 'Home', icon: 'home', active: true, linkType: 'home' }],
+                    // NAVBAR STYLING
+                    bgType: 'solid',
+                    bgColor: 'white',
+                    gradientStart: 'blue-600',
+                    gradientEnd: 'indigo-900'
+                }; 
+            }
+            else if (type === 'info-card') newComponent.data = { title: 'Informasi', date: 'Hari ini', text: 'Tulis pesan informasi disini...', type: 'info' };
+            // NEW COMPONENTS
+            else if (type === 'org-structure') newComponent.data = { title: 'Struktur Organisasi', members: [] };
+            else if (type === 'photo-album') newComponent.data = { title: 'Galeri Foto', items: [] };
+            else if (type === 'video-collection') newComponent.data = { title: 'Video Gallery', items: [] };
+            
+            if (overrideData) newComponent.data = { ...newComponent.data, ...overrideData };
+            appData.components.push(newComponent); renderCanvas(); saveToLocal(); return id;
+        }
+        function renderCanvas() { if (isEditMode) renderEditMode(); else renderPreviewMode(); lucide.createIcons(); }
+        function renderEditMode() {
+            const canvas = document.getElementById('app-canvas'); const navContainer = document.getElementById('bottom-nav-container'); const emptyMsg = canvas.querySelector('.empty-placeholder');
+            Array.from(canvas.children).forEach(child => { if(!child.classList.contains('empty-placeholder')) child.remove(); }); navContainer.innerHTML = ''; navContainer.style.pointerEvents = 'none';
+            if(appData.components.length > 0) { if(emptyMsg) emptyMsg.style.display = 'none'; } else { if(emptyMsg) emptyMsg.style.display = 'block'; }
+            appData.components.forEach(comp => {
+                const el = document.createElement('div'); 
+                el.className = `builder-component transition-all duration-200 ${selectedId === comp.id ? 'selected' : ''}`; 
+                el.onclick = (e) => { e.stopPropagation(); selectComponent(comp.id); }; 
+                el.innerHTML = generateComponentHTML(comp, true);
+                if (comp.type === 'navbar') { 
+                    navContainer.style.pointerEvents = 'auto'; 
+                    el.className = `w-full h-[70px] cursor-pointer ${selectedId === comp.id ? 'bg-blue-50' : ''}`; 
+                    navContainer.appendChild(el); 
+                } else if (comp.type === 'header') { 
+                    el.className += ' sticky top-0 z-30'; canvas.appendChild(el); 
+                } else { canvas.appendChild(el); }
+            });
+        }
+        function renderPreviewMode() {
+            const canvas = document.getElementById('app-canvas'); const navContainer = document.getElementById('bottom-nav-container');
+            
+            // Logic khusus untuk Struktur Organisasi View Modes
+            if (previewState.view === 'org-list' || previewState.view === 'org-member') {
+                navContainer.innerHTML = ''; 
+                let contentHTML = '';
+                
+                if (previewState.view === 'org-list') {
+                    // Full Grid View
+                    const comp = appData.components.find(c => c.id === previewState.orgSourceId);
+                    if(!comp) return previewHome(); // Safety fallback
+
+                    contentHTML = `<div class="p-4 min-h-screen bg-gray-50"><h2 class="text-lg font-bold text-gray-800 mb-4">${comp.data.title}</h2>`;
+                    contentHTML += `<div class="grid grid-cols-2 gap-3">`;
+                    
+                    comp.data.members.forEach((m, idx) => {
+                         contentHTML += `
+                            <div onclick="openOrgMemberDetail('${comp.id}', ${idx})" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
+                                <img src="${m.photo || 'https://via.placeholder.com/100'}" class="w-16 h-16 rounded-full object-cover mb-2 bg-gray-100">
+                                <h4 class="font-bold text-gray-800 text-sm line-clamp-1">${m.name}</h4>
+                                <p class="text-[10px] text-blue-600 font-medium">${m.role}</p>
+                            </div>`;
+                    });
+                    contentHTML += `</div></div>`;
+                } 
+                else if (previewState.view === 'org-member') {
+                    // Single Member Detail View
+                    const member = previewState.data; 
+                    contentHTML = `<div class="p-6 bg-white min-h-screen">
+                        <div class="flex flex-col items-center mb-6">
+                            <img src="${member.photo}" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg mb-4 bg-gray-100">
+                            <h2 class="text-xl font-bold text-gray-800">${member.name}</h2>
+                            <p class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full mt-1">${member.role}</p>
+                        </div>
+                        <div class="prose prose-sm max-w-none">
+                            ${member.content || '<p class="text-center text-gray-400">Tidak ada detail informasi.</p>'}
+                        </div>
+                    </div>`; 
+                }
+
+                canvas.innerHTML = `<div class="min-h-full bg-gray-50 animate-fade-in">
+                    <header class="px-6 py-4 bg-white shadow-sm flex items-center gap-3 sticky top-0 z-40">
+                        <button onclick="handleOrgBack()" class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"><i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i></button>
+                        <h2 class="text-lg font-bold text-gray-800">${previewState.title}</h2>
+                    </header>
+                    ${contentHTML}
+                </div>`;
+                return; // Skip normal rendering
+            }
+
+            // Normal View Mode (Home, Sheet, Content, Submenu)
+            if (previewState.view === 'home') {
+                canvas.innerHTML = ''; navContainer.innerHTML = ''; navContainer.style.pointerEvents = 'auto';
+                appData.components.forEach(comp => {
+                    const el = document.createElement('div');
+                    if (comp.type === 'navbar') { el.className = `w-full h-[70px]`; el.innerHTML = generateComponentHTML(comp, false); navContainer.appendChild(el); } 
+                    else { if(comp.type === 'header') el.className = 'sticky top-0 z-30 border-b border-gray-50'; el.innerHTML = generateComponentHTML(comp, false); canvas.appendChild(el); }
+                });
+                
+                // Trigger Hero Updates in Preview
+                appData.components.filter(c => c.type === 'hero').forEach(comp => {
+                    if(comp.data.dataSource === 'sheet') updateHeroPreview(comp.id, comp.data);
+                });
+            } else {
+                navContainer.innerHTML = ''; let contentHTML = '';
+                if (previewState.view === 'sheet') {
+                    const tabs = previewState.config && previewState.config.tabs ? previewState.config.tabs : [{ label: 'Data', layout: 'list', hiddenColumns: [], columnOrder: [], enableSearch: false }];
+                    let searchHTML = '';
+                    if (tabs[previewState.activeTabIdx || 0].enableSearch) {
+                        searchHTML = `<div class="p-4 bg-white border-b sticky top-0 z-20"><div class="relative"><i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i><input type="text" oninput="handlePreviewSearch(this.value)" placeholder="Cari data..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div></div>`;
+                    }
+                    let bottomTabBar = '';
+                    if(tabs.length > 1) {
+                        bottomTabBar = `<div class="sticky pb-4 bottom-0 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 pt-2"><div class="flex justify-around items-center px-2">${tabs.map((t, idx) => `<button onclick="switchPreviewTab(${idx})" class="flex flex-col items-center justify-center gap-1 w-full active:scale-95 transition-transform group"><div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors ${idx === previewState.activeTabIdx ? 'bg-blue-100 text-blue-600' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'}"><span class="text-sm font-bold">${t.label.charAt(0)}</span></div><span class="text-[10px] font-medium ${idx === previewState.activeTabIdx ? 'text-blue-600' : 'text-gray-500'}">${t.label}</span></button>`).join('')}</div></div>`;
+                    }
+                    contentHTML = `${searchHTML}<div id="sheet-content" class="p-4 min-h-[300px] pb-24"><div class="text-center py-10"><div class="loader mx-auto mb-2"></div><p class="text-xs text-gray-500">Memuat Data...</p></div></div>${bottomTabBar}`;
+                    setTimeout(() => loadSheetPreview(previewState.data, tabs[previewState.activeTabIdx || 0]), 100); 
+                    window.currentPreviewTabs = tabs; window.currentPreviewUrl = previewState.data;
+                } else if (previewState.view === 'content') { contentHTML = `<div class="p-6 prose prose-sm max-w-none bg-white min-h-screen">${previewState.data || '<p>Belum ada konten.</p>'}</div>`; } 
+                else if (previewState.view === 'submenu') { contentHTML = `<div class="p-6 space-y-3">` + previewState.data.map(sub => `<div onclick="handleSubClick('${sub.action}', '${sub.link}', '${sub.content ? sub.content.replace(/'/g, "\\'") : ''}', '${sub.label}')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer active:scale-95"><div class="${sub.color||'bg-blue-500'} w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white"><i data-lucide="${sub.icon}"></i></div><span class="font-medium text-gray-700">${sub.label}</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 ml-auto"></i></div>`).join('') + `</div>`; }
+                
+                canvas.innerHTML = `<div class="min-h-full bg-gray-50 animate-fade-in"><header class="px-6 py-4 bg-white shadow-sm flex items-center gap-3 sticky top-0 z-40"><button onclick="previewHome()" class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"><i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i></button><h2 class="text-lg font-bold text-gray-800">${previewState.title}</h2></header>${contentHTML}</div>`;
+            }
+        }
+        function generateComponentHTML(comp, isEdit) {
+            if (comp.type === 'header') {
+                let avatarSrc = `https://api.dicebear.com/7.x/avataaars/svg?seed=${comp.id}`;
+                if(comp.data.avatarType === 'custom' && comp.data.customAvatarUrl) avatarSrc = comp.data.customAvatarUrl;
+                let containerClass = "px-6 py-4 flex justify-between items-center shadow-sm";
+                let textClass = "text-gray-800"; let subtitleClass = "text-xs text-gray-500"; let iconColorClass = "text-gray-600";
+                
+                // REVERTED: Removed the fixed top-0 logic. Now it behaves like previous version.
+                
+                if (comp.data.gradientEnabled) { containerClass += ` bg-gradient-to-l from-${comp.data.gradientStart} to-${comp.data.gradientEnd}`; textClass = "text-white"; subtitleClass = "text-xs text-white/80"; iconColorClass = "text-white"; }
+                const aboutClickAttr = !isEdit ? `onclick="openAboutModal('${comp.id}')"` : '';
+                return `<div class="${containerClass}"><div class="flex items-center gap-3">${comp.data.showAvatar?`<div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white/20"><img src="${avatarSrc}" class="w-full h-full object-cover"></div>`:''}<div><p class="${subtitleClass}">${comp.data.subtitle}</p><h1 class="text-lg font-bold ${textClass}">${comp.data.title}</h1></div></div><i data-lucide="info" class="w-5 h-5 ${iconColorClass} cursor-pointer" ${aboutClickAttr}></i></div>`;
+            }
+            if (comp.type === 'grid-menu') {
+                const items = comp.data.items.map((i, idx) => {
+                    let clickAttr = '';
+                    if (!isEdit) { 
+                        if (i.action === 'sheet' && i.link) clickAttr = `onclick='openPreviewSheet("${encodeURIComponent(i.link)}", "${i.label.replace(/'/g, "\\'")}", ${JSON.stringify(i.sheetConfig || null).replace(/"/g, '&quot;')})'`; 
+                        else if (i.action === 'content') clickAttr = `onclick='previewState={view:"content", title:"${i.label.replace(/'/g, "\\'")}", data:\`${i.content||""}\`}; renderCanvas();'`; 
+                        else if (i.action === 'submenu' && i.submenu?.length > 0) clickAttr = `onclick="openPreviewSubmenu(${idx}, '${comp.id}', '${i.label.replace(/'/g, "\\'")}')"`;
+                    }
+                    return `<div ${clickAttr} class="flex flex-col items-center gap-2 group cursor-pointer active:scale-95 transition-transform relative">${isEdit && ((i.submenu?.length > 0) || i.link || i.content) ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white"></div>' : ''}<div class="${i.color} w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200"><i data-lucide="${i.icon}" class="w-6 h-6 text-white"></i></div><span class="text-[11px] font-medium text-gray-600 text-center leading-tight">${i.label}</span></div>`;
+                }).join(''); 
+                return `<div class="px-6 py-6"><div class="grid ${comp.data.cols} gap-4">${items}</div></div>`;
+            }
+            // UPDATED ORG STRUCTURE HTML
+            if (comp.type === 'org-structure') {
+                if (isEdit) {
+                    // EDIT MODE: Show all members list vertically with delete/edit buttons
+                    const members = comp.data.members.map((m, idx) => {
+                        return `<div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 group">
+                            <img src="${m.photo || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-gray-100">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 text-sm">${m.name}</h4>
+                                <p class="text-xs text-blue-600 font-medium">${m.role}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openOrgMemberEditor('${comp.id}', ${idx})" class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="removeOrgMember('${comp.id}', ${idx})" class="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                    return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="space-y-3">${members}</div></div>`;
+                } else {
+                    // PREVIEW MODE (HOME): Show only 3 members + "Lihat Detail" button
+                    // Logic handled by renderPreviewMode mostly, but component HTML is basic structure
+                    // However, if we are in Home view:
+                    const limitedMembers = comp.data.members.slice(0, 3);
+                    const members = limitedMembers.map((m, idx) => {
+                         return `<div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 cursor-pointer active:scale-95 transition" onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')">
+                            <img src="${m.photo || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-gray-100">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 text-sm">${m.name}</h4>
+                                <p class="text-xs text-blue-600 font-medium">${m.role}</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                        </div>`;
+                    }).join('');
+                    
+                    let btnHtml = '';
+                    if (comp.data.members.length > 3) {
+                        btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">Lihat Semua (${comp.data.members.length})</button>`;
+                    } else if (comp.data.members.length > 0) {
+                        // If 3 or less, still show a button but maybe "Lihat Detail" to enter grid view
+                         btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Lihat Detail Struktur</button>`;
+                    }
+
+                    return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm flex justify-between items-center">${comp.data.title} <span class="text-[10px] font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${comp.data.members.length} Anggota</span></h3><div class="space-y-3">${members}</div>${btnHtml}</div>`;
+                }
+            }
+            // END UPDATED ORG STRUCTURE
+
+            if (comp.type === 'photo-album') {
+                const photos = comp.data.items.map((p, idx) => `<div class="relative group cursor-pointer"><img src="${p.url}" class="w-full aspect-square object-cover rounded-lg shadow-sm"><div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white rounded-lg"><i data-lucide="zoom-in" class="w-6 h-6"></i></div></div>`).join('');
+                return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="grid grid-cols-2 gap-3">${photos}</div></div>`;
+            }
+            if (comp.type === 'video-collection') {
+                const videos = comp.data.items.map((v, idx) => {
+                    let thumb = v.url.includes('youtu.be') ? `https://img.youtube.com/vi/${v.url.split('/').pop()}/mqdefault.jpg` : (v.url.includes('youtube.com') ? `https://img.youtube.com/vi/${v.url.split('v=')[1].split('&')[0]}/mqdefault.jpg` : 'https://via.placeholder.com/320x180');
+                    return `<div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-sm"><img src="${thumb}" class="w-full aspect-video object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1"><i data-lucide="play" class="w-4 h-4 text-gray-800 fill-current"></i></div></div></div>`;
+                }).join('');
+                return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="grid grid-cols-2 gap-3">${videos}</div></div>`;
+            }
+            // END NEW COMPONENTS
+
+            if (comp.type === 'image-banner') return `<div class="px-6 py-4"><div class="w-full ${comp.data.height} ${comp.data.rounded} overflow-hidden shadow-sm relative bg-gray-200"><img src="${comp.data.url}" class="w-full h-full object-cover"></div></div>`;
+            if (comp.type === 'hero') {
+                // FIXED: Apply formatting
+                const displayAmount = formatRupiah(comp.data.amount);
+                return `<div class="px-6 pt-4" id="hero-container-${comp.id}">
+                    <div class="bg-gradient-to-r from-${comp.data.colorFrom} to-${comp.data.colorTo} rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+                        <div>
+                            <p class="text-white/80 text-sm mb-1 font-medium">${comp.data.label}</p>
+                            <h2 class="text-3xl font-bold tracking-tight hero-balance-amount" data-src="${comp.data.dataSource}">${displayAmount}</h2>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            if (comp.type === 'list-transaksi') { 
+                const items = comp.data.items.map(i => {
+                    let formattedRight = i.right;
+                    if (typeof i.right === 'string' && (i.right.includes('Rp') || !isNaN(i.right.replace(/[^0-9]/g, '')))) {
+                        formattedRight = formatRupiah(i.right);
+                    }
+                    return `<div class="p-3 flex justify-between border-b border-gray-50 items-center hover:bg-gray-50 transition"><div class="flex gap-3 items-center"><div class="w-9 h-9 rounded-full ${i.colorIcon} flex items-center justify-center"><i data-lucide="${i.icon}" class="w-4 h-4"></i></div><div><h4 class="font-semibold text-sm text-gray-800">${i.title}</h4><p class="text-[10px] text-gray-400">${i.sub}</p></div></div><span class="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">${formattedRight}</span></div>`;
+                }).join('');
+                return `<div class="px-6 mb-4"><div class="flex justify-between items-center mb-2"><h3 class="text-sm font-bold text-gray-800">${comp.data.title}</h3></div><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-1 overflow-hidden">${items}</div></div>`; 
+            }
+            if (comp.type === 'info-card') { let c = comp.data.type === 'alert' ? 'red' : comp.data.type === 'health' ? 'green' : 'blue'; return `<div class="px-6 mb-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-${c}-500"><div class="flex justify-between mb-1"><span class="bg-${c}-50 text-${c}-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${comp.data.type}</span><span class="text-xs text-gray-400">${comp.data.date}</span></div><h3 class="font-bold text-gray-800 text-sm">${comp.data.title}</h3><p class="text-xs text-gray-500 mt-1">${comp.data.text}</p></div></div>`; }
+            
+            // --- CLEAN & PROFESSIONAL NAVBAR LOGIC (UPDATED) ---
+            if (comp.type === 'navbar') {
+                let containerClass = `w-full h-[70px] flex justify-around items-center px-2 backdrop-blur-sm border-t transition-colors duration-300 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]`;
+                if (comp.data.bgType === 'gradient') {
+                    containerClass += ` bg-gradient-to-r from-${comp.data.gradientStart} to-${comp.data.gradientEnd} border-t-0`;
+                } else {
+                    containerClass += ` bg-${comp.data.bgColor} border-t border-gray-200`;
+                }
+                const items = comp.data.items.map((i, idx) => {
+                    let clickAttr = '';
+                    if (!isEdit) clickAttr = `onclick="handleNavbarClick('${comp.id}', ${idx})"`;
+                    const isGradient = comp.data.bgType === 'gradient';
+                    const activeClass = isGradient ? 'text-white' : 'text-blue-600';
+                    const inactiveClass = isGradient ? 'text-white/60' : 'text-gray-400';
+                    return `<div ${clickAttr} class="flex-1 flex flex-col items-center justify-center gap-1 h-full cursor-pointer group select-none">
+                                <i data-lucide="${i.icon}" class="w-6 h-6 transition-transform group-active:scale-90 ${i.active ? activeClass : inactiveClass}"></i>
+                                <span class="text-[10px] font-medium tracking-wide ${i.active ? activeClass : inactiveClass}">${i.label}</span>
+                            </div>`;
+                }).join('');
+                return `<div class="${containerClass}">${items}</div>`;
+            }
+            // END NAVBAR LOGIC
+
+            // FIXED: SEARCH BAR INPUT
+            if (comp.type === 'search-bar') return `<div class="px-6 py-2"><div class="relative"><i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i><input type="text" placeholder="${comp.data.placeholder}" class="w-full pl-10 pr-4 py-2 ${comp.data.bg} border border-gray-200 rounded-xl text-sm text-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div></div>`;
+            
+            if (comp.type === 'button') return `<div class="px-6 py-2 flex ${comp.data.width === 'w-auto' ? 'justify-start' : 'justify-center'}"><button class="${comp.data.color} ${comp.data.width} text-white py-3 px-6 rounded-xl font-semibold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">${comp.data.label} ${comp.data.icon ? `<i data-lucide="${comp.data.icon}" class="w-4 h-4"></i>` : ''}</button></div>`;
+            if (comp.type === 'text-block') return `<div class="px-6 py-2 ${comp.data.align}"><p class="${comp.data.size} ${comp.data.weight} ${comp.data.color}">${comp.data.text}</p></div>`;
+            return '';
+        }
+        
+        // --- ORG STRUCTURE NAVIGATION HELPERS ---
+        function openOrgList(compId, title) {
+            previewState = { view: 'org-list', title: title, data: null, config: null, content: null, orgSourceId: compId };
+            renderCanvas();
+        }
+        function openOrgMemberDetail(compId, memberIdx) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(comp && comp.data.members[memberIdx]) {
+                previewState = { view: 'org-member', title: comp.data.members[memberIdx].name, data: comp.data.members[memberIdx], orgSourceId: compId };
+                renderCanvas();
+            }
+        }
+        function handleOrgBack() {
+            // Determine where to go back
+            if (previewState.view === 'org-member') {
+                // Go back to Org List
+                const comp = appData.components.find(c => c.id === previewState.orgSourceId);
+                if(comp) {
+                    previewState = { view: 'org-list', title: comp.data.title, data: null, config: null, content: null, orgSourceId: comp.id };
+                    renderCanvas();
+                } else {
+                    previewHome();
+                }
+            } else if (previewState.view === 'org-list') {
+                previewHome();
+            }
+        }
+
+        function openAboutModal(compId) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(comp && comp.data && comp.data.aboutContent) {
+                document.getElementById('about-title').innerText = comp.data.title || "Tentang Aplikasi";
+                document.getElementById('about-content').innerHTML = comp.data.aboutContent;
+                document.getElementById('about-modal').classList.remove('hidden');
+            }
+        }
+        
+        function removeOrgMember(compId, memberIdx) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(comp) {
+                comp.data.members.splice(memberIdx, 1);
+                selectComponent(compId);
+            }
+        }
+
+        function createInput(l, k, v) { return `<div class="prop-group"><label class="prop-label">${l}</label><input type="text" value="${v}" onchange="updateData('${k}', this.value)" class="prop-input"></div>`; }
+        function createTextarea(l, k, v) { return `<div class="prop-group"><label class="prop-label">${l}</label><textarea onchange="updateData('${k}', this.value)" class="prop-textarea" rows="3">${v}</textarea></div>`; }
+        function createCheckbox(l, k, v) { return `<div class="prop-group flex items-center gap-2"><input type="checkbox" ${v?'checked':''} onchange="updateData('${k}', this.checked)"><label class="text-sm font-medium text-gray-700">${l}</label></div>`; }
+        function createSelect(l, k, v, opts) { return `<div class="prop-group"><label class="prop-label">${l}</label><select onchange="updateData('${k}', this.value)" class="prop-select">${opts.map(o=>`<option value="${o}" ${v===o?'selected':''}>${o}</option>`).join('')}</select></div>`; }
+        function createColorSelect(l, k, v) { const c=['bg-blue-600','bg-blue-800','bg-red-600','bg-green-600','bg-purple-600','bg-orange-500','bg-gray-800','bg-black','bg-white', 'teal-800']; return `<div class="prop-group"><label class="prop-label">${l}</label><select onchange="updateData('${k}', this.value)" class="prop-select">${c.map(o=>`<option value="${o.replace('bg-','')}" ${v.includes(o.replace('bg-',''))?'selected':''}>${o.replace('bg-','')}</option>`).join('')}</select></div>`; }
+        
+        function updateData(k, v) { const c = appData.components.find(x=>x.id===selectedId); if(c){ c.data[k]=v; renderCanvas(); selectComponent(selectedId); saveToLocal(); } }
+        function updateArrayItem(id, arr, idx, f, v) { const c = appData.components.find(x=>x.id===id); if(c){ c.data[arr][idx][f]=v; renderCanvas(); saveToLocal(); } }
+        function addArrayItem(id, arr, obj) { const c = appData.components.find(x=>x.id===id); if(c){ c.data[arr].push(obj); renderCanvas(); selectComponent(id); saveToLocal(); } }
+        function removeArrayItem(id, arr, idx) { const c = appData.components.find(x=>x.id===id); if(c){ c.data[arr].splice(idx,1); renderCanvas(); selectComponent(id); saveToLocal(); } }
+        function moveComponent(dir) { const idx = appData.components.findIndex(c=>c.id===selectedId); if(idx<0)return; const n = idx+dir; if(n>=0 && n<appData.components.length){ [appData.components[idx],appData.components[n]]=[appData.components[n],appData.components[idx]]; renderCanvas(); saveToLocal(); } }
+
+        // --- GRID MENU REORDERING ---
+        function setupGridReorder(compId) {
+            const list = document.getElementById('grid-items-list'); if (!list) return;
+            let draggedItemIndex = null;
+            list.querySelectorAll('.grid-item-draggable').forEach(item => {
+                item.addEventListener('dragstart', (e) => { draggedItemIndex = parseInt(e.target.dataset.index); e.target.classList.add('opacity-50'); e.dataTransfer.effectAllowed = 'move'; });
+                item.addEventListener('dragend', (e) => { e.target.classList.remove('opacity-50'); draggedItemIndex = null; });
+                item.addEventListener('dragover', (e) => { e.preventDefault(); const afterElement = getDragAfterElementGrid(list, e.clientY); const draggable = document.querySelector('.grid-item-draggable.opacity-50'); if (afterElement == null) list.appendChild(draggable); else list.insertBefore(draggable, afterElement); });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const comp = appData.components.find(c => c.id === compId); if (!comp) return;
+                    const newOrder = []; list.querySelectorAll('.grid-item-draggable').forEach(el => { newOrder.push(parseInt(el.dataset.index)); });
+                    const newItems = newOrder.map(idx => comp.data.items[idx]); comp.data.items = newItems; renderCanvas(); selectComponent(compId);
+                });
+            });
+        }
+        function getDragAfterElementGrid(container, y) {
+            const draggableElements = [...container.querySelectorAll('.grid-item-draggable:not(.opacity-50)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest;
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function selectComponent(id) {
+            if(!isEditMode) return; selectedId = id; renderCanvas();
+            const panel = document.getElementById('properties-panel'); const btnDelete = document.getElementById('btn-delete'); const comp = appData.components.find(c => c.id === id);
+            if (window.innerWidth < 768) { const sb = document.getElementById('sidebar-right'); sb.classList.remove('hidden'); sb.classList.add('mobile-active'); sb.style.display = 'flex'; }
+            if (!comp) { panel.innerHTML = `<div class="text-center text-gray-400 mt-20"><i data-lucide="mouse-pointer-click" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i><p class="text-sm">Klik komponen untuk edit.</p></div>`; btnDelete.classList.add('hidden'); lucide.createIcons(); return; }
+            btnDelete.classList.remove('hidden'); let html = `<div class="space-y-1 animate-fade-in">`;
+            
+            // --- HERO COMPONENT UPDATED LOGIC ---
+            if (comp.type === 'hero') {
+                html += createInput('Label', 'label', comp.data.label) + createColorSelect('Grad Awal', 'colorFrom', comp.data.colorFrom) + createColorSelect('Grad Akhir', 'colorTo', comp.data.colorTo);
+                const isManual = comp.data.dataSource === 'manual';
+                html += `<div class="prop-group mt-4">
+                    <label class="prop-label">Sumber Nominal</label>
+                    <div class="flex bg-gray-100 p-1 rounded-lg">
+                        <button onclick="toggleHeroSource('${id}', 'manual')" class="flex-1 py-1 text-xs font-bold rounded transition-colors ${isManual ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}">Manual</button>
+                        <button onclick="toggleHeroSource('${id}', 'sheet')" class="flex-1 py-1 text-xs font-bold rounded transition-colors ${!isManual ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500'}">Spreadsheet</button>
+                    </div>
+                </div>`;
+                if(!isManual) {
+                    html += `<div class="bg-blue-50 border border-blue-100 rounded-lg p-3 space-y-3 animate-fade-in">
+                        <div>
+                            <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Link Spreadsheet</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="hero-sheet-link" value="${comp.data.sheetLink}" placeholder="https://docs.google.com/spreadsheets/d/..." class="prop-input text-xs flex-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Nama Sheet (Opsional)</label>
+                            <input type="text" id="hero-sheet-name" value="${comp.data.sheetName || ''}" placeholder="Ketik Nama Sheet (cth: Sheet1, Data)" class="prop-input text-xs w-full">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Kolom</label>
+                                <select id="hero-sheet-col" onchange="updateHeroSheetConfig('${id}', 'sheetColIndex', this.value)" class="prop-select text-xs">
+                                    <option value="" disabled>Pilih Kolom</option>
+                                    ${comp.data.sheetColIndex !== undefined && comp.data.sheetColIndex !== null ? `<option value="${comp.data.sheetColIndex}" selected>Kolom ${String.fromCharCode(65 + parseInt(comp.data.sheetColIndex))}</option>` : ''}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Baris Ke-</label>
+                                <input type="number" id="hero-sheet-row" value="${comp.data.sheetRowIndex || 2}" onchange="updateHeroSheetConfig('${id}', 'sheetRowIndex', this.value)" class="prop-input text-xs" min="2">
+                            </div>
+                        </div>
+                        <div>
+                            <button onclick="loadHeroColumns('${id}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded text-xs font-bold flex items-center justify-center gap-1 transition-colors">
+                                <i data-lucide="refresh-cw" class="w-3 h-3"></i> Cek Kolom
+                            </button>
+                        </div>
+                    </div>`;
+                }
+            }
+            // END HERO UPDATE
+
+            else if (comp.type === 'header') { 
+                html += createInput('Judul Aplikasi', 'title', comp.data.title) + createInput('Sub Judul', 'subtitle', comp.data.subtitle) + createTextarea('Isi About (Icon Info)', 'aboutContent', comp.data.aboutContent || '') + createCheckbox('Tampilkan Avatar', 'showAvatar', comp.data.showAvatar);
+                html += createCheckbox('Background Gradiasi (Kanan ke Kiri)', 'gradientEnabled', comp.data.gradientEnabled || false);
+                if (comp.data.gradientEnabled) { html += createColorSelect('Warna Awal (Kanan)', 'gradientStart', comp.data.gradientStart || 'teal-800'); html += createColorSelect('Warna Akhir (Kiri)', 'gradientEnd', comp.data.gradientEnd || 'black'); }
+                if (comp.data.showAvatar) {
+                    html += `<div class="prop-group"><label class="prop-label">Tipe Avatar</label><select onchange="updateData('avatarType', this.value)" class="prop-select"><option value="default" ${comp.data.avatarType === 'default' ? 'selected' : ''}>Default (Acak)</option><option value="custom" ${comp.data.avatarType === 'custom' ? 'selected' : ''}>Upload Foto</option></select></div>`;
+                    if (comp.data.avatarType === 'custom') { html += `<div class="prop-group bg-blue-50 p-2 rounded border border-blue-100"><label class="prop-label text-blue-800">Foto Profil</label><input type="file" id="avatar-file-input" accept="image/*" class="w-full text-xs mb-2 text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" onchange="handleAvatarUpload(this)"><input type="text" class="prop-input" value="${comp.data.customAvatarUrl}" placeholder="Atau paste URL gambar..." onchange="updateData('customAvatarUrl', this.value)"></div>`; }
+                }
+            } 
+            
+            // --- UPDATED NAVBAR EDITOR LOGIC ---
+            else if (comp.type === 'navbar') {
+                html += `<div class="text-xs font-bold mb-4 text-blue-600 bg-blue-50 p-2 rounded border border-blue-100"><span>💡 Styling Navbar</span></div>`;
+                
+                html += `<div class="prop-group">
+                    <label class="prop-label">Background Type</label>
+                    <select onchange="updateData('bgType', this.value)" class="prop-select">
+                        <option value="solid" ${comp.data.bgType === 'solid' ? 'selected' : ''}>Solid (Warna Polos)</option>
+                        <option value="gradient" ${comp.data.bgType === 'gradient' ? 'selected' : ''}>Gradient (Gradiasi)</option>
+                    </select>
+                </div>`;
+
+                if (comp.data.bgType === 'solid') {
+                    html += createColorSelect('Warna Background', 'bgColor', comp.data.bgColor || 'white');
+                } else {
+                    html += createColorSelect('Warna Awal (Kiri)', 'gradientStart', comp.data.gradientStart || 'blue-600') + createColorSelect('Warna Akhir (Kanan)', 'gradientEnd', comp.data.gradientEnd || 'blue-800');
+                }
+                html += `<div class="text-xs text-gray-500 mb-4 italic text-center">*Warna teks otomatis putih jika menggunakan Gradient.</div>`;
+                
+                comp.data.items.forEach((item, index) => { 
+                    const isLinked = item.linkType === 'grid' && item.linkTarget;
+                    html += `<div class="border p-3 rounded mb-2 bg-gray-50 relative group hover:bg-white transition-colors">
+                        <button onclick="removeArrayItem('${id}', 'items', ${index})" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full shadow flex items-center justify-center hover:bg-red-600"><i data-lucide="x" class="w-3 h-3"></i></button>
+                        <div class="flex items-center gap-2 mb-2"><button onclick="openIconPickerForArray('${id}', 'items', ${index}, 'icon')" class="w-8 h-8 border bg-white rounded flex items-center justify-center hover:bg-blue-50 shadow-sm"><i data-lucide="${item.icon}" class="w-4 h-4 text-gray-600"></i></button><input class="prop-input m-0 font-medium" value="${item.label}" onchange="updateArrayItem('${id}', 'items', ${index}, 'label', this.value)" placeholder="Label"></div>
+                        <div class="mb-2"><label class="text-[10px] text-gray-500 font-bold block mb-1">Link Ke:</label><select class="prop-select text-xs" onchange="updateNavbarLink('${id}', ${index}, this.value)"><option value="home" ${item.linkType==='home'?'selected':''}>Home (Halaman Utama)</option><option value="grid" ${item.linkType==='grid'?'selected':''}>Link ke Menu Grid...</option></select></div>
+                        ${item.linkType === 'grid' ? `<div class="bg-blue-50 p-2 rounded border border-blue-100"><label class="text-[10px] text-blue-700 font-bold block mb-1">Pilih Menu:</label><select class="prop-select text-xs" onchange="updateNavbarTarget('${id}', ${index}, this.value)"><option value="">-- Pilih Menu --</option>${generateGridOptions(item.linkTarget)}</select></div>` : ''}
+                    </div>`; 
+                }); 
+                html += `<button onclick="addArrayItem('${id}', 'items', {label:'Baru', icon:'circle', active:false, linkType:'home'})" class="w-full py-2 border border-dashed rounded text-xs font-bold bg-white hover:bg-gray-50">+ Tambah Item</button>`;
+            }
+            // --- END UPDATED NAVBAR EDITOR LOGIC ---
+
+            else if (comp.type === 'grid-menu') {
+                html += createSelect('Kolom', 'cols', comp.data.cols, ['grid-cols-2', 'grid-cols-3', 'grid-cols-4', 'grid-cols-5', 'grid-cols-6']);
+                html += `<div id="grid-items-list" class="space-y-2 mb-4 min-h-[100px]">`;
+                comp.data.items.forEach((item, index) => {
+                    const subCount = item.submenu ? item.submenu.length : 0; const configText = item.sheetConfig ? 'Edit Config' : 'Konfigurasi Sheet';
+                    html += `<div class="grid-item-draggable border p-3 rounded-lg bg-white shadow-sm relative group" draggable="true" data-index="${index}">
+                        <div class="absolute top-2 right-2 z-10"><button onclick="removeArrayItem('${id}', 'items', ${index})" class="text-red-300 hover:text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button><div class="absolute -left-2 -top-2 bg-blue-500 w-6 h-6 rounded-full flex items-center justify-center text-white shadow cursor-move"><i data-lucide="grip-vertical" class="w-4 h-4"></i></div></div>
+                        <div class="flex items-center gap-2 mb-2"><button onclick="openIconPickerForArray('${id}', 'items', ${index}, 'icon')" class="w-8 h-8 border rounded flex items-center justify-center hover:bg-blue-50"><i data-lucide="${item.icon}" class="w-4 h-4 text-gray-600"></i></button><input type="text" class="prop-input flex-1 m-0" value="${item.label}" onchange="updateArrayItem('${id}', 'items', ${index}, 'label', this.value)" placeholder="Label"></div>
+                        <div class="mb-2"><label class="text-[10px] text-gray-500 font-bold">Aksi Menu</label><select class="prop-select" onchange="updateArrayItem('${id}', 'items', ${index}, 'action', this.value); selectComponent('${id}')"><option value="sheet" ${item.action==='sheet'?'selected':''}>Link Sheet</option><option value="content" ${item.action==='content'?'selected':''}>Konten HTML</option><option value="submenu" ${item.action==='submenu'?'selected':''}>Sub-menu</option></select></div>
+                        ${item.action === 'sheet' ? `<div class="mb-2"><input type="text" class="prop-input text-xs bg-gray-50 text-blue-600 mb-1" value="${item.link||''}" onchange="updateArrayItem('${id}', 'items', ${index}, 'link', this.value)" placeholder="Link Google Sheet"><button onclick="openSheetConfig('${id}', ${index})" class="w-full py-1 text-xs border border-green-200 text-green-600 rounded hover:bg-green-50 flex items-center justify-center gap-1"><i data-lucide="table" class="w-3 h-3"></i> ${configText}</button></div>` : ''}
+                        ${item.action === 'content' ? `<div class="mb-2"><button onclick="openContentEditor('${id}', ${index})" class="w-full py-1 text-xs border border-blue-200 text-blue-600 rounded hover:bg-blue-50 flex items-center justify-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Edit Konten</button></div>` : ''}
+                        ${item.action === 'submenu' ? `<button onclick="openSubmenuEditor('${id}', ${index})" class="w-full py-1.5 text-xs font-bold rounded border ${subCount>0?'bg-orange-50 text-orange-600':'bg-gray-50 text-gray-500'} flex items-center justify-center gap-1"><i data-lucide="layers" class="w-3 h-3"></i> Edit Sub-menu (${item.submenu?.length||0})</button>` : ''}
+                        <select class="prop-select mb-2 mt-2" onchange="updateArrayItem('${id}', 'items', ${index}, 'color', this.value)"><option value="bg-blue-500" ${item.color==='bg-blue-500'?'selected':''}>Biru</option><option value="bg-green-500" ${item.color==='bg-green-500'?'selected':''}>Hijau</option><option value="bg-red-500" ${item.color==='bg-red-500'?'selected':''}>Merah</option><option value="bg-orange-500" ${item.color==='bg-orange-500'?'selected':''}>Orange</option><option value="bg-purple-500" ${item.color==='bg-purple-500'?'selected':''}>Ungu</option><option value="bg-gray-500" ${item.color==='bg-gray-500'?'selected':''}>Abu</option><option value="bg-black" ${item.color==='bg-black'?'selected':''}>Hitam</option></select>
+                    </div>`;
+                });
+                html += `</div>`; 
+                html += `<button onclick="addArrayItem('${id}', 'items', {label:'Baru', icon:'circle', color:'bg-gray-500', action:'content', submenu:[], link:'', sheetConfig:null, content:''})" class="w-full py-2 border border-dashed rounded text-xs font-bold">+ Tambah Menu</button>`;
+                setTimeout(() => setupGridReorder(id), 100);
+            } 
+            else if (comp.type === 'list-transaksi') { html += createInput('Judul', 'title', comp.data.title); comp.data.items.forEach((item, index) => { html += `<div class="border p-2 rounded mb-2"><div class="flex gap-2 mb-2"><button onclick="openIconPickerForArray('${id}', 'items', ${index}, 'icon')" class="w-8 h-8 border rounded flex items-center justify-center"><i data-lucide="${item.icon}" class="w-4 h-4"></i></button><input class="prop-input m-0" value="${item.title}" onchange="updateArrayItem('${id}', 'items', ${index}, 'title', this.value)"></div><input class="prop-input" value="${item.sub}" onchange="updateArrayItem('${id}', 'items', ${index}, 'sub', this.value)" placeholder="Sub"><input class="prop-input" value="${item.right}" onchange="updateArrayItem('${id}', 'items', ${index}, 'right', this.value)" placeholder="Kanan"></div>`; }); html += `<button onclick="addArrayItem('${id}', 'items', {title:'Baru', sub:'Ket', right:'Info', icon:'circle', colorIcon:'bg-gray-100 text-gray-600'})" class="w-full py-2 border border-dashed rounded text-xs font-bold">+ Item</button>`; }
+            else if (comp.type === 'image-banner') { html += createInput('URL', 'url', comp.data.url) + createSelect('Tinggi', 'height', comp.data.height, ['h-32', 'h-40', 'h-48', 'h-64']) + createSelect('Radius', 'rounded', comp.data.rounded, ['rounded-none', 'rounded-lg', 'rounded-2xl', 'rounded-full']); }
+            else if (comp.type === 'search-bar') { html += createInput('Placeholder Text', 'placeholder', comp.data.placeholder); }
+            else if (comp.type === 'button') { html += createInput('Label Tombol', 'label', comp.data.label) + createIconPicker('Icon Tombol', 'icon', comp.data.icon) + createColorSelect('Warna Background', 'color', comp.data.color) + createSelect('Lebar', 'width', comp.data.width, ['w-full', 'w-auto']); }
+            else if (comp.type === 'text-block') { html += createInput('Isi Teks', 'text', comp.data.text) + createSelect('Ukuran', 'size', comp.data.size, ['text-xs','text-sm','text-base','text-lg','text-xl','text-2xl']) + createSelect('Ketebalan', 'weight', comp.data.weight, ['font-light','font-normal','font-medium','font-bold']) + createSelect('Align', 'align', comp.data.align, ['text-left','text-center','text-right']); }
+            
+            else if (comp.type === 'info-card') { html += createInput('Judul', 'title', comp.data.title) + createInput('Tanggal', 'date', comp.data.date) + `<div class="prop-group"><label class="prop-label">Isi Pesan</label><textarea onchange="updateData('text', this.value)" class="prop-textarea" rows="2">${comp.data.text}</textarea></div>` + createSelect('Tipe', 'type', comp.data.type, ['info', 'alert', 'health']); }
+            
+            // --- NEW COMPONENT PROPERTIES (ORG STRUCTURE) ---
+            if (comp.type === 'org-structure') {
+                html += createInput('Judul', 'title', comp.data.title);
+                html += `<div class="space-y-2 mb-2">`;
+                comp.data.members.forEach((m, idx) => {
+                    html += `<div class="bg-gray-50 p-2 rounded border relative group">
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" class="prop-input text-xs" value="${m.name}" placeholder="Nama" onchange="updateOrgMemberData('${id}', ${idx}, 'name', this.value)">
+                            <input type="text" class="prop-input text-xs" value="${m.role}" placeholder="Jabatan" onchange="updateOrgMemberData('${id}', ${idx}, 'role', this.value)">
+                        </div>
+                        <input type="text" class="prop-input text-xs mb-2" value="${m.photo}" placeholder="URL Foto" onchange="updateOrgMemberData('${id}', ${idx}, 'photo', this.value)">
+                        <button onclick="openOrgMemberEditor('${id}', ${idx})" class="w-full py-1 text-xs bg-purple-50 text-purple-600 hover:bg-purple-100 rounded font-bold mb-1">Edit Detail (HTML)</button>
+                        <button onclick="removeOrgMember('${id}', ${idx})" class="absolute top-1 right-1 text-red-400 hover:text-red-600"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </div>`;
+                });
+                html += `</div>`;
+                html += `<button onclick="addOrgMember('${id}')" class="w-full py-2 border border-dashed rounded text-xs font-bold text-gray-500 hover:bg-gray-50">+ Tambah Anggota</button>`;
+            }
+            else if (comp.type === 'photo-album') {
+                html += createInput('Judul', 'title', comp.data.title);
+                html += `<div class="space-y-2 mb-2">`;
+                comp.data.items.forEach((p, idx) => {
+                    html += `<div class="bg-gray-50 p-2 rounded border relative">
+                        <input type="text" class="prop-input text-xs" value="${p.url}" placeholder="URL Gambar" onchange="updateArrayItem('${id}', 'items', ${idx}, 'url', this.value)">
+                        <button onclick="removeArrayItem('${id}', 'items', ${idx})" class="absolute top-1 right-1 text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>`;
+                });
+                html += `</div>`;
+                html += `<button onclick="addArrayItem('${id}', 'items', {url:''})" class="w-full py-2 border border-dashed rounded text-xs font-bold text-gray-500 hover:bg-gray-50">+ Tambah Foto</button>`;
+            }
+            else if (comp.type === 'video-collection') {
+                html += createInput('Judul', 'title', comp.data.title);
+                html += `<div class="space-y-2 mb-2">`;
+                comp.data.items.forEach((v, idx) => {
+                    html += `<div class="bg-gray-50 p-2 rounded border relative">
+                        <input type="text" class="prop-input text-xs" value="${v.url}" placeholder="Link YouTube" onchange="updateArrayItem('${id}', 'items', ${idx}, 'url', this.value)">
+                        <button onclick="removeArrayItem('${id}', 'items', ${idx})" class="absolute top-1 right-1 text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>`;
+                });
+                html += `</div>`;
+                html += `<button onclick="addArrayItem('${id}', 'items', {url:''})" class="w-full py-2 border border-dashed rounded text-xs font-bold text-gray-500 hover:bg-gray-50">+ Tambah Video</button>`;
+            }
+            // END NEW COMPONENT PROPERTIES
+
+            html += `<div class="grid grid-cols-2 gap-2 mt-6 pt-4 border-t"><button onclick="moveComponent(-1)" class="bg-gray-100 py-2 rounded text-xs font-bold hover:bg-gray-200">Naik</button><button onclick="moveComponent(1)" class="bg-gray-100 py-2 rounded text-xs font-bold hover:bg-gray-200">Turun</button></div></div>`;
+            panel.innerHTML = html; lucide.createIcons();
+        }
+
+        // --- HERO SHEET HELPERS ---
+        window.toggleHeroSource = function(id, source) {
+            const comp = appData.components.find(c => c.id === id);
+            if(comp) {
+                comp.data.dataSource = source;
+                saveToLocal();
+                selectComponent(id);
+            }
+        };
+        window.loadHeroColumns = async function(id) {
+            const linkInput = document.getElementById('hero-sheet-link');
+            const nameInput = document.getElementById('hero-sheet-name');
+            const colSelect = document.getElementById('hero-sheet-col');
+            const btn = document.querySelector(`button[onclick="loadHeroColumns('${id}')"]`);
+            
+            const url = linkInput.value.trim();
+            const sheetName = nameInput.value.trim(); 
+            
+            if(!url || !sheetName) { alert('Masukkan link dan nama sheet dulu.'); return; } 
+            colSelect.innerHTML = '<option value="" disabled>Loading...</option>';
+            colSelect.disabled = true;
+            btn.disabled = true;
+            try {
+                const sheetId = url.match(/\/d\/(.*?)(\/|$)/)[1];
+                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                if(sheetName) apiUrl += `&sheet=${encodeURIComponent(sheetName)}`; else apiUrl += `&gid=0`;
+                const res = await fetch(apiUrl); const txt = await res.text(); const jsonStart = txt.indexOf('{'); const jsonEnd = txt.lastIndexOf('}') + 1; const json = JSON.parse(txt.substring(jsonStart, jsonEnd)); 
+                const cols = json.table.cols;
+                let options = '<option value="" disabled>Pilih Kolom</option>';
+                cols.forEach((c, idx) => { let label = c.label ? c.label : `Kolom ${String.fromCharCode(65+idx)}`; options += `<option value="${idx}">${label} (${String.fromCharCode(65+idx)})</option>`; });
+                colSelect.innerHTML = options; colSelect.disabled = false; btn.disabled = false;
+                updateHeroSheetConfig(id, 'sheetLink', url); updateHeroSheetConfig(id, 'sheetName', sheetName);
+            } catch(e) { colSelect.innerHTML = '<option value="" disabled>Error Load Kolom</option>'; colSelect.disabled = false; btn.disabled = false; console.error(e); alert('Gagal mengambil kolom untuk sheet ini.'); } 
+        };
+        window.updateHeroSheetConfig = function(id, key, value) {
+            const comp = appData.components.find(c => c.id === id);
+            if(comp) { if(key === 'sheetRowIndex') value = parseInt(value); comp.data[key] = value; saveToLocal(); }
+        };
+        window.updateHeroPreview = async function(id, data) {
+            const container = document.getElementById(`hero-container-${id}`);
+            if(!container) return;
+            const textEl = container.querySelector('.hero-balance-amount');
+            if(!textEl) return;
+            textEl.innerText = 'Loading...';
+            try {
+                if(!data.sheetLink) throw new Error('No Link');
+                const sheetId = data.sheetLink.match(/\/d\/(.*?)(\/|$)/)[1];
+                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+                if (data.sheetName) apiUrl += `&sheet=${encodeURIComponent(data.sheetName)}`; else apiUrl += `&gid=0`;
+                const res = await fetch(apiUrl); const txt = await res.text(); const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}')+1)); 
+                const rowIndex = data.sheetRowIndex - 1; const colIndex = data.sheetColIndex;
+                if(json.table.rows[rowIndex] && json.table.rows[rowIndex].c[colIndex]) { const val = json.table.rows[rowIndex].c[colIndex].v; textEl.innerText = formatRupiah(val); } else { textEl.innerText = 'Data Not Found'; }
+            } catch(e) { console.warn("Hero Sheet Fetch Error", e); textEl.innerText = 'Error'; }
+        };
+        function updateOrgMemberData(compId, idx, field, val) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(comp) { comp.data.members[idx][field] = val; renderCanvas(); selectComponent(compId); saveToLocal(); }
+        }
+        function addOrgMember(compId) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(comp) { comp.data.members.push({name:'Nama Baru', role:'Jabatan', photo:'', content:''}); renderCanvas(); selectComponent(compId); saveToLocal(); }
+        }
+        function openOrgMemberEditor(compId, memberIdx) {
+            currentOrgCompId = compId; currentOrgMemberIndex = memberIdx;
+            const comp = appData.components.find(c => c.id === compId);
+            const member = comp.data.members[memberIdx];
+            
+            const editor = document.getElementById('content-html-input'); const codeEditor = document.getElementById('code-editor-textarea');
+            editor.innerHTML = ''; codeEditor.value = '';
+            setEditorMode('visual'); 
+            
+            let content = member.content || '';
+            editor.innerHTML = content; codeEditor.value = content;
+            document.getElementById('content-editor-modal').classList.remove('hidden');
+        }
+
+        function handleAvatarUpload(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) { updateData('customAvatarUrl', e.target.result); }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function generateGridOptions(currentTarget) {
+            let options = '';
+            const gridComps = appData.components.filter(c => c.type === 'grid-menu');
+            if(gridComps.length === 0) return `<option disabled>Tidak ada Menu Grid</option>`;
+            gridComps.forEach((comp, cIdx) => {
+                comp.data.items.forEach((item, iIdx) => {
+                    const isSelected = currentTarget && currentTarget.compId === comp.id && currentTarget.itemIndex === iIdx;
+                    options += `<option value="${comp.id}|${iIdx}" ${isSelected?'selected':''}>${item.label}</option>`;
+                });
+            });
+            return options;
+        }
+        function updateNavbarLink(navId, itemIdx, type) {
+            const navComp = appData.components.find(c => c.id === navId);
+            if(!navComp) return; navComp.data.items[itemIdx].linkType = type;
+            if(type === 'home') navComp.data.items[itemIdx].linkTarget = null;
+            renderCanvas(); selectComponent(navId);
+        }
+        function updateNavbarTarget(navId, itemIdx, value) {
+            const navComp = appData.components.find(c => c.id === navId);
+            if(!navComp || !value) return;
+            const [compId, itemIndex] = value.split('|');
+            navComp.data.items[itemIdx].linkTarget = { compId, itemIndex: parseInt(itemIndex) };
+            renderCanvas(); selectComponent(navId);
+        }
+        function openSubmenuEditor(cid, idx) { currentSubmenuCompId=cid; currentSubmenuItemIndex=idx; tempSubmenuItems = JSON.parse(JSON.stringify(appData.components.find(c=>c.id===cid).data.items[idx].submenu || [])); document.getElementById('submenu-modal').classList.remove('hidden'); renderSubmenuList(); }
+        function closeSubmenuModal() { document.getElementById('submenu-modal').classList.add('hidden'); }
+        function renderSubmenuList() { 
+            document.getElementById('submenu-content').innerHTML = tempSubmenuItems.map((item,i) => `
+            <div class="bg-white p-3 rounded border mb-2 group relative">
+                <button onclick="removeTempSubmenu(${i})" class="absolute top-2 right-2 text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <div class="flex gap-2 items-center mb-2"><div class="${item.color||'bg-blue-500'} w-8 h-8 rounded flex items-center justify-center text-white"><i data-lucide="${item.icon}"></i></div><input value="${item.label}" onchange="updateTempSubmenu(${i},'label',this.value)" class="text-sm border rounded px-1 flex-1"></div>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <select onchange="updateTempSubmenu(${i},'action',this.value); renderSubmenuList()" class="text-xs border rounded px-1 py-1"><option value="sheet" ${item.action==='sheet'?'selected':''}>Link Sheet</option><option value="content" ${item.action==='content'?'selected':''}>Konten</option></select>
+                    ${item.action==='sheet' ? `<input value="${item.link||''}" onchange="updateTempSubmenu(${i},'link',this.value)" class="text-xs border rounded px-1" placeholder="Link Sheet">` : `<button onclick="openContentEditor('${currentSubmenuCompId}', ${currentSubmenuItemIndex}, ${i})" class="text-xs border rounded px-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold">✎ Edit Konten</button>`}
+                </div>
+            </div>`).join(''); lucide.createIcons(); 
+        }
+        function addSubmenuItem() { tempSubmenuItems.push({label:'Baru',icon:'circle',color:'bg-blue-500', action:'content', content:''}); renderSubmenuList(); }
+        function updateTempSubmenu(i,k,v) { tempSubmenuItems[i][k]=v; }
+        function removeTempSubmenu(i) { tempSubmenuItems.splice(i,1); renderSubmenuList(); }
+        function saveSubmenuAndClose() { const comp = appData.components.find(c=>c.id===currentSubmenuCompId); comp.data.items[currentSubmenuItemIndex].submenu = JSON.parse(JSON.stringify(tempSubmenuItems)); closeSubmenuModal(); renderCanvas(); selectComponent(currentSubmenuCompId); saveToLocal(); }
+        
+        function createIconPicker(l,k,v) { return `<div class="prop-group"><label class="prop-label">${l}</label><button onclick="openIconPicker('${k}')" class="w-full flex justify-between px-3 py-2 border rounded bg-white text-sm"><span>${v}</span><span>Ganti</span></button></div>`; }
+        function openIconPicker(k) { iconPickerCallback = (v) => updateData(k,v); document.getElementById('icon-modal').classList.remove('hidden'); renderIconGrid(POPULAR_ICONS); }
+        function openIconPickerForArray(id,arr,idx,f) { iconPickerCallback = (v) => updateArrayItem(id,arr,idx,f,v); document.getElementById('icon-modal').classList.remove('hidden'); renderIconGrid(POPULAR_ICONS); }
+        function closeIconModal() { document.getElementById('icon-modal').classList.add('hidden'); }
+        function renderIconGrid(icons) { document.getElementById('icon-grid').innerHTML = icons.map(i=>`<button onclick="selectIcon('${i}')" class="flex flex-col items-center p-2 hover:bg-blue-50 rounded"><i data-lucide="${i}"></i></button>`).join(''); lucide.createIcons(); }
+        function selectIcon(i) { if(iconPickerCallback) iconPickerCallback(i); closeIconModal(); }
+        function openMagicModal() { document.getElementById('magic-modal').classList.remove('hidden'); }
+        function closeMagicModal() { document.getElementById('magic-modal').classList.add('hidden'); }
+        
+        // --- CONTENT EDITOR & SHORTCUTS ---
+        function setEditorMode(mode) {
+            editorMode = mode;
+            const visualContainer = document.getElementById('visual-editor-container'); const codeContainer = document.getElementById('code-editor-container');
+            const toolbar = document.getElementById('editor-toolbar'); const btnVis = document.getElementById('btn-mode-visual'); const btnCode = document.getElementById('btn-mode-code');
+            const visualInput = document.getElementById('content-html-input'); const codeInput = document.getElementById('code-editor-textarea');
+            if (mode === 'visual') { visualInput.innerHTML = codeInput.value; visualContainer.classList.remove('hidden'); codeContainer.classList.add('hidden'); toolbar.classList.remove('hidden'); btnVis.className = "flex-1 py-1 text-xs font-bold rounded border transition-colors bg-blue-50 text-blue-600 border-blue-200"; btnCode.className = "flex-1 py-1 text-xs font-bold rounded border transition-colors text-gray-500 hover:bg-gray-50 border-gray-200"; } 
+            else { codeInput.value = visualInput.innerHTML; visualContainer.classList.add('hidden'); codeContainer.classList.remove('hidden'); toolbar.classList.add('hidden'); btnVis.className = "flex-1 py-1 text-xs font-bold rounded border transition-colors text-gray-500 hover:bg-gray-50 border-gray-200"; btnCode.className = "flex-1 py-1 text-xs font-bold rounded border transition-colors bg-blue-50 text-blue-600 border-blue-200"; }
+        }
+        function openContentEditor(compId, itemIndex, submenuIndex = null) { 
+            currentContentCompId = compId; currentContentItemIndex = itemIndex; currentSubmenuContentIndex = submenuIndex; 
+            const isOrgEdit = currentOrgCompId !== null && document.getElementById('shortcut-modal').classList.contains('hidden');
+            if(isOrgEdit) {
+                // handled elsewhere (already opened via openOrgMemberEditor)
+            } else {
+                const editor = document.getElementById('content-html-input'); const codeEditor = document.getElementById('code-editor-textarea');
+                editor.innerHTML = ''; codeEditor.value = '';
+                setEditorMode('visual'); 
+                let content = '';
+                if (submenuIndex !== null && document.getElementById('submenu-modal').classList.contains('hidden') === false) { content = tempSubmenuItems[submenuIndex].content || ''; } 
+                else { const comp = appData.components.find(c => c.id === compId); if (!comp) return; let item = comp.data.items[itemIndex]; if (submenuIndex !== null) item = item.submenu[submenuIndex]; content = item.content || ''; } 
+                editor.innerHTML = content; codeEditor.value = content;
+                document.getElementById('content-editor-modal').classList.remove('hidden'); 
+            }
+        }
+        function closeContentModal() { document.getElementById('content-editor-modal').classList.add('hidden'); currentOrgCompId = null; currentOrgMemberIndex = null; }
+        function saveContentConfig() { 
+            let html = '';
+            if (editorMode === 'visual') { html = document.getElementById('content-html-input').innerHTML; } else { html = document.getElementById('code-editor-textarea').value; }
+            
+            if (currentOrgCompId !== null) {
+                // Saving Org Member Detail
+                const comp = appData.components.find(c => c.id === currentOrgCompId);
+                comp.data.members[currentOrgMemberIndex].content = html;
+                selectComponent(currentOrgCompId);
+            } else {
+                const isSubmenuEdit = currentSubmenuContentIndex !== null && document.getElementById('submenu-modal').classList.contains('hidden') === false;
+                if (isSubmenuEdit) { tempSubmenuItems[currentSubmenuContentIndex].content = html; renderSubmenuList(); } 
+                else { const comp = appData.components.find(c => c.id === currentContentCompId); if (currentSubmenuContentIndex !== null) { comp.data.items[currentContentItemIndex].submenu[currentSubmenuContentIndex].content = html; } else { comp.data.items[currentContentItemIndex].content = html; } selectComponent(currentContentCompId); saveToLocal(); }
+            }
+        }
+        function formatDoc(cmd, value = null) { document.execCommand(cmd, false, value); document.getElementById('content-html-input').focus(); }
+        function insertImage() { const url = prompt("Masukkan URL Gambar:", "https://"); if (url) document.execCommand('insertImage', false, url); }
+        function insertVideo() {
+            const url = prompt("Masukkan Link YouTube (Contoh: https://youtu.be/...)", "");
+            if (url) {
+                let videoId = '';
+                if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1];
+                else if (url.includes('youtube.com/watch')) { videoId = url.split('v=')[1]; const ampersandPosition = videoId.indexOf('&'); if (ampersandPosition !== -1) videoId = videoId.substring(0, ampersandPosition); }
+                if (videoId) {
+                    const iframe = `<div style="margin: 10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><br>`;
+                    document.execCommand('insertHTML', false, iframe);
+                } else { alert("Link YouTube tidak valid."); }
+            }
+        }
+        function openShortcutModal() {
+            const list = document.getElementById('shortcut-list');
+            let html = '<p class="text-xs text-gray-500 mb-4">Pilih menu untuk disisipkan sebagai shortcut.</p>';
+            
+            appData.components.filter(c => c.type === 'grid-menu').forEach(comp => {
+                html += `<div class="mb-4"><h4 class="font-bold text-xs text-gray-700 mb-2 uppercase">${comp.data.title || 'Menu Grid'}</h4>`;
+                comp.data.items.forEach((item, idx) => {
+                    if(item.label && item.label !== 'Baru') {
+                        html += `<div onclick="insertShortcut('${comp.id}', ${idx})" class="flex items-center gap-3 p-2 rounded hover:bg-blue-50 cursor-pointer border border-transparent hover:border-blue-100 mb-2">
+                                    <div class="${item.color} w-8 h-8 rounded-lg flex items-center justify-center"><i data-lucide="${item.icon}" class="w-4 h-4 text-white"></i></div>
+                                    <span class="text-sm font-medium text-gray-700">${item.label}</span>
+                                </div>`;
+                    }
+                });
+                html += `</div>`;
+            });
+            list.innerHTML = html;
+            lucide.createIcons();
+            document.getElementById('shortcut-modal').classList.remove('hidden');
+        }
+        function closeShortcutModal() { document.getElementById('shortcut-modal').classList.add('hidden'); }
+        function insertShortcut(compId, itemIdx) {
+            const comp = appData.components.find(c => c.id === compId);
+            const item = comp.data.items[itemIdx];
+            const html = `<div class="editor-shortcut" data-action="shortcut" data-comp-id="${compId}" data-item-idx="${itemIdx}"><i data-lucide="${item.icon}" class="w-4 h-4"></i> ${item.label}</div>`;
+            document.execCommand('insertHTML', false, html);
+            closeShortcutModal();
+        }
+
+        function cleanSheetData(json) {
+            let headersSource = []; let dataRows = json.table.rows;
+            const colsHaveLabels = json.table.cols.some(c => c.label && c.label.trim() !== '');
+            if (colsHaveLabels) { headersSource = json.table.cols; } else { if (json.table.rows.length > 0) { headersSource = json.table.rows[0].c || []; dataRows = json.table.rows.slice(1); } }
+            return { headers: headersSource, data: dataRows };
+        }
+        function openSheetConfig(compId, itemIndex) {
+            currentSheetCompId = compId; currentSheetItemIndex = itemIndex; 
+            const comp = appData.components.find(c => c.id === compId); const item = comp.data.items[itemIndex];
+            if (item.sheetConfig && item.sheetConfig.tabs) { tempSheetTabs = JSON.parse(JSON.stringify(item.sheetConfig.tabs)); } 
+            else { tempSheetTabs = [{ label: 'Data Utama', sheetName: '', layout: 'list', hiddenColumns: [], columnOrder: [], enableSearch: false }]; } 
+            activeTabIndex = 0; sampleSheetData = [];
+            document.getElementById('sheet-config-modal').classList.remove('hidden'); renderConfigTabs(); loadTabInputs();
+            if(item.link && item.link.includes('http')) fetchSheetHeaders(item.link);
+        }
+        function closeSheetConfigModal() { document.getElementById('sheet-config-modal').classList.add('hidden'); currentSheetCompId = null; }
+        function renderConfigTabs() { document.getElementById('sheet-tabs-nav').innerHTML = tempSheetTabs.map((t, i) => `<div onclick="switchConfigTab(${i})" class="config-tab ${i === activeTabIndex ? 'active' : ''}"><input type="text" value="${t.label || 'Tab ' + (i+1)}" onchange="updateTabLabel(${i}, this.value)" class="bg-transparent border-none w-20 text-center focus:ring-0 font-bold" onclick="event.stopPropagation()"></div>`).join(''); }
+        function updateTabLabel(idx, val) { tempSheetTabs[idx].label = val; }
+        function switchConfigTab(idx) { saveCurrentTabState(); activeTabIndex = idx; renderConfigTabs(); loadTabInputs(); const comp = appData.components.find(c => c.id === currentSheetCompId); if(comp.data.items[currentSheetItemIndex].link) fetchSheetHeaders(comp.data.items[currentSheetItemIndex].link); }
+        function addConfigTab() { saveCurrentTabState(); tempSheetTabs.push({ label: 'Data Baru', sheetName: '', layout: 'list', hiddenColumns: [], columnOrder: [], enableSearch: false }); activeTabIndex = tempSheetTabs.length -1; renderConfigTabs(); loadTabInputs(); }
+        function deleteConfigTab() { if(tempSheetTabs.length <= 1) return alert("Minimal satu tab harus ada."); tempSheetTabs.splice(activeTabIndex, 1); if(activeTabIndex >= tempSheetTabs.length) activeTabIndex = tempSheetTabs.length - 1; renderConfigTabs(); loadTabInputs(); }
+        function loadTabInputs() {
+            const tab = tempSheetTabs[activeTabIndex]; if(!tab) return;
+            document.getElementById('tab-label-input').value = tab.label || ''; document.getElementById('sheet-name-input').value = tab.sheetName || '';
+            const radios = document.getElementsByName('layout-type'); radios.forEach(r => { if(r.value === (tab.layout || 'list')) r.checked = true; });
+            document.getElementById('config-enable-search').checked = tab.enableSearch || false;
+            document.getElementById('sheet-columns-list').innerHTML = `<div class="text-center text-gray-400 py-6 text-xs flex flex-col items-center"><i data-lucide="table" class="w-8 h-8 mb-2 opacity-30"></i>Klik 'Muat Data' untuk melihat kolom.</div>`;
+            document.getElementById('config-live-preview').innerHTML = `<p class="text-gray-400 text-xs italic text-center">Preview akan muncul setelah data dimuat...</p>`;
+        }
+        function saveCurrentTabState() { const tab = tempSheetTabs[activeTabIndex]; if(!tab) return; tab.label = document.getElementById('tab-label-input').value; tab.sheetName = document.getElementById('sheet-name-input').value; const radios = document.getElementsByName('layout-type'); radios.forEach(r => { if(r.checked) tab.layout = r.value; }); tab.enableSearch = document.getElementById('config-enable-search').checked; }
+        function updateConfigSearch(checked) { const tab = tempSheetTabs[activeTabIndex]; if(tab) tab.enableSearch = checked; }
+        async function fetchSheetHeaders(urlOverride) { 
+            const comp = appData.components.find(c => c.id === currentSheetCompId); const item = comp.data.items[currentSheetItemIndex]; const url = urlOverride || item.link; 
+            if(!url || !url.includes('http')) { alert('Masukkan link Google Sheet di menu terlebih dahulu.'); return; } 
+            if(url.includes('sd=true')) { alert('Link ini adalah file Excel (.xlsx). Harap simpan sebagai Google Sheet agar bisa dibaca.'); return; }
+            document.getElementById('config-live-preview').innerHTML = `<div class="text-center py-4"><div class="loader mx-auto"></div></div>`; 
+            
+            try { 
+                const sheetId = url.match(/\/d\/(.*?)(\/|$)/)[1]; let gid = '0'; if(url.includes('gid=')) gid = url.split('gid=')[1].split('&')[0]; 
+                const tab = tempSheetTabs[activeTabIndex];
+                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`; 
+                if(tab.sheetName) apiUrl += `&sheet=${encodeURIComponent(tab.sheetName)}`;
+                
+                const res = await fetch(apiUrl); const text = await res.text(); const jsonStart = text.indexOf('{'); const jsonEnd = text.lastIndexOf('}') + 1; const json = JSON.parse(text.substring(jsonStart, jsonEnd)); 
+                
+                const { headers: source, data: cleanData } = cleanSheetData(json);
+                sampleSheetData = cleanData; 
+                let headers = []; 
+                source.forEach((cell, idx) => { let colLetter = String.fromCharCode(65 + idx); let label = (cell && (cell.v || cell.label)) ? (cell.v || cell.label) : `(Kosong)`; headers.push({ index: idx, letter: colLetter, label: label }); });
+                window.currentHeaders = headers;
+                if (!tab.columnOrder || tab.columnOrder.length === 0) { tab.columnOrder = headers.map(h => h.index); if(!tab.hiddenColumns) tab.hiddenColumns = []; headers.forEach(h => { if(h.label === '(Kosong)') tab.hiddenColumns.push(h.index); }); }
+                renderColumnList(headers); updateConfigPreview(); 
+            } catch (e) { console.error(e); document.getElementById('config-live-preview').innerHTML = `<p class="text-red-500 text-xs text-center">Gagal memuat. Pastikan Link Publik.</p>`; } 
+        }
+        function renderColumnList(headers) { 
+            const container = document.getElementById('sheet-columns-list'); const tab = tempSheetTabs[activeTabIndex]; 
+            let rawOrder = (tab.columnOrder && tab.columnOrder.length > 0) ? tab.columnOrder : headers.map(h=>h.index);
+            const validIndices = new Set(headers.map(h => h.index));
+            let order = rawOrder.filter(idx => validIndices.has(idx));
+            if (order.length !== rawOrder.length) { tab.columnOrder = order; }
+            let html = ''; 
+            order.forEach(colIndex => { 
+                const h = headers.find(head => head.index === colIndex); if(!h) return; 
+                const isHidden = tab.hiddenColumns.includes(h.index); 
+                html += `<div class="col-item flex items-center justify-between p-2 border-b last:border-0 hover:bg-gray-50 bg-white" draggable="true" data-index="${h.index}">
+                            <div class="flex items-center gap-2 overflow-hidden pointer-events-none">
+                                <i data-lucide="grip-vertical" class="w-3 h-3 text-gray-300"></i>
+                                <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 rounded w-6 text-center">${h.letter}</span>
+                                <span class="text-sm font-medium text-gray-700 truncate w-32" title="${h.label}">${h.label}</span>
+                            </div>
+                            <label class="flex items-center cursor-pointer">
+                                <span class="mr-2 text-[10px] text-gray-400">${isHidden?'Sembunyi':'Tampil'}</span>
+                                <input type="checkbox" ${!isHidden ? 'checked' : ''} onchange="toggleColumn(${h.index}, this.checked)" class="accent-green-600 w-4 h-4">
+                            </label>
+                        </div>`; 
+            }); 
+            container.innerHTML = html; lucide.createIcons(); setupDragAndDrop(); 
+        }
+        function toggleColumn(index, isVisible) { const tab = tempSheetTabs[activeTabIndex]; if(isVisible) { tab.hiddenColumns = tab.hiddenColumns.filter(i => i !== index); } else { if(!tab.hiddenColumns.includes(index)) tab.hiddenColumns.push(index); } updateConfigPreview(); }
+        function toggleAllColumns(select) { const tab = tempSheetTabs[activeTabIndex]; if(select) tab.hiddenColumns = []; else tab.hiddenColumns = window.currentHeaders.map(h => h.index); renderColumnList(window.currentHeaders); updateConfigPreview(); }
+        function updateConfigPreview() {
+            saveCurrentTabState(); const container = document.getElementById('config-live-preview'); const tab = tempSheetTabs[activeTabIndex];
+            if(!sampleSheetData || sampleSheetData.length === 0) { container.innerHTML = `<p class="text-gray-400 text-xs text-center">Data belum dimuat.</p>`; return; }
+            let order = []; document.querySelectorAll('#sheet-columns-list .col-item').forEach(el => order.push(parseInt(el.dataset.index)));
+            if(order.length === 0 && window.currentHeaders) order = window.currentHeaders.map(h=>h.index);
+            let html = tab.layout === 'grid' ? '<div class="grid grid-cols-2 gap-2 w-full">' : '<div class="space-y-2 w-full">';
+            const rowsToShow = sampleSheetData.slice(0, 4); 
+            rowsToShow.forEach(row => {
+                if(!row.c) return; let displayCells = [];
+                order.forEach(colIndex => { if (!row.c || colIndex >= row.c.length) return; if(!tab.hiddenColumns.includes(colIndex)) { const cell = row.c[colIndex]; if(cell && cell.v !== null) displayCells.push(cell.v); } });
+                if(displayCells.length > 0) {
+                    const imageCell = displayCells.find(d => typeof d === 'string' && (d.match(/^https?:\/\//) || d.startsWith('data:image')));
+                    const iconOrImage = imageCell ? `<img src="${imageCell}" onerror="this.onerror=null;this.src='https://via.placeholder.com/40'" class="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="file-text" class="w-5 h-5"></i></div>`;
+                    let textValues = displayCells.filter(c => c !== imageCell); let title = textValues[0] || 'No Data';
+                    let subtitle = textValues[1] ? textValues[1] : '';
+                    if(tab.layout === 'grid') { 
+                        html += `<div class="bg-white p-2 rounded shadow-sm border text-left flex flex-col h-full"><div class="flex justify-between mb-2">${iconOrImage}</div><h4 class="font-bold text-gray-800 text-xs mb-1 truncate">${title}</h4></div>`; 
+                    } else { 
+                        const rightLabel = textValues[2] || 'Info';
+                        html += `<div class="bg-white p-2 rounded shadow-sm border text-left flex items-center gap-3">${iconOrImage}<div class="flex flex-col flex-1 min-w-0"><h4 class="font-bold text-gray-800 text-sm truncate">${title}</h4><p class="text-xs text-gray-500 truncate">${subtitle}</p></div><div class="ml-2 px-3 py-1 bg-red-600 text-white font-bold text-sm rounded shadow-sm whitespace-nowrap">${rightLabel}</div></div>`; 
+                    }
+                }
+            });
+            html += '</div>'; container.innerHTML = html; lucide.createIcons(); 
+        }
+        function setupDragAndDrop() {
+            const list = document.getElementById('sheet-columns-list'); let draggedItem = null;
+            list.querySelectorAll('.col-item').forEach(item => { 
+                item.addEventListener('dragstart', function(e) { draggedItem = item; setTimeout(() => item.classList.add('dragging'), 0); }); 
+                item.addEventListener('dragend', function() { item.classList.remove('dragging'); draggedItem = null; updateColumnMappingOrder(); }); 
+            });
+            list.addEventListener('dragover', function(e) { e.preventDefault(); const afterElement = getDragAfterElement(list, e.clientY); const draggable = document.querySelector('.dragging'); if (afterElement == null) list.appendChild(draggable); else list.insertBefore(draggable, afterElement); });
+        }
+        function getDragAfterElement(container, y) { 
+            const draggableElements = [...container.querySelectorAll('.col-item:not(.dragging)')]; 
+            return draggableElements.reduce((closest, child) => { 
+                const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; 
+                if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest; 
+            }, { offset: Number.NEGATIVE_INFINITY }).element; 
+        }
+        function updateColumnMappingOrder() { 
+            const list = document.getElementById('sheet-columns-list'); const newOrder = []; 
+            list.querySelectorAll('.col-item').forEach(item => { newOrder.push(parseInt(item.dataset.index)); }); 
+            tempSheetTabs[activeTabIndex].columnOrder = newOrder; updateConfigPreview(); 
+        }
+        function saveSheetConfig() { 
+            saveCurrentTabState(); 
+            let order = []; document.querySelectorAll('#sheet-columns-list .col-item').forEach(el => order.push(parseInt(el.dataset.index)));
+            if(order.length > 0) tempSheetTabs[activeTabIndex].columnOrder = order;
+            if(currentSheetCompId) { const comp = appData.components.find(c => c.id === currentSheetCompId); comp.data.items[currentSheetItemIndex].sheetConfig = { tabs: JSON.parse(JSON.stringify(tempSheetTabs)) }; selectComponent(currentSheetCompId); } 
+            closeSheetConfigModal(); 
+        }
+        function previewHome() { previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null }; const navComp = appData.components.find(c => c.type === 'navbar'); if(navComp) navComp.data.items.forEach((item, idx) => item.active = (idx === 0)); renderCanvas(); }
+        window.handleNavbarClick = function(navId, itemIndex) {
+            const navComp = appData.components.find(c => c.id === navId);
+            if(navComp) { navComp.data.items.forEach((item, idx) => { item.active = (idx === itemIndex); }); }
+            const item = navComp.data.items[itemIndex];
+            if (item.linkType === 'home') previewHome();
+            else if (item.linkType === 'grid' && item.linkTarget) {
+                const targetComp = appData.components.find(c => c.id === item.linkTarget.compId);
+                if (targetComp) {
+                    const targetItem = targetComp.data.items[item.linkTarget.itemIndex];
+                    if (targetItem) {
+                        if (targetItem.action === 'content') previewState = { view: 'content', title: targetItem.label, data: targetItem.content || '' };
+                        else if (targetItem.action === 'sheet') openPreviewSheet(encodeURIComponent(targetItem.link), targetItem.label, targetItem.sheetConfig);
+                        else if (targetItem.action === 'submenu') openPreviewSubmenu(item.linkTarget.itemIndex, item.linkTarget.compId, targetItem.label);
+                    }
+                }
+            }
+            renderCanvas();
+        };
+        function openPreviewSubmenu(idx, compId, label) {
+            const comp = appData.components.find(c => c.id === compId);
+            if(!comp || !comp.data.items[idx]) return;
+            const items = comp.data.items[idx].submenu;
+            previewState = { view: 'submenu', title: label, data: items };
+            renderCanvas();
+        }
+        window.handleSubClick = function(action, link, content, label) {
+            if (action === 'content') { previewState = { view: 'content', title: label, data: content }; renderCanvas(); } 
+            else if (action === 'sheet' && link) openPreviewSheet(link, label, null); 
+        };
+        function openPreviewSheet(url, title, config) {
+            previewState.view = 'sheet'; previewState.title = title; previewState.data = decodeURIComponent(url); previewState.config = config; previewState.activeTabIdx = 0; renderCanvas();
+        }
+        function switchPreviewTab(idx) { previewState.activeTabIdx = idx; renderCanvas(); }
+        window.previewSheetRows = []; window.previewSheetHeaders = [];
+        async function loadSheetPreview(url, tabConfig) {
+            const container = document.getElementById('sheet-content');
+            if(!url) { container.innerHTML = '<div class="text-red-500 text-center p-4">Link Sheet belum diset.</div>'; return; }
+            try {
+                container.innerHTML = '<div class="text-center py-10"><div class="loader mx-auto mb-2"></div><p class="text-xs text-gray-500">Memuat Data...</p></div>';
+                let sheetId = url.match(/\/d\/(.*?)(\/|$)/)?.[1]; let gid = '0'; if(url.includes('gid=')) gid = url.split('gid=')[1].split('&')[0];
+                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`; if(tabConfig.sheetName) apiUrl += `&sheet=${encodeURIComponent(tabConfig.sheetName)}`; else apiUrl += `&gid=${gid}`;
+                const res = await fetch(apiUrl); const txt = await res.text(); const jsonStart = txt.indexOf('{'); const jsonEnd = txt.lastIndexOf('}') + 1; const json = JSON.parse(txt.substring(jsonStart, jsonEnd)); 
+                const { headers: source, data: cleanData } = cleanSheetData(json);
+                window.previewSheetRows = cleanData;
+                let order = tabConfig.columnOrder && tabConfig.columnOrder.length > 0 ? tabConfig.columnOrder : source.map((_,i)=>i);
+                window.previewSheetHeaders = source.map((cell, idx) => ({ index: idx, label: (cell && (cell.v || cell.label)) ? (cell.v || cell.label) : 'Kolom ' + (idx+1) }));
+                renderSheetListContent(order, tabConfig);
+            } catch (e) { console.error(e); container.innerHTML = '<div class="text-red-500 text-center p-4">Gagal memuat data. Cek koneksi atau link.</div>'; } 
+        }
+        function handlePreviewSearch(query) {
+            if (!window.previewSheetRows || window.previewSheetRows.length === 0) return;
+            const config = previewState.config.tabs[previewState.activeTabIdx || 0];
+            let order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
+            const lowerQuery = query.toLowerCase();
+            const filteredIndices = window.previewSheetRows.map((row, rIdx) => {
+                let isMatch = false;
+                for(let colIndex of order) {
+                    if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) continue;
+                    const cell = row.c && row.c[colIndex];
+                    if (cell && cell.v) { if(String(cell.v).toLowerCase().includes(lowerQuery)) { isMatch = true; break; } }
+                }
+                return isMatch ? rIdx : -1;
+            }).filter(idx => idx!==-1);
+            renderSheetListContent(order, config, filteredIndices);
+        }
+        function renderSheetListContent(order, tabConfig, rowIndices = null) {
+            const container = document.getElementById('sheet-content');
+            const rowsToProcess = rowIndices ? rowIndices.map(i => window.previewSheetRows[i]) : window.previewSheetRows;
+            const headerComp = appData.components.find(c => c.type === 'header');
+            let fallbackAvatar = 'https://via.placeholder.com/40';
+            if (headerComp && headerComp.data) {
+                if (headerComp.data.avatarType === 'custom' && headerComp.data.customAvatarUrl) { fallbackAvatar = headerComp.data.customAvatarUrl; } 
+                else { fallbackAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${headerComp.id}`; }
+            }
+            window.userProfileFallback = fallbackAvatar;
+            let html = tabConfig.layout === 'grid' ? '<div class="grid grid-cols-2 gap-3">' : '<div class="space-y-3">';
+            rowsToProcess.forEach((row, i) => {
+                if(!row.c) return; let displayCells = [];
+                order.forEach(colIndex => {
+                    if (!row.c || colIndex >= row.c.length) return;
+                    if(tabConfig.hiddenColumns && tabConfig.hiddenColumns.includes(colIndex)) return;
+                    const cell = row.c[colIndex]; 
+                    if(cell && cell.v !== null) displayCells.push(cell.v); 
+                });
+                if(displayCells.length > 0) {
+                    const imageCell = displayCells.find(d => typeof d === 'string' && (d.match(/^https?:\/\//) || d.startsWith('data:image')));
+                    const iconOrImage = imageCell ? `<img src="${imageCell}" onerror="this.onerror=null;this.src='${fallbackAvatar}'" class="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="user" class="w-5 h-5"></i></div>`;
+                    let textValues = displayCells.filter(c => c !== imageCell); 
+                    let title = textValues[0] || 'No Data';
+                    let subtitle = textValues[1] ? textValues[1] : '';
+                    if(tabConfig.layout === 'grid') { 
+                        html += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
+                                    <div class="flex justify-between items-start mb-2">${iconOrImage}</div>
+                                    <h4 class="font-bold text-gray-800 text-xs mb-1 truncate">${title}</h4>
+                                 </div>`; 
+                    } else { 
+                        let rightLabel = textValues[2] || 'Info';
+                        if (typeof rightLabel === 'string' && (rightLabel.includes('Rp') || !isNaN(rightLabel.replace(/[^0-9]/g, '')))) {
+                            rightLabel = formatRupiah(rightLabel);
+                        }
+                        const rIndexOriginal = window.previewSheetRows.indexOf(row); 
+                        html += `<div onclick="openSheetDetail(${rIndexOriginal})" class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-3 cursor-pointer active:bg-gray-50 transition">
+                                    ${iconOrImage}
+                                    <div class="flex flex-col flex-1 min-w-0">
+                                        <h4 class="font-bold text-gray-800 text-sm truncate">${title}</h4>
+                                        <p class="text-xs text-gray-500 truncate">${subtitle}</p>
+                                    </div>
+                                    <div class="ml-2 px-3 py-1 bg-red-600 text-white font-bold text-sm rounded shadow-sm whitespace-nowrap shrink-0">
+                                        ${rightLabel}
+                                    </div>
+                                 </div>`; 
+                    }
+                }
+            });
+            html += '</div>'; container.innerHTML = html; lucide.createIcons(); 
+        }
+        function openSheetDetail(rowIndex) {
+            const row = window.previewSheetRows[rowIndex]; const config = previewState.config.tabs[previewState.activeTabIdx || 0];
+            const order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
+            let html = '<div class="space-y-3">';
+            order.forEach(colIndex => {
+                if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) return;
+                const headerInfo = window.previewSheetHeaders.find(h => h.index === colIndex); const label = headerInfo ? headerInfo.label : 'Kolom';
+                const cell = row.c && row.c[colIndex]; const value = cell ? (cell.v || '') : '';
+                const isImage = typeof value === 'string' && (value.match(/^https?:\/\//) || value.startsWith('data:image'));
+                if (isImage) html += `<div class="flex justify-between items-start pb-2 border-b border-gray-100"><span class="text-xs font-bold text-gray-500 uppercase">${label}</span><img src="${value}" class="w-16 h-16 rounded object-cover border border-gray-200"></div>`;
+                else html += `<div class="pb-2 border-b border-gray-100"><div class="text-[10px] text-gray-400 uppercase mb-1">${label}</div><div class="text-sm text-gray-800 leading-relaxed">${value}</div>`;
+            });
+            html += '</div>'; document.getElementById('sheet-detail-content').innerHTML = html; document.getElementById('sheet-detail-modal').classList.remove('hidden');
+        }
+        function closeSheetDetail() { document.getElementById('sheet-detail-modal').classList.add('hidden'); }
+        function exportJSON() {
+            const dataStr = JSON.stringify(appData, null,2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const a = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            a.href = url;
+            a.download = `ui-settings-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        function handleJSONImport(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (json && Array.isArray(json.components)) {
+                        if(confirm('Apakah Anda yakin ingin memuat desain ini? Desain saat ini akan ditimpa.')) {
+                            appData = json;
+                            saveToLocal();
+                            renderCanvas();
+                            selectedId = null; 
+                            alert('Settingan berhasil diimpor!');
+                            document.getElementById('mobile-library-modal').classList.remove('flex');
+                            document.getElementById('mobile-library-modal').classList.add('hidden');
+                        }
+                    } else { alert('Format file JSON tidak valid.'); }
+                } catch (err) { console.error(err); alert('Gagal membaca file JSON.'); }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+        function processMagicPrompt() {
+            appData.components = [];
+            addComponent('header', { title: 'LA6 & Kav', subtitle: 'Warga RT 09', showAvatar: true, gradientEnabled: false });
+            addComponent('hero', { label: 'Laporan Aktif Jan2024', amount: 'Rp 24,500,000', colorFrom: 'blue-600', colorTo: 'blue-800' });
+            const menuItems = [
+                { label: 'Informasi', icon: 'info', color: 'bg-blue-500', action:'content', content:'<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>' },
+                { label: 'Struktur Org', icon: 'users', color: 'bg-purple-500', action:'content', content:'<p>Lihat struktur organisasi kami.</p>' },
+                { label: 'Galeri Foto', icon: 'image', color: 'bg-pink-500', action:'content', content:'<p>Album kegiatan RT.</p>' },
+                { label: 'Bantuan', icon: 'heart', color: 'bg-red-500', action:'content', content:'<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>' }
+            ];
+            const gridId = addComponent('grid-menu', { cols: 'grid-cols-4', items: menuItems });
+            const transItems = [
+                { title: 'Iuran Sampah', sub: 'Kebersihan', right: '-Rp 25,000', colorIcon: 'bg-red-100 text-red-600', icon: 'trash-2' },
+                { title: 'Jimpitan Warga', sub: 'Kas Rutin', right: '+Rp 150,000', colorIcon: 'bg-green-100 text-green-600', icon: 'coins' }
+            ];
+            addComponent('list-transaksi', { title: 'Aktivitas Warga', items: transItems });
+            // Add Org Structure Example
+            addComponent('org-structure', { 
+                title: 'Pengurus RT', 
+                members: [
+                    { name: 'Budi Santoso', role: 'Ketua RT', photo: 'https://i.pravatar.cc/150?img=11', content: '<p>Bertanggung jawab atas kelancaran kegiatan warga.</p>' },
+                    { name: 'Siti Aminah', role: 'Sekretaris', photo: 'https://i.pravatar.cc/150?img=5', content: '<p>Mengurus administrasi dan surat menyurat.</p>' },
+                    { name: 'Rahmat Hidayat', role: 'Bendahara', photo: 'https://i.pravatar.cc/150?img=3', content: '<p>Mengelola keuangan dan iuran warga.</p>' },
+                    { name: 'Joko Anwar', role: 'Keamanan', photo: 'https://i.pravatar.cc/150?img=12', content: '<p>Memastikan kondusifnya lingkungan.</p>' }
+                ]
+            });
+            const gridComp = appData.components.find(c => c.id === gridId);
+            const navItems = [
+                { label: 'Beranda', icon: 'home', active: true, linkType: 'home' },
+                { label: 'Laporan', icon: 'file-text', active: false, linkType: 'grid', linkTarget: { compId: gridId, itemIndex: 2 } },
+                { label: 'Akun', icon: 'user', active: false, linkType: 'home' }
+            ];
+            appData.components.push({ id: Date.now().toString(), type: 'navbar', data: { items: navItems } });
+            renderCanvas(); saveToLocal(); closeMagicModal();
+        }
+        // --- DOWNLOADER (ONLY NAVBAR FIXED) ---
+        function downloadCode() {
+            const currentAppData = JSON.stringify(appData);
+            const funcStr_renderCanvas = renderCanvas.toString();
+            const funcStr_renderPreviewMode = renderPreviewMode.toString();
+            const funcStr_generateComponentHTML = generateComponentHTML.toString();
+            const funcStr_previewHome = previewHome.toString();
+            const funcStr_handleNavbarClick = handleNavbarClick.toString();
+            const funcStr_openPreviewSubmenu = openPreviewSubmenu.toString();
+            const funcStr_handleSubClick = handleSubClick.toString();
+            const funcStr_openPreviewSheet = openPreviewSheet.toString();
+            const funcStr_switchPreviewTab = switchPreviewTab.toString();
+            const funcStr_loadSheetPreview = loadSheetPreview.toString();
+            const funcStr_renderSheetListContent = renderSheetListContent.toString();
+            const funcStr_handlePreviewSearch = handlePreviewSearch.toString();
+            const funcStr_openSheetDetail = openSheetDetail.toString();
+            const funcStr_closeSheetDetail = closeSheetDetail.toString();
+            const funcStr_cleanSheetData = cleanSheetData.toString();
+            const funcStr_openAboutModal = openAboutModal.toString();
+            // Added Org Helpers
+            const funcStr_openOrgList = openOrgList.toString();
+            const funcStr_openOrgMemberDetail = openOrgMemberDetail.toString();
+            const funcStr_handleOrgBack = handleOrgBack.toString();
+            const funcStr_updateHeroPreview = updateHeroPreview.toString(); 
+
+            const essentialCSS = `
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+                body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100vh; }
+                ::-webkit-scrollbar { width: 6px; height: 6px; }
+                ::-webkit-scrollbar-track { background: #f1f1f1; }
+                ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+                ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+                .no-scrollbar::-webkit-scrollbar { display: none; }
+                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+                .prose img { max-width: 100%; border-radius: 8px; }
+                .prose iframe { width: 100%; border-radius: 8px; }
+                .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height:    20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* LAYOUT FIX: Flexbox untuk mempertahankan Fixed Navbar */
+    #app-container { 
+        width: 100%; 
+        height: 100%; 
+        max-width: 480px; 
+        margin: 0 auto; 
+        background-color: #f9fafb; 
+        position: relative; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden;
+    }
+    
+    #app-canvas { 
+        flex: 1; 
+        overflow-y: auto; 
+        overflow-x: hidden; 
+        position: relative;
+        /* Padding bawah agar konten tidak tertutup navbar */
+        padding-bottom: 80px; 
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Navbar Container Fixed di Bawah */
+    #bottom-nav-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        width: 100%;
+    }
+
+    #sheet-content { min-height: 300px; }
+    
+    .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
+    .editor-shortcut:hover { background-color: #dbeafe; }
+    `;
+
+    const htmlContent = `<!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Generated App</title>
+        <script src="https://cdn.tailwindcss.com"><\/script>
+        <script src="https://unpkg.com/lucide@latest"><\/script>
+        <style>
+            ${essentialCSS}
+        </style>
+    </head>
+    <body>
+        <div id="app-container">
+            <div id="app-canvas"></div>
+            <!-- Bottom Nav Container (Fixed) -->
+            <div id="bottom-nav-container"></div>
+        </div>
+
+        <!-- MODALS -->
+        <div id="about-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm z-[200]">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col">
+                <div class="p-6"><h3 class="text-lg font-bold text-center mb-2" id="about-title">Tentang</h3><div id="about-content" class="text-sm text-gray-600 text-center leading-relaxed"></div></div>
+                <div class="p-4 border-t flex justify-center"><button onclick="document.getElementById('about-modal').classList.add('hidden')" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Tutup</button></div>
+            </div>
+        </div>
+
+        <div id="sheet-detail-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col max-h-[85vh]">
+                <div class="p-4 border-b bg-blue-50 rounded-t-xl flex justify-between items-center">
+                    <div><h3 class="font-bold text-blue-900">Detail Data</h3></div>
+                    <button onclick="window.closeSheetDetail()" class="text-blue-900/50 hover:text-blue-900 p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                <div id="sheet-detail-content" class="p-4 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <script>
+            // FORMAT RUPIAH HELPER
+            function formatRupiah(amount) {
+                if (!amount) return 'Rp 0';
+                let numberString = String(amount).replace(/[^0-9]/g, '');
+                if (numberString === '') return 'Rp 0';
+                return 'Rp ' + parseInt(numberString).toLocaleString('en-US');
+            }
+
+            const appData = ${currentAppData};
+            let isEditMode = false; 
+            let previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null };
+            window.previewSheetRows = []; window.previewSheetHeaders = []; window.userProfileFallback = 'https://via.placeholder.com/40';
+
+            window.cleanSheetData = ${funcStr_cleanSheetData};
+            window.generateComponentHTML = ${funcStr_generateComponentHTML};
+            window.renderCanvas = ${funcStr_renderCanvas};
+            window.renderPreviewMode = ${funcStr_renderPreviewMode};
+            window.previewHome = ${funcStr_previewHome};
+            window.handleNavbarClick = ${funcStr_handleNavbarClick};
+            window.openPreviewSubmenu = ${funcStr_openPreviewSubmenu};
+            window.handleSubClick = ${funcStr_handleSubClick};
+            window.openPreviewSheet = ${funcStr_openPreviewSheet};
+            window.switchPreviewTab = ${funcStr_switchPreviewTab};
+            window.loadSheetPreview = ${funcStr_loadSheetPreview};
+            window.renderSheetListContent = ${funcStr_renderSheetListContent};
+            window.handlePreviewSearch = ${funcStr_handlePreviewSearch};
+            window.openSheetDetail = ${funcStr_openSheetDetail};
+            window.closeSheetDetail = ${funcStr_closeSheetDetail};
+            window.openAboutModal = ${funcStr_openAboutModal};
+            window.updateHeroPreview = ${funcStr_updateHeroPreview};
+
+            // --- ORGANIZATION STRUCTURE FUNCTIONS ---
+            window.openOrgList = ${funcStr_openOrgList};
+            window.openOrgMemberDetail = ${funcStr_openOrgMemberDetail};
+            window.handleOrgBack = ${funcStr_handleOrgBack};
+
+            // Handle Shortcut Clicks in exported content
+            document.body.addEventListener('click', function(e) {
+                const target = e.target.closest('.editor-shortcut');
+                if(target) {
+                    const compId = target.dataset.compId;
+                    const itemIdx = parseInt(target.dataset.itemIdx);
+                    const comp = appData.components.find(c => c.id === compId);
+                    if(comp && comp.data.items[itemIdx]) {
+                        const item = comp.data.items[itemIdx];
+                        if(item.action === 'content') {
+                            previewState = { view: 'content', title: item.label, data: item.content || '' };
+                            renderCanvas();
+                        } else if(item.action === 'sheet') {
+                            openPreviewSheet(encodeURIComponent(item.link), item.label, item.sheetConfig);
+                        } else if(item.action === 'submenu') {
+                            openPreviewSubmenu(itemIdx, compId, item.label);
+                        }
+                    }
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const headerComp = appData.components.find(c => c.type === 'header');
+                if (headerComp && headerComp.data) {
+                    if (headerComp.data.avatarType === 'custom' && headerComp.data.customAvatarUrl) { window.userProfileFallback = headerComp.data.customAvatarUrl; } 
+                    else { window.userProfileFallback = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + headerComp.id; }
+                }
+                window.renderCanvas();
+                lucide.createIcons();
+            });
+        <\/script>
+    </body>
+    </html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${appName.replace(/\s+/g, '')}-v${appVersion}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
