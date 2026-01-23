@@ -8,59 +8,61 @@
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
             
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-                body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100vh; }
-                ::-webkit-scrollbar { width: 6px; height: 6px; }
-                ::-webkit-scrollbar-track { background: #f1f1f1; }
-                ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-                ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                .prose img { max-width: 100%; border-radius: 8px; }
-                .prose iframe { width: 100%; border-radius: 8px; }
-                .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height:    20px; height: 20px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    
-    /* LAYOUT FIX: Flexbox untuk mempertahankan Fixed Navbar */
-    #app-container { 
-        width: 100%; 
-        height: 100%; 
-        max-width: 480px; 
-        margin: 0 auto; 
-        background-color: #f9fafb; 
-        position: relative; 
-        box-shadow: 0 0 20px rgba(0,0,0,0.05); 
-        display: flex; 
-        flex-direction: column; 
-        overflow: hidden;
-    }
-    
-    #app-canvas { 
-        flex: 1; 
-        overflow-y: auto; 
-        overflow-x: hidden; 
-        position: relative;
-        /* Padding bawah agar konten tidak tertutup navbar */
-        padding-bottom: 80px; 
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Navbar Container Fixed di Bawah */
-    #bottom-nav-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 50;
-        width: 100%;
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100vh; }
+        
+        /* HILANGKAN SCROLLBAR (GLOBAL & DOWNLOAD) */
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; display: none; }
+        html { -ms-overflow-style: none; scrollbar-width: none; }
 
-    #sheet-content { min-height: 300px; }
-    
-    .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
-    .editor-shortcut:hover { background-color: #dbeafe; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .prose img { max-width: 100%; border-radius: 8px; }
+        .prose iframe { width: 100%; border-radius: 8px; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* LAYOUT FIX: Flexbox untuk mempertahankan Fixed Navbar & Mepet Bawah */
+        #app-container { 
+            width: 100%; 
+            height: 100%; 
+            max-width: 480px; 
+            margin: 0 auto; 
+            background-color: #f9fafb; 
+            position: relative; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+        
+        #app-canvas { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            position: relative;
+            /* Padding bawah dihapus (0px) agar navbar mepet bawah full */
+            padding-bottom: 0px !important; 
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Navbar Container Fixed di Bawah */
+        #bottom-nav-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            width: 100%;
+        }
+
+        #sheet-content { min-height: 300px; }
+        
+        .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
+        .editor-shortcut:hover { background-color: #dbeafe; }
     
         </style>
     </head>
@@ -100,7 +102,7 @@
                 return 'Rp ' + parseInt(numberString).toLocaleString('en-US');
             }
 
-            const appData = {"components":[{"id":"1768772944321536","type":"header","data":{"title":"LA6 & Kavling","subtitle":"RT 09","showAvatar":true,"avatarType":"custom","customAvatarUrl":"https://avatars.githubusercontent.com/u/61934361?v=4","colorEnd":"black","gradientEnabled":true,"gradientStart":"black","gradientEnd":"teal-800","aboutContent":"Dibuat oleh: YOUSHE"}},{"id":"176877294432428","type":"hero","data":{"label":"Saldo RT 09","amount":"Rp 54,500,000","colorFrom":"blue-600","colorTo":"blue-800","sheetLink":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetName":"Saldo","sheetRowIndex":8,"sheetColIndex":"1","dataSource":"sheet"}},{"id":"1768772944326634","type":"grid-menu","data":{"cols":"grid-cols-4","items":[{"label":"Bendahara","icon":"wallet","color":"bg-purple-500","action":"sheet","content":"<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Kas","sheetName":"Kas","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Sampah","sheetName":"Sampah","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Konsumsi","sheetName":"Konsumsi","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Arisan","sheetName":"Arisan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Jimpitan","icon":"banknote","color":"bg-orange-500","action":"sheet","content":"<h3>Profil Pengurus</h3><p>Data struktur RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Jimpitan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Sosial","icon":"heart","color":"bg-green-500","action":"sheet","content":"<h3>Laporan Keuangan</h3><p>Rincian kas RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Sosial","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Keamanan","icon":"lock","color":"bg-red-500","action":"sheet","content":"<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Keamanan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Data Warga","icon":"users","color":"bg-green-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Ronda","icon":"clock","color":"bg-red-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Arisan","icon":"calendar","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Pengurus RT","icon":"user","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"PKK","icon":"heart","color":"bg-blue-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Dawis","icon":"sun","color":"bg-purple-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Kerja Bakti","icon":"coffee","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Lainya..","icon":"list","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""}]}},{"id":"1768772944329940","type":"list-transaksi","data":{"title":"Aktivitas Warga","items":[{"title":"Iuran Sampah","sub":"Kebersihan","right":"-Rp 25,000","colorIcon":"bg-red-100 text-red-600","icon":"trash-2"},{"title":"Jimpitan Warga","sub":"Kas Rutin","right":"+Rp 150,000","colorIcon":"bg-green-100 text-green-600","icon":"coins"},{"title":"Sumbangan Sosial","sub":"Bantuan","right":"-Rp 50,000","colorIcon":"bg-red-100 text-red-600","icon":"heart"}]}},{"id":"1768772944331","type":"navbar","data":{"items":[{"label":"Beranda","icon":"home","active":true,"linkType":"home"},{"label":"Laporan","icon":"file-text","active":false,"linkType":"grid","linkTarget":{"compId":"1768772944326634","itemIndex":2}},{"label":"Akun","icon":"user","active":false,"linkType":"home"}],"bgType":"gradient","gradientStart":"black","gradientEnd":"teal-800"}},{"id":"1768967821241747","type":"org-structure","data":{"title":"Struktur Organisasi","members":[{"name":"Bayu Adi Nugroho","role":"Ketua RT","photo":"https://la6.my.id/file/a11.jpg","content":""},{"name":"Ariyanto","role":"Penasehat RT","photo":"https://la6.my.id/file/a9.jpg","content":""},{"name":"Arif Fajar Santoso","role":"Sekretaris","photo":"https://la6.my.id/file/a7.jpg","content":""},{"name":"Budi Setiawan","role":"Bendahara","photo":"https://la6.my.id/file/c7.jpg","content":""},{"name":"M. Dicky","role":"Seksi Jimpitan","photo":"https://la6.my.id/file/b7.jpg","content":""},{"name":"Thomas Hendra","role":"Seksi Sosial","photo":"https://la6.my.id/file/b9.jpg","content":""},{"name":"Wahyudi","role":"Seksi Keamanan","photo":"https://la6.my.id/file/ra1.jpg","content":""},{"name":"Hari Susanto","role":"Seksi Keamanan 2","photo":"https://la6.my.id/file/a12.jpg","content":""},{"name":"Eko Santoso","role":"Seksi Kebersihan","photo":"https://la6.my.id/file/a4b.jpg","content":""},{"name":"Heru","role":"Seksi Kebersihan 2","photo":"https://la6.my.id/file/kavc9.jpg","content":""}]}},{"id":"1768818148870564","type":"button","data":{"label":"Klik Disini","color":"bg-blue-600","width":"w-full","icon":"mouse-pointer-2"}}]};
+            const appData = {"components":[{"id":"1768772944321536","type":"header","data":{"title":"LA6 & Kavling","subtitle":"RT 09","showAvatar":true,"avatarType":"custom","customAvatarUrl":"https://avatars.githubusercontent.com/u/61934361?v=4","colorEnd":"black","gradientEnabled":true,"gradientStart":"black","gradientEnd":"teal-800","aboutContent":"Oleh"}},{"id":"1769199066426500","type":"promo","data":{"title":"Jangan Lupa Datang!","subtitle":"Rapat/Arisan RT Tanggal 25 Januari 2026","badge":"Info Arisa RT","ctaText":"Konfirmasi Kehadiran","gradientFrom":"purple-600","gradientTo":"pink-600","imageUrl":"https://la6.my.id/file/a7.jpg"}},{"id":"1768772944326634","type":"grid-menu","data":{"cols":"grid-cols-4","items":[{"label":"Bendahara","icon":"wallet","color":"bg-purple-500","action":"sheet","content":"<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Kas","sheetName":"Kas","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Sampah","sheetName":"Sampah","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Konsumsi","sheetName":"Konsumsi","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Arisan","sheetName":"Arisan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Jimpitan","icon":"banknote","color":"bg-orange-500","action":"sheet","content":"<h3>Profil Pengurus</h3><p>Data struktur RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Jimpitan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Sosial","icon":"heart","color":"bg-green-500","action":"sheet","content":"<h3>Laporan Keuangan</h3><p>Rincian kas RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Sosial","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Keamanan","icon":"lock","color":"bg-red-500","action":"sheet","content":"<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Keamanan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Data Warga","icon":"users","color":"bg-green-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Ronda","icon":"clock","color":"bg-red-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Arisan","icon":"calendar","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Pengurus RT","icon":"user","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"PKK","icon":"heart","color":"bg-blue-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Dawis","icon":"sun","color":"bg-purple-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Kerja Bakti","icon":"coffee","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Lainya..","icon":"list","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""}]}},{"id":"176877294432428","type":"hero","data":{"label":"Saldo RT 09","amount":"Rp 54,500,000","colorFrom":"blue-600","colorTo":"blue-800","sheetLink":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetName":"Saldo","sheetRowIndex":8,"sheetColIndex":"1","dataSource":"sheet"}},{"id":"1768967821241747","type":"org-structure","data":{"title":"Struktur Organisasi","members":[{"name":"Bayu Adi Nugroho","role":"Ketua RT","photo":"https://la6.my.id/file/a11.jpg","content":""},{"name":"Ariyanto","role":"Penasehat RT","photo":"https://la6.my.id/file/a9.jpg","content":""},{"name":"Arif Fajar Santoso","role":"Sekretaris","photo":"https://la6.my.id/file/a7.jpg","content":""},{"name":"Budi Setiawan","role":"Bendahara","photo":"https://la6.my.id/file/c7.jpg","content":""},{"name":"M. Dicky","role":"Seksi Jimpitan","photo":"https://la6.my.id/file/b7.jpg","content":""},{"name":"Thomas Hendra","role":"Seksi Sosial","photo":"https://la6.my.id/file/b9.jpg","content":""},{"name":"Wahyudi","role":"Seksi Keamanan","photo":"https://la6.my.id/file/ra1.jpg","content":""},{"name":"Hari Susanto","role":"Seksi Keamanan 2","photo":"https://la6.my.id/file/a12.jpg","content":""},{"name":"Eko Santoso","role":"Seksi Kebersihan","photo":"https://la6.my.id/file/a4b.jpg","content":""},{"name":"Heru","role":"Seksi Kebersihan 2","photo":"https://la6.my.id/file/kavc9.jpg","content":""}]}},{"id":"1768772944331","type":"navbar","data":{"items":[{"label":"Beranda","icon":"home","active":true,"linkType":"home"},{"label":"Laporan","icon":"file-text","active":false,"linkType":"grid","linkTarget":{"compId":"1768772944326634","itemIndex":2}},{"label":"Akun","icon":"user","active":false,"linkType":"home"}],"bgType":"gradient","gradientStart":"black","gradientEnd":"teal-800"}},{"id":"1769199111121612","type":"price-list","data":{"title":"Iuran Warga","mode":"grid","items":[{"name":"Kas","desc":"Perbulan","price":"Rp 2.000","color":"bg-gray-100 text-gray-800"},{"name":"Konsumsi","desc":"Perbulan","price":"Rp 5000","color":"bg-blue-600 text-white"},{"name":"Sampah","desc":"Perbulan","price":"Rp 18.000","color":"bg-gray-100 text-gray-800"},{"name":"Arisan","desc":"Perbulan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"},{"name":"Jimpitan","desc":"Perhari","price":"Rp 1000","color":"bg-gray-100 text-gray-800"},{"name":"Sosial","desc":"Perbulan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"},{"name":"Denda Ronda","desc":"Rp 25.000 untuk Bulanan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"}]}}]};
             let isEditMode = false; 
             let previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null };
             window.previewSheetRows = []; window.previewSheetHeaders = []; window.userProfileFallback = 'https://via.placeholder.com/40';
@@ -117,8 +119,6 @@
                 if(comp.data.avatarType === 'custom' && comp.data.customAvatarUrl) avatarSrc = comp.data.customAvatarUrl;
                 let containerClass = "px-6 py-4 flex justify-between items-center shadow-sm";
                 let textClass = "text-gray-800"; let subtitleClass = "text-xs text-gray-500"; let iconColorClass = "text-gray-600";
-                
-                // REVERTED: Removed the fixed top-0 logic. Now it behaves like previous version.
                 
                 if (comp.data.gradientEnabled) { containerClass += ` bg-gradient-to-l from-${comp.data.gradientStart} to-${comp.data.gradientEnd}`; textClass = "text-white"; subtitleClass = "text-xs text-white/80"; iconColorClass = "text-white"; }
                 const aboutClickAttr = !isEdit ? `onclick="openAboutModal('${comp.id}')"` : '';
@@ -139,7 +139,6 @@
             // UPDATED ORG STRUCTURE HTML
             if (comp.type === 'org-structure') {
                 if (isEdit) {
-                    // EDIT MODE: Show all members list vertically with delete/edit buttons
                     const members = comp.data.members.map((m, idx) => {
                         return `<div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 group">
                             <img src="${m.photo || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-gray-100">
@@ -155,9 +154,6 @@
                     }).join('');
                     return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="space-y-3">${members}</div></div>`;
                 } else {
-                    // PREVIEW MODE (HOME): Show only 3 members + "Lihat Detail" button
-                    // Logic handled by renderPreviewMode mostly, but component HTML is basic structure
-                    // However, if we are in Home view:
                     const limitedMembers = comp.data.members.slice(0, 3);
                     const members = limitedMembers.map((m, idx) => {
                          return `<div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 cursor-pointer active:scale-95 transition" onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')">
@@ -174,7 +170,6 @@
                     if (comp.data.members.length > 3) {
                         btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">Lihat Semua (${comp.data.members.length})</button>`;
                     } else if (comp.data.members.length > 0) {
-                        // If 3 or less, still show a button but maybe "Lihat Detail" to enter grid view
                          btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Lihat Detail Struktur</button>`;
                     }
 
@@ -198,7 +193,6 @@
 
             if (comp.type === 'image-banner') return `<div class="px-6 py-4"><div class="w-full ${comp.data.height} ${comp.data.rounded} overflow-hidden shadow-sm relative bg-gray-200"><img src="${comp.data.url}" class="w-full h-full object-cover"></div></div>`;
             if (comp.type === 'hero') {
-                // FIXED: Apply formatting
                 const displayAmount = formatRupiah(comp.data.amount);
                 return `<div class="px-6 pt-4" id="hero-container-${comp.id}">
                     <div class="bg-gradient-to-r from-${comp.data.colorFrom} to-${comp.data.colorTo} rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
@@ -222,6 +216,64 @@
             }
             if (comp.type === 'info-card') { let c = comp.data.type === 'alert' ? 'red' : comp.data.type === 'health' ? 'green' : 'blue'; return `<div class="px-6 mb-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-${c}-500"><div class="flex justify-between mb-1"><span class="bg-${c}-50 text-${c}-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${comp.data.type}</span><span class="text-xs text-gray-400">${comp.data.date}</span></div><h3 class="font-bold text-gray-800 text-sm">${comp.data.title}</h3><p class="text-xs text-gray-500 mt-1">${comp.data.text}</p></div></div>`; }
             
+            // --- NEW COMPONENT HTML GENERATION ---
+            if (comp.type === 'promo') {
+                return `<div class="px-6 py-4">
+                    <div class="relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-${comp.data.gradientFrom} to-${comp.data.gradientTo} text-white p-5 flex flex-col justify-center min-h-[160px]">
+                        <img src="${comp.data.imageUrl}" class="absolute right-[-20px] top-[-20px] w-40 h-40 object-cover opacity-30 rounded-full mix-blend-overlay">
+                        <div class="relative z-10">
+                            <div class="inline-block bg-yellow-400 text-black text-[10px] font-black px-2 py-1 rounded mb-2 transform -rotate-2 shadow-sm">${comp.data.badge}</div>
+                            <h2 class="text-2xl font-black mb-1 leading-tight">${comp.data.title}</h2>
+                            <p class="text-white/90 text-xs mb-3">${comp.data.subtitle}</p>
+                            <button class="bg-white text-${comp.data.gradientFrom.split('-')[0]}-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm hover:bg-gray-50 transition-colors">${comp.data.ctaText}</button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            if (comp.type === 'price-list') {
+                const isGrid = comp.data.mode === 'grid';
+                const items = comp.data.items.map((item, idx) => {
+                    const cardClass = isGrid ? 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col text-center' : 'bg-white p-4 mb-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between';
+                    const nameClass = isGrid ? 'font-bold text-gray-800 text-sm mb-1' : 'font-bold text-gray-800 text-sm';
+                    const priceClass = isGrid ? `text-lg font-black ${item.color} my-2` : `text-lg font-black ${item.color}`;
+                    
+                    return `<div class="${cardClass} group">
+                        <div class="${nameClass}">${item.name}</div>
+                        ${!isGrid ? `<p class="text-[10px] text-gray-500 max-w-[150px]">${item.desc}</p>` : ''}
+                        <div class="${priceClass}">${item.price}</div>
+                        ${isGrid ? `<p class="text-[10px] text-gray-500 mb-3">${item.desc}</p>` : ''}
+                        <button class="${isGrid ? 'mt-auto w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-lg' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg'}">Pilih</button>
+                    </div>`;
+                }).join('');
+                
+                const container = isGrid ? `<div class="grid grid-cols-2 gap-3">${items}</div>` : `<div>${items}</div>`;
+                return `<div class="px-6 py-4"><h3 class="text-sm font-bold text-gray-800 mb-3">${comp.data.title}</h3>${container}</div>`;
+            }
+            if (comp.type === 'payment-history') {
+                const items = comp.data.items.map((item) => {
+                    let statusBadge = '';
+                    if(item.status === 'success') statusBadge = `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">Sukses</span>`;
+                    else if(item.status === 'pending') statusBadge = `<span class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-full">Pending</span>`;
+                    else statusBadge = `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-full">Gagal</span>`;
+                    
+                    return `<div class="flex items-center gap-3 mb-3 pb-3 border-b border-gray-50 last:border-0">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-sm text-gray-800 truncate">${item.name}</h4>
+                            <p class="text-[10px] text-gray-400">${item.date}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-bold text-gray-800">${item.amount}</div>
+                            <div class="mt-1">${statusBadge}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+                return `<div class="px-6 py-4"><h3 class="text-sm font-bold text-gray-800 mb-3">${comp.data.title}</h3><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">${items}</div></div>`;
+            }
+            // --- END NEW COMPONENT HTML ---
+
             // --- CLEAN & PROFESSIONAL NAVBAR LOGIC (UPDATED) ---
             if (comp.type === 'navbar') {
                 let containerClass = `w-full h-[70px] flex justify-around items-center px-2 backdrop-blur-sm border-t transition-colors duration-300 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]`;
@@ -398,46 +450,49 @@
             }
             window.userProfileFallback = fallbackAvatar;
             let html = tabConfig.layout === 'grid' ? '<div class="grid grid-cols-2 gap-3">' : '<div class="space-y-3">';
-            rowsToProcess.forEach((row, i) => {
-                if(!row.c) return; let displayCells = [];
-                order.forEach(colIndex => {
-                    if (!row.c || colIndex >= row.c.length) return;
-                    if(tabConfig.hiddenColumns && tabConfig.hiddenColumns.includes(colIndex)) return;
-                    const cell = row.c[colIndex]; 
-                    if(cell && cell.v !== null) displayCells.push(cell.v); 
-                });
-                if(displayCells.length > 0) {
-                    const imageCell = displayCells.find(d => typeof d === 'string' && (d.match(/^https?:\/\//) || d.startsWith('data:image')));
-                    const iconOrImage = imageCell ? `<img src="${imageCell}" onerror="this.onerror=null;this.src='${fallbackAvatar}'" class="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="user" class="w-5 h-5"></i></div>`;
-                    let textValues = displayCells.filter(c => c !== imageCell); 
-                    let title = textValues[0] || 'No Data';
-                    let subtitle = textValues[1] ? textValues[1] : '';
-                    if(tabConfig.layout === 'grid') { 
-                        html += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
-                                    <div class="flex justify-between items-start mb-2">${iconOrImage}</div>
-                                    <h4 class="font-bold text-gray-800 text-xs mb-1 truncate">${title}</h4>
-                                 </div>`; 
-                    } else { 
-                        let rightLabel = textValues[2] || 'Info';
-                        if (typeof rightLabel === 'string' && (rightLabel.includes('Rp') || !isNaN(rightLabel.replace(/[^0-9]/g, '')))) {
-                            rightLabel = formatRupiah(rightLabel);
-                        }
-                        const rIndexOriginal = window.previewSheetRows.indexOf(row); 
-                        html += `<div onclick="openSheetDetail(${rIndexOriginal})" class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-3 cursor-pointer active:bg-gray-50 transition">
-                                    ${iconOrImage}
-                                    <div class="flex flex-col flex-1 min-w-0">
-                                        <h4 class="font-bold text-gray-800 text-sm truncate">${title}</h4>
-                                        <p class="text-xs text-gray-500 truncate">${subtitle}</p>
-                                    </div>
-                                    <div class="ml-2 px-3 py-1 bg-red-600 text-white font-bold text-sm rounded shadow-sm whitespace-nowrap shrink-0">
-                                        ${rightLabel}
-                                    </div>
-                                 </div>`; 
-                    }
+            rowsToProcess.forEach((row) => {
+        if(!row.c) return; 
+        let displayCells = [];
+        order.forEach(colIndex => { 
+            if (!row.c || colIndex >= row.c.length) return; 
+            if(tabConfig.hiddenColumns && tabConfig.hiddenColumns.includes(colIndex)) return; 
+            const cell = row.c[colIndex]; 
+            if(cell && cell.v !== null) displayCells.push(cell.v); 
+        }); 
+        if(displayCells.length > 0) { 
+            const imageCell = displayCells.find(d => typeof d === 'string' && (d.match(/^https?:\/\//) || d.startsWith('data:image')));
+            const iconOrImage = imageCell ? `<img src="${imageCell}" onerror="this.onerror=null;this.src='${window.userProfileFallback}'" class="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="user" class="w-5 h-5"></i></div>`;
+            let textValues = displayCells.filter(c => c !== imageCell); 
+            let title = textValues[0] || 'No Data';
+            let subtitle = textValues[1] ? textValues[1] : '';
+            if(tabConfig.layout === 'grid') { 
+                html += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-2">${iconOrImage}</div>
+                            <h4 class="font-bold text-gray-800 text-xs mb-1 truncate">${title}</h4>
+                         </div>`; 
+            } else { 
+                let rightLabel = textValues[2] || 'Info';
+                if (typeof rightLabel === 'string' && (rightLabel.includes('Rp') || !isNaN(rightLabel.replace(/[^0-9]/g, '')))) {
+                    rightLabel = formatRupiah(rightLabel);
                 }
-            });
-            html += '</div>'; container.innerHTML = html; lucide.createIcons(); 
-        };
+                const rIndexOriginal = window.previewSheetRows.indexOf(row); 
+                html += `<div onclick="openSheetDetail(${rIndexOriginal})" class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-3 cursor-pointer active:bg-gray-50 transition">
+                            ${iconOrImage}
+                            <div class="flex flex-col flex-1 min-w-0">
+                                <h4 class="font-bold text-gray-800 text-sm truncate">${title}</h4>
+                                <p class="text-xs text-gray-500 truncate">${subtitle}</p>
+                            </div>
+                            <div class="ml-2 px-3 py-1 bg-red-600 text-white font-bold text-sm rounded shadow-sm whitespace-nowrap shrink-0">
+                                ${rightLabel}
+                            </div>
+                         </div>`; 
+            }
+        }
+    });
+    html += '</div>'; 
+    container.innerHTML = html; 
+    lucide.createIcons(); 
+};
             window.handlePreviewSearch = function handlePreviewSearch(query) {
             if (!window.previewSheetRows || window.previewSheetRows.length === 0) return;
             const config = previewState.config.tabs[previewState.activeTabIdx || 0];
@@ -455,19 +510,19 @@
             renderSheetListContent(order, config, filteredIndices);
         };
             window.openSheetDetail = function openSheetDetail(rowIndex) {
-            const row = window.previewSheetRows[rowIndex]; const config = previewState.config.tabs[previewState.activeTabIdx || 0];
-            const order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
-            let html = '<div class="space-y-3">';
-            order.forEach(colIndex => {
-                if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) return;
-                const headerInfo = window.previewSheetHeaders.find(h => h.index === colIndex); const label = headerInfo ? headerInfo.label : 'Kolom';
-                const cell = row.c && row.c[colIndex]; const value = cell ? (cell.v || '') : '';
-                const isImage = typeof value === 'string' && (value.match(/^https?:\/\//) || value.startsWith('data:image'));
-                if (isImage) html += `<div class="flex justify-between items-start pb-2 border-b border-gray-100"><span class="text-xs font-bold text-gray-500 uppercase">${label}</span><img src="${value}" class="w-16 h-16 rounded object-cover border border-gray-200"></div>`;
-                else html += `<div class="pb-2 border-b border-gray-100"><div class="text-[10px] text-gray-400 uppercase mb-1">${label}</div><div class="text-sm text-gray-800 leading-relaxed">${value}</div>`;
-            });
-            html += '</div>'; document.getElementById('sheet-detail-content').innerHTML = html; document.getElementById('sheet-detail-modal').classList.remove('hidden');
-        };
+    const row = window.previewSheetRows[rowIndex]; const config = previewState.config.tabs[previewState.activeTabIdx || 0];
+    const order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
+    let html = '<div class="space-y-3">';
+    order.forEach(colIndex => {
+        if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) return;
+        const headerInfo = window.previewSheetHeaders.find(h => h.index === colIndex); const label = headerInfo ? headerInfo.label : 'Kolom';
+        const cell = row.c && row.c[colIndex]; const value = cell ? (cell.v || '') : '';
+        const isImage = typeof value === 'string' && (value.match(/^https?:\/\//) || value.startsWith('data:image'));
+        if (isImage) html += `<div class="flex justify-between items-start pb-2 border-b border-gray-100"><span class="text-xs font-bold text-gray-500 uppercase">${label}</span><img src="${value}" class="w-16 h-16 rounded object-cover border border-gray-200"></div>`;
+        else html += `<div class="pb-2 border-b border-gray-100"><div class="text-[10px] text-gray-400 uppercase mb-1">${label}</div><div class="text-sm text-gray-800 leading-relaxed">${value}</div>`;
+    });
+    html += '</div>'; document.getElementById('sheet-detail-content').innerHTML = html; document.getElementById('sheet-detail-modal').classList.remove('hidden');
+};
             window.closeSheetDetail = function closeSheetDetail() { document.getElementById('sheet-detail-modal').classList.add('hidden'); };
             window.openAboutModal = function openAboutModal(compId) {
             const comp = appData.components.find(c => c.id === compId);
@@ -507,9 +562,7 @@
             }
         };
             window.handleOrgBack = function handleOrgBack() {
-            // Determine where to go back
             if (previewState.view === 'org-member') {
-                // Go back to Org List
                 const comp = appData.components.find(c => c.id === previewState.orgSourceId);
                 if(comp) {
                     previewState = { view: 'org-list', title: comp.data.title, data: null, config: null, content: null, orgSourceId: comp.id };
