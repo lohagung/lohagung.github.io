@@ -148,7 +148,56 @@
         .btn-close-icon:hover { background: #f1f5f9; color: var(--danger); }
         
         .settings-body { padding: 1.5rem; }
-        .btn-logout { width: 100%; padding: 1rem; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        
+        /* Container baru untuk tombol berdampingan */
+        .settings-buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        /* Mengubah style tombol logout agar muat berdampingan */
+        .settings-buttons-row .btn-logout {
+            width: auto;
+            flex: 1;
+        }
+
+        /* Style tombol Bagikan baru */
+        .btn-share {
+            flex: 1;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-share:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-logout { 
+            /* Default style kept, overridden by .settings-buttons-row .btn-logout */
+            width: 100%; 
+            padding: 1rem; 
+            background: #fee2e2; 
+            color: #ef4444; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            transition: 0.2s; 
+        }
         .btn-logout:hover { background: #fecaca; }
 
         .btn-update-pass {
@@ -329,11 +378,17 @@
             </div>
             
             <div class="settings-body">
-                <button class="btn-logout" onclick="handleLogout()">
-                    <span>🚪</span> Keluar Akun
-                </button>
+                <!-- Baris tombol sejajar -->
+                <div class="settings-buttons-row">
+                    <button class="btn-share" onclick="shareSheet()">
+                        <span>🔗</span> Bagikan
+                    </button>
+                    <button class="btn-logout" onclick="handleLogout()">
+                        <span>🚪</span> Keluar
+                    </button>
+                </div>
 
-                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password Sheet</div>
+                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password</div>
                 <form id="settings-form" onsubmit="event.preventDefault(); updateTokenAction();">
                     <input type="hidden" id="set-sheet-target" value="">
                     <div class="input-group">
@@ -436,6 +491,16 @@
             } else {
                 location.reload(); 
             }
+        }
+
+        // --- FUNGSI BARU: BAGIKAN ---
+        function shareSheet() {
+            const sheetName = APP_CONFIG.sheet;
+            const baseUrl = "https://la6.my.id/";
+            const fullUrl = baseUrl + sheetName;
+            
+            // Membuka link di tab baru
+            window.open(fullUrl, '_blank');
         }
 
         // --- DATA FETCHING & SAVING ---
