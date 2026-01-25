@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denda Ronda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABEL CSS --- */
+        :root {
+            --primary: #4f46e5; --primary-dark: #4338ca; --secondary: #64748b;
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+            --danger: #ef4444; --danger-light: #fef2f2; --border: #e2e8f0;
+            --success: #22c55e; --success-light: #dcfce7;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding-bottom: 80px;
+        }
+
+        /* HEADER - GRADIASI TELA 800 KE HITAM */
+        header { 
+            /* Gradient 90deg (Kiri ke Kanan): #115e59 (Teal-800) -> #000000 (Hitam) */
+            background: linear-gradient(90deg, #115e59 0%, #000000 100%);
+            padding: 1rem 1.5rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); /* Bayangan lebih gelap */
+            position: sticky; 
+            top: 0; 
+            z-index: 20; 
+        }
+
+        .brand { 
+            font-weight: 600; 
+            font-size: 1.2rem; 
+            color: #ffffff; /* Teks Putih agar kontras dengan background gelap */
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .brand-logo { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.5); /* Border putih transparan */
+            background-color: #ffffff; /* Background putih jika gambar transparan */
+        }
+
+        /* MAIN */
+        main { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 1.5rem; 
+            width: 100%; 
+        }
+
+        /* LOADING SPINNER */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(2px);
+        }
+        .spinner { 
+            width: 40px; height: 40px; border: 4px solid #e2e8f0; 
+            border-top-color: var(--primary); border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* SEARCH */
+        .search-container { margin-bottom: 1.5rem; }
+        .search-input { 
+            width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 50px; 
+            background: var(--bg-card); box-shadow: var(--shadow); font-size: 1rem; 
+            padding-left: 3.5rem; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E"); 
+            background-repeat: no-repeat; background-position: 1.2rem center; background-size: 1.2rem; 
+        }
+
+        /* CARD GRID */
+        .card-grid { display: flex; flex-direction: column; gap: 0.8rem; padding-bottom: 2rem; }
+        .warga-card { 
+            background: var(--bg-card); border-radius: var(--radius); padding: 0rem 1.5rem 0rem 0rem; 
+            display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow); 
+            border: 1px solid transparent; transition: transform 0.2s; 
+        }
+        .warga-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+        .avatar { 
+            width: 60px; height: 60px; border-radius: 0.8rem 0 0 0.8rem; object-fit: cover; 
+            flex-shrink: 0; background-color: #e2e8f0; 
+        }
+        .info { flex: 1; min-width: 0; }
+        .info-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .info-blok { font-size: 0.85rem; color: var(--secondary); font-weight: 500; }
+
+        /* BADGES */
+        .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+        .kurang-badge { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .lunas-badge { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+
+        .hidden { display: none !important; }
+        #empty-state { text-align: center; margin-top: 3rem; color: var(--secondary); }
+    </style>
+</head>
+<body>
+
+    <!-- Loading -->
+    <div id="loading-overlay"><div class="spinner"></div></div>
+
+    <header>
+        <div class="brand">
+            <!-- 
+                LOGO HEADER
+                Menggunakan link GitHub. 
+                Fallback SVG Data URI digunakan jika link error/blokir.
+            -->
+            <img 
+                src="https://avatars.githubusercontent.com/u/61934361?v=4" 
+                class="brand-logo" 
+                alt="Logo"
+                onerror="this.onerror=null;this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0iIzEzNDUzNCIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1zaXplPSI0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsIj5SPC90ZXh0Pjwvc3ZnPg=='"
+            >
+            <span>Denda Ronda</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <input type="text" id="search-box" class="search-input" placeholder="Cari Nama atau Blok..." onkeyup="filterCards()">
+        </div>
+
+        <!-- STATISTIK SUDAH DIHAPUS SESUAI REQUEST -->
+
+        <div id="card-container" class="card-grid">
+            <!-- Data akan dimuat di sini -->
+        </div>
+        <div id="empty-state" class="hidden"><p>Data tidak ditemukan.</p></div>
+    </main>
+
+    <script>
+        // --- KONFIGURASI SPREADSHEET ---
+        const SHEET_ID = '1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0';
+        const SHEET_NAME = 'Keamanan';
+        
+        // Kolom yang ingin ditampilkan
+        const TARGET_COLS = {
+            nama: 'Nama',
+            blok: 'Blok',
+            foto: 'Foto',
+            kurang: 'Kurang'
+        };
+
+        // Fallback untuk avatar data warga jika foto error/hilang
+        const DEFAULT_IMG = 'https://avatars.githubusercontent.com/u/61934361?v=4';
+        let allData = [];
+
+        // --- FUNGSI AMBIL DATA (Fetch) ---
+        async function fetchData() {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Gagal mengakses Google Sheet");
+                
+                const text = await response.text();
+                const jsonString = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/);
+                if (!jsonString) throw new Error("Format data tidak dikenali");
+
+                const json = JSON.parse(jsonString[1]);
+                processData(json);
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('card-container').innerHTML = `
+                    <div style="text-align:center; color: var(--danger); padding: 2rem;">
+                        <p><b>Gagal memuat data.</b></p>
+                        <p style="font-size:0.9rem;">Pastikan Link Sheet diset ke "Anyone with the link".</p>
+                        <p style="font-size:0.8rem; margin-top:10px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                document.getElementById('loading-overlay').classList.add('hidden');
+            }
+        }
+
+        // --- FUNGSI PROSES DATA ---
+        function processData(json) {
+            const table = json.table;
+            const rows = table.rows;
+            const cols = table.cols;
+
+            const indices = {
+                nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                blok: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase()),
+                foto: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.foto.toLowerCase()),
+                kurang: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.kurang.toLowerCase())
+            };
+
+            allData = [];
+
+            rows.forEach(row => {
+                const c = row.c;
+                const getVal = (idx) => (idx !== -1 && c[idx] && c[idx].v !== null) ? c[idx].v : '';
+
+                const nama = getVal(indices.nama);
+                if (!nama) return;
+
+                const blok = getVal(indices.blok);
+                const foto = getVal(indices.foto);
+                const kurang = parseFloat(getVal(indices.kurang)) || 0;
+
+                allData.push({ nama, blok, foto, kurang });
+            });
+
+            renderCards(allData);
+            // updateStats(allData); // DIHAPUS
+        }
+
+        // --- FUNGSI RENDER ---
+        function renderCards(data) {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('empty-state').classList.add('hidden');
+
+            data.forEach(item => {
+                let avatarSrc = DEFAULT_IMG;
+                if (item.foto && item.foto.startsWith('http')) {
+                    avatarSrc = item.foto;
+                }
+
+                let badgeHTML = '';
+                if (item.kurang <= 0) {
+                    badgeHTML = `<div class="badge lunas-badge">✅ Lunas</div>`;
+                } else {
+                    const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.kurang);
+                    badgeHTML = `<div class="badge kurang-badge">${fmtKurang}</div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'warga-card';
+                card.innerHTML = `
+                    <img src="${avatarSrc}" class="avatar" alt="${item.nama}" onerror="this.src='${DEFAULT_IMG}'">
+                    <div class="info">
+                        <div class="info-name">${item.nama}</div>
+                        <div class="info-blok">Blok ${item.blok}</div>
+                    </div>
+                    ${badgeHTML}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- FUNGSI UPDATE STATS (DIHAPUS TOTAL) ---
+        /* function updateStats(data) { ... } */
+
+        // --- FUNGSI PENCARIAN ---
+        function filterCards() {
+            const term = document.getElementById('search-box').value.toLowerCase();
+            const filtered = allData.filter(item => 
+                item.nama.toLowerCase().includes(term) || 
+                item.blok.toLowerCase().includes(term)
+            );
+            renderCards(filtered);
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+    </script>
+</body>
+</html>
