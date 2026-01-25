@@ -60,8 +60,9 @@
         .info-blok { font-size: 0.85rem; color: var(--secondary); font-weight: 500; display: flex; align-items: center; gap: 0.25rem; }
         
         .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .badge.readonly { cursor: default; } /* Style khusus badge read-only */
         .kurang-badge { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .kurang-badge:hover { background: var(--danger); color: white; }
+        .kurang-badge:hover:not(.readonly) { background: var(--danger); color: white; }
         .lunas-badge { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 
         /* --- REKAP & RIWAYAT --- */
@@ -113,7 +114,7 @@
         .note-2025 { padding: 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; color: var(--text-main); }
         .note-2025 span { font-weight: 700; color: var(--danger); }
 
-        /* --- MODAL PENGATURAN (REDESIGN) --- */
+        /* --- MODAL PENGATURAN --- */
         .modal-settings { height: auto; min-height: 300px; max-height: 90vh; }
         .modal-header-simple { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
@@ -124,7 +125,6 @@
         .btn-logout { width: 100%; padding: 1rem; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-logout:hover { background: #fecaca; }
 
-        /* --- NEW STYLE: TOMBOL UPDATE PASSWORD KEREN & TENGAH --- */
         .btn-update-pass {
             display: block;
             width: 100%;
@@ -146,9 +146,6 @@
         .btn-update-pass:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 56, 202, 0.6);
-        }
-        .btn-update-pass:active {
-            transform: translateY(0);
         }
 
         /* --- BOTTOM NAV --- */
@@ -190,14 +187,16 @@
                 <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwopjwy5tR4Q1q3q8oHOYZ83VKaDGekoM8hULbX-5jb460XCFREvv9cDZRVb50voHmaOw/exec" readonly>
             </div>
             
+            <!-- PERUBAHAN: Label "Nama Sheet" -> "Pengurus" -->
             <div class="input-group">
-                <label>Nama Sheet</label>
+                <label>Pengurus</label>
                 <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: Jimpitan">
             </div>
 
+            <!-- PERUBAHAN: Label "Password Sheet (API Token)" -> "Password" -->
             <div class="input-group">
-                <label>Password Sheet (API Token)</label>
-                <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password Sheet">
+                <label>Password</label>
+                <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password">
             </div>
             
             <button class="btn-login" onclick="doLogin()">Masuk Dashboard</button>
@@ -258,7 +257,6 @@
             <span>Riwayat</span>
         </div>
         <div class="nav-item" onclick="openSettingsModal()">
-            <!-- ICON GEAR (RODA GIGI) -->
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
             <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             <span>Pengaturan</span>
@@ -269,9 +267,7 @@
     <div id="edit-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header-bg">
-                <!-- Tombol Close Edit -->
                 <button class="btn-close-edit" onclick="closeModal('edit-modal')">&times;</button>
-                
                 <img id="modal-avatar" src="" class="modal-profile-img" alt="Profile">
                 <div class="modal-profile-name" id="modal-nama">Nama Warga</div>
                 <div class="modal-profile-blok" id="modal-blok">Blok A1</div>
@@ -317,7 +313,6 @@
                         <input type="password" id="new-token" class="input-field" placeholder="Masukkan password baru">
                     </div>
                     
-                    <!-- CLASS BARU: btn-update-pass -->
                     <button type="submit" class="btn-update-pass">Update Password</button>
                 </form>
             </div>
@@ -330,17 +325,56 @@
         const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const FORMULA_COLS = ["Total", "Sudah_Bayar", "Kurang", "Bulan_Aktif", "Timestamp", "Foto", "ID", "Created", "Email", "Telp"]; 
         let APP_CONFIG = { url: '', token: '', sheet: '' };
+        let IS_PUBLIC_MODE = false; // FLAG BARU
         let STATE = { data: [], headers: [], currentEdit: null };
 
         // --- INIT & AUTH ---
         window.addEventListener('DOMContentLoaded', () => {
-            const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
-            if (stored) {
-                APP_CONFIG = stored;
-                document.getElementById('app-url').value = stored.url || '';
-                document.getElementById('api-token').value = stored.token || '';
-                document.getElementById('sheet-name').value = stored.sheet || '';
-                if(stored.token) doLogin(true);
+            // 1. DETEKSI URL SHARE (PUBLIC MODE)
+            // Mencari parameter di URL misal: ?Jimpitan
+            const params = new URLSearchParams(window.location.search);
+            let publicSheet = null;
+
+            // Cek apakah ada parameter standar seperti ?sheet=Jimpitan
+            if(params.has('sheet')) {
+                publicSheet = params.get('sheet');
+            } else {
+                // Fallback: Cek key apa saja yang ada di URL. 
+                // Jika user mengetik ?Jimpitan (tanpa 'sheet='), kita ambil key-nya.
+                for (const [key, value] of params.entries()) {
+                    // Jika key bukan parameter sistem (seperti nocache), anggap itu nama sheet
+                    if(key !== 'nocache' && !value) {
+                        publicSheet = key;
+                        break;
+                    }
+                }
+            }
+
+            // 2. Jika URL share ditemukan, masuk mode Public
+            if (publicSheet) {
+                IS_PUBLIC_MODE = true;
+                APP_CONFIG.url = window.location.href.split('?')[0]; // Ambil base URL saja
+                APP_CONFIG.sheet = publicSheet;
+                APP_CONFIG.token = ''; // Public tidak butuh token
+                
+                // Langsung load dashboard tanpa login
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('main-nav').style.display = 'none'; // Hide nav di public mode
+                
+                const headerTitle = document.querySelector('#header-title');
+                if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet + " (Lihat Saja)";
+                
+                fetchData(); // Fetch data public
+            } else {
+                // 3. Jika tidak ada URL share, cek LocalStorage (Login Biasa)
+                const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
+                if (stored) {
+                    APP_CONFIG = stored;
+                    document.getElementById('app-url').value = stored.url || '';
+                    document.getElementById('api-token').value = stored.token || '';
+                    document.getElementById('sheet-name').value = stored.sheet || '';
+                    if(stored.token) doLogin(true);
+                }
             }
         });
 
@@ -371,14 +405,28 @@
             } finally { toggleLoading(false); }
         }
 
-        function handleLogout() { localStorage.removeItem('gas_dashboard_config'); location.reload(); }
+        function handleLogout() { 
+            localStorage.removeItem('gas_dashboard_config'); 
+            // Jika mode public, redirect ke base URL (hilangkan ?sheet)
+            if(IS_PUBLIC_MODE) {
+                window.location.href = window.location.href.split('?')[0];
+            } else {
+                location.reload(); 
+            }
+        }
 
         // --- DATA FETCHING & SAVING ---
         async function fetchData() {
             const url = new URL(APP_CONFIG.url);
-            url.searchParams.append('token', APP_CONFIG.token);
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
+            
+            // Jika PUBLIC MODE, kirim mode=public agar server mengizinkan tanpa password
+            if (IS_PUBLIC_MODE) {
+                url.searchParams.append('mode', 'public');
+            } else {
+                url.searchParams.append('token', APP_CONFIG.token);
+            }
             
             const res = await fetch(url.toString());
             const json = await res.json();
@@ -397,6 +445,11 @@
         }
 
         async function saveData() {
+            // BLOKIR SAVE DI MODE PUBLIC
+            if (IS_PUBLIC_MODE) {
+                return showToast("❌ Mode Publik: Tidak bisa mengubah data.");
+            }
+
             const params = { Blok: STATE.currentEdit['Blok'] };
             let totalPembayaran = 0;
 
@@ -450,6 +503,8 @@
 
         // --- LOGIC UPDATE TOKEN ---
         async function updateTokenAction() {
+            if (IS_PUBLIC_MODE) return showToast("❌ Tidak bisa ubah password di mode publik.");
+
             const oldToken = document.getElementById('old-token').value.trim();
             const newToken = document.getElementById('new-token').value.trim();
             const sheetTarget = document.getElementById('set-sheet-target').value; 
@@ -508,12 +563,21 @@
         }
 
         async function fetchRiwayat() {
+            // Riwayat biasanya hanya untuk user login, tapi jika Public mode, kita bisa coba akses (Riwayat itu Public)
+            // Tapi user minta "Pembayaran" dibagikan public. Tab Riwayat tersembunyi di public mode.
+            
             const container = document.getElementById('riwayat-container');
             container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat...</p></div>';
 
             try {
                 const url = new URL(APP_CONFIG.url);
-                url.searchParams.append('token', APP_CONFIG.token); 
+                // Gunakan token jika ada, jika tidak pakai mode public
+                if (!IS_PUBLIC_MODE) {
+                    url.searchParams.append('token', APP_CONFIG.token); 
+                } else {
+                    url.searchParams.append('mode', 'public');
+                }
+                
                 url.searchParams.append('sheet', 'Riwayat'); 
                 url.searchParams.append('action', 'get-data');
                 
@@ -532,23 +596,13 @@
                 }
 
                 const sheetName = APP_CONFIG.sheet;
-
-                // ==========================================
-                // FILTER LOGIC: HIDE PASSWORD LOGS
-                // ==========================================
+                
+                // Filter: Hanya tampilkan log pembayaran untuk sheet ini, DAN sembunyikan log password
                 const filteredData = data.filter(row => {
-                    // 1. Pastikan ada isi kolom Pesan
                     if (!row.Pesan) return false;
-
-                    // 2. Jika ada kata 'Password' (case-insensitive), JANGAN TAMPILKAN
-                    if (row.Pesan.toLowerCase().includes("password")) {
-                        return false;
-                    }
-
-                    // 3. Hanya tampilkan jika pesan terkait dengan sheet yang sedang dibuka
+                    if (row.Pesan.toLowerCase().includes("password")) return false;
                     return row.Pesan.includes(sheetName);
                 }).reverse();
-                // ==========================================
 
                 container.innerHTML = '';
                 filteredData.forEach(row => {
@@ -588,6 +642,9 @@
 
         // --- NAVIGATION ---
         function switchTab(tabName, el) {
+            // JIKA PUBLIC MODE, TOLAK NAVIGASI (HANYA PEMBAYARAN YG TAMPIL)
+            if (IS_PUBLIC_MODE) return;
+
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             if(el) el.classList.add('active');
@@ -632,10 +689,16 @@
 
                 let badgeHTML = '';
                 if (kurang <= 0) {
-                    badgeHTML = `<div class="badge lunas-badge">✅ Lunas</div>`;
+                    badgeHTML = `<div class="badge lunas-badge readonly">✅ Lunas</div>`;
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
-                    badgeHTML = `<div class="badge kurang-badge" onclick="openEdit('${blok}')">${fmtKurang}</div>`;
+                    
+                    // JIKA PUBLIC MODE, BAGI TIDAK KLIK
+                    if (IS_PUBLIC_MODE) {
+                        badgeHTML = `<div class="badge kurang-badge readonly">${fmtKurang}</div>`;
+                    } else {
+                        badgeHTML = `<div class="badge kurang-badge" onclick="openEdit('${blok}')">${fmtKurang}</div>`;
+                    }
                 }
 
                 const div = document.createElement('div');
@@ -680,6 +743,8 @@
 
         // --- MODAL ---
         function openEdit(blokId) {
+            if (IS_PUBLIC_MODE) return; // Blok modal edit di public
+
             const row = STATE.data.find(r => r['Blok'] == blokId);
             if (!row) return;
             STATE.currentEdit = row;
@@ -806,6 +871,7 @@
         }
 
         function openSettingsModal() {
+            if (IS_PUBLIC_MODE) return;
             if (APP_CONFIG.sheet === 'Riwayat') {
                 showToast("⚠️ Sheet Riwayat bersifat Publik, password tidak bisa diganti.");
                 return;
