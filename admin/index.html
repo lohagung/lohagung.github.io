@@ -93,8 +93,34 @@
 
         .modal-body { padding: 1.5rem 2rem; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 3rem; }
 
-        .form-section-title { font-size: 0.8rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; margin: 1.5rem 0 0.5rem 0; font-weight: 600; border-left: 3px solid var(--primary); padding-left: 8px; }
-        
+        /* PERUBAHAN CSS: Section Title agar bisa menampung elemen sebelah kanan */
+        .form-section-title { 
+            font-size: 0.8rem; 
+            color: var(--secondary); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin: 1.5rem 0 0.5rem 0; 
+            font-weight: 600; 
+            border-left: 3px solid var(--primary); 
+            padding-left: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        /* Style untuk teks "Kurang" yang bisa diklik */
+        .kurang-text-link {
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .kurang-text-link:hover {
+            color: #dc2626;
+        }
+
         .month-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; background: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); transition: 0.2s; flex-wrap: nowrap; }
         .month-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
         .month-label { width: 80px; font-size: 0.85rem; font-weight: 500; color: var(--text-main); flex-shrink: 0;}
@@ -275,9 +301,15 @@
             
             <div class="modal-body">
                 <form id="edit-form" onsubmit="event.preventDefault(); saveData();">
-                    <!-- PERUBAHAN: Input di atas 'Status Pembayaran Bulanan' disembunyikan -->
+                    <!-- Input di atas disembunyikan -->
                     <div id="general-fields" style="margin-bottom: 1rem; display: none;"></div>
-                    <div class="form-section-title">Status Pembayaran Bulanan</div>
+                    
+                    <!-- PERUBAHAN: Menambahkan tombol/link "Kurang" di sebelah kanan judul -->
+                    <div class="form-section-title">
+                        <span>Status Pembayaran Bulanan</span>
+                        <span id="btn-kurang-modal" class="kurang-text-link" onclick="autoFillKurang()">Kurang: Rp 0</span>
+                    </div>
+                    
                     <div id="monthly-fields"></div>
                 </form>
                 
@@ -332,18 +364,13 @@
         // --- INIT & AUTH ---
         window.addEventListener('DOMContentLoaded', () => {
             // 1. DETEKSI URL SHARE (PUBLIC MODE)
-            // Mencari parameter di URL misal: ?Jimpitan
             const params = new URLSearchParams(window.location.search);
             let publicSheet = null;
 
-            // Cek apakah ada parameter standar seperti ?sheet=Jimpitan
             if(params.has('sheet')) {
                 publicSheet = params.get('sheet');
             } else {
-                // Fallback: Cek key apa saja yang ada di URL. 
-                // Jika user mengetik ?Jimpitan (tanpa 'sheet='), kita ambil key-nya.
                 for (const [key, value] of params.entries()) {
-                    // Jika key bukan parameter sistem (seperti nocache), anggap itu nama sheet
                     if(key !== 'nocache' && !value) {
                         publicSheet = key;
                         break;
@@ -351,23 +378,20 @@
                 }
             }
 
-            // 2. Jika URL share ditemukan, masuk mode Public
             if (publicSheet) {
                 IS_PUBLIC_MODE = true;
-                APP_CONFIG.url = window.location.href.split('?')[0]; // Ambil base URL saja
+                APP_CONFIG.url = window.location.href.split('?')[0]; 
                 APP_CONFIG.sheet = publicSheet;
-                APP_CONFIG.token = ''; // Public tidak butuh token
+                APP_CONFIG.token = ''; 
                 
-                // Langsung load dashboard tanpa login
                 document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('main-nav').style.display = 'none'; // Hide nav di public mode
+                document.getElementById('main-nav').style.display = 'none'; 
                 
                 const headerTitle = document.querySelector('#header-title');
                 if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet + " (Lihat Saja)";
                 
-                fetchData(); // Fetch data public
+                fetchData(); 
             } else {
-                // 3. Jika tidak ada URL share, cek LocalStorage (Login Biasa)
                 const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
                 if (stored) {
                     APP_CONFIG = stored;
@@ -408,7 +432,6 @@
 
         function handleLogout() { 
             localStorage.removeItem('gas_dashboard_config'); 
-            // Jika mode public, redirect ke base URL (hilangkan ?sheet)
             if(IS_PUBLIC_MODE) {
                 window.location.href = window.location.href.split('?')[0];
             } else {
@@ -422,7 +445,6 @@
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
             
-            // Jika PUBLIC MODE, kirim mode=public agar server mengizinkan tanpa password
             if (IS_PUBLIC_MODE) {
                 url.searchParams.append('mode', 'public');
             } else {
@@ -446,7 +468,6 @@
         }
 
         async function saveData() {
-            // BLOKIR SAVE DI MODE PUBLIC
             if (IS_PUBLIC_MODE) {
                 return showToast("❌ Mode Publik: Tidak bisa mengubah data.");
             }
@@ -564,15 +585,11 @@
         }
 
         async function fetchRiwayat() {
-            // Riwayat biasanya hanya untuk user login, tapi jika Public mode, kita bisa coba akses (Riwayat itu Public)
-            // Tapi user minta "Pembayaran" dibagikan public. Tab Riwayat tersembunyi di public mode.
-            
             const container = document.getElementById('riwayat-container');
             container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat...</p></div>';
 
             try {
                 const url = new URL(APP_CONFIG.url);
-                // Gunakan token jika ada, jika tidak pakai mode public
                 if (!IS_PUBLIC_MODE) {
                     url.searchParams.append('token', APP_CONFIG.token); 
                 } else {
@@ -598,7 +615,6 @@
 
                 const sheetName = APP_CONFIG.sheet;
                 
-                // Filter: Hanya tampilkan log pembayaran untuk sheet ini, DAN sembunyikan log password
                 const filteredData = data.filter(row => {
                     if (!row.Pesan) return false;
                     if (row.Pesan.toLowerCase().includes("password")) return false;
@@ -643,7 +659,6 @@
 
         // --- NAVIGATION ---
         function switchTab(tabName, el) {
-            // JIKA PUBLIC MODE, TOLAK NAVIGASI (HANYA PEMBAYARAN YG TAMPIL)
             if (IS_PUBLIC_MODE) return;
 
             const navItems = document.querySelectorAll('.nav-item');
@@ -694,7 +709,6 @@
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
                     
-                    // JIKA PUBLIC MODE, BAGI TIDAK KLIK
                     if (IS_PUBLIC_MODE) {
                         badgeHTML = `<div class="badge kurang-badge readonly">${fmtKurang}</div>`;
                     } else {
@@ -742,9 +756,9 @@
             if(statTunggakan) statTunggakan.innerText = fmtTunggakan;
         }
 
-        // --- MODAL ---
+        // --- MODAL & AUTO FILL KURANG ---
         function openEdit(blokId) {
-            if (IS_PUBLIC_MODE) return; // Blok modal edit di public
+            if (IS_PUBLIC_MODE) return; 
 
             const row = STATE.data.find(r => r['Blok'] == blokId);
             if (!row) return;
@@ -752,19 +766,36 @@
 
             const idxNama = findIdx(['nama', 'pemilik', 'name']);
             const idxImg = findIdx(['foto', 'gambar', 'image', 'url', 'pic']);
+            const idxKurang = findIdx(['kurang', 'sisa', 'deficit']); // Index kurang
+            
             const nama = getVal(row, idxNama) || "-";
             const imgUrl = getVal(row, idxImg);
             const avatarSrc = (imgUrl && imgUrl.startsWith('http')) ? imgUrl : DEFAULT_IMG;
+            
+            // Ambil nilai kurang
+            const valKurang = parseFloat(getVal(row, idxKurang)) || 0;
+            const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(valKurang);
 
             const modalAvatar = document.getElementById('modal-avatar');
             const modalNama = document.getElementById('modal-nama');
             const modalBlok = document.getElementById('modal-blok');
+            const btnKurang = document.getElementById('btn-kurang-modal');
             
             if(modalAvatar) modalAvatar.src = avatarSrc;
             if(modalAvatar) modalAvatar.onerror = function() { this.src = DEFAULT_IMG; };
 
             if(modalNama) modalNama.innerText = nama;
             if(modalBlok) modalBlok.innerText = blokId;
+
+            // Update teks tombol kurang
+            if(btnKurang) {
+                btnKurang.innerText = `Kurang: ${fmtKurang}`;
+                if(valKurang <= 0) {
+                    btnKurang.style.display = 'none'; // Sembunyikan jika tidak ada kurang
+                } else {
+                    btnKurang.style.display = 'inline-block';
+                }
+            }
 
             const generalContainer = document.getElementById('general-fields');
             const monthlyContainer = document.getElementById('monthly-fields');
@@ -826,6 +857,43 @@
             const overlay = document.getElementById('edit-modal');
             overlay.style.display = 'flex';
             setTimeout(() => overlay.classList.add('active'), 10);
+        }
+
+        // --- FITUR BARU: AUTO FILL KURANG ---
+        function autoFillKurang() {
+            if (!STATE.currentEdit) return;
+
+            // 1. Ambil nilai kurang dari data
+            const idxKurang = findIdx(['kurang', 'sisa', 'deficit']);
+            const valKurang = parseFloat(getVal(STATE.currentEdit, idxKurang)) || 0;
+
+            if (valKurang <= 0) {
+                showToast("Tidak ada tagihan (Kurang).");
+                return;
+            }
+
+            // 2. Cari input bulan pertama yang masih kosong / belum full (disabled)
+            let filled = false;
+            MONTHS.forEach(m => {
+                if (filled) return; // Stop setelah mengisi 1 input
+
+                const input = document.getElementById(`month-input-${m}`);
+                if (input && !input.disabled) {
+                    // Masukkan nilai kurang
+                    input.value = valKurang;
+                    
+                    // Trigger event input agar UI state (active month) terupdate jika sesuai logika
+                    input.dispatchEvent(new Event('input'));
+                    
+                    filled = true;
+                }
+            });
+
+            if (filled) {
+                showToast("Nilai Kurang dimasukkan ke input bulan.");
+            } else {
+                showToast("Semua bulan sudah terisi penuh.");
+            }
         }
 
         function toggleMonthMode(month, checkbox) {
