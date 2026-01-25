@@ -369,7 +369,8 @@
             data: [], 
             headers: [], 
             currentEdit: null,
-            multiDataCache: {} 
+            multiDataCache: {},
+            sheetPrices: {} // Menyimpan harga spesifik per sheet { Kas: 2000, Sampah: 18000, ... }
         };
 
         // --- HELPER: CARI KEY SECARA CASE-INSENSITIVE ---
@@ -758,6 +759,64 @@
             } finally { toggleLoading(false); }
         }
 
+        // --- CORE LOGIC SETTINGS (INDEX & PRICE) ---
+        function getSettings() {
+            let index = 12; 
+            let price = 0;
+            
+            let sourceData = STATE.data;
+            
+            if (PAYMENT_MODE === 'multi') {
+                // --- UPDATE LOGIC: Ambil harga spesifik per sheet dari Row T5 (Spreadsheet Row 5) ---
+                // Spreadsheet Row 1: Headers (Removed via shift)
+                // Spreadsheet Row 2: Array Index 0
+                // Spreadsheet Row 3: Array Index 1
+                // Spreadsheet Row 4: Array Index 2
+                // Spreadsheet Row 5: Array Index 3  <-- TARGET INI
+                
+                STATE.sheetPrices = {}; // Reset prices
+                
+                MULTI_SHEETS.forEach(sheetName => {
+                    let specificPrice = 0;
+                    const sheetData = STATE.multiDataCache[sheetName] || [];
+                    
+                    if (sheetData.length > 3) {
+                        // Target Array Index 3 (Spreadsheet Row 5)
+                        const rowT5 = sheetData[3];
+                        
+                        let foundPrice = 0;
+                        if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) {
+                            foundPrice = parseFloat(rowT5['Bulan_Aktif']);
+                        } else {
+                            // Fallback jika Row 5 kosong/tidak valid
+                            for(let i=0; i<sheetData.length; i++) {
+                                if (sheetData[i]['Bulan_Aktif'] && !isNaN(sheetData[i]['Bulan_Aktif'])) {
+                                    foundPrice = parseFloat(sheetData[i]['Bulan_Aktif']);
+                                    break;
+                                }
+                            }
+                        }
+                        specificPrice = foundPrice;
+                    }
+                    
+                    STATE.sheetPrices[sheetName] = specificPrice;
+                });
+                
+                // Ambil index bulan aktif dari salah satu sheet (misal Kas)
+                sourceData = STATE.multiDataCache["Kas"] || [];
+            }
+
+            sourceData.forEach(row => {
+                const val = row['Bulan_Aktif'];
+                if (val !== undefined && val !== '' && val !== null) {
+                    const numVal = parseFloat(val);
+                    if (numVal >= 1 && numVal <= 12) index = numVal;
+                    if (numVal > price) price = numVal; 
+                }
+            });
+            return { index, price };
+        }
+
         function renderRekap() {
             const container = document.getElementById('rekap-container');
             container.innerHTML = '';
@@ -853,28 +912,6 @@
             } catch (e) {
                 container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Error: ${e.message}</p></div>`;
             }
-        }
-
-        function getSettings() {
-            let index = 12; 
-            let price = 0;
-            
-            let sourceData = STATE.data;
-            
-            if (PAYMENT_MODE === 'multi') {
-                 const firstSheet = MULTI_SHEETS[0];
-                 sourceData = STATE.multiDataCache[firstSheet] || [];
-            }
-
-            sourceData.forEach(row => {
-                const val = row['Bulan_Aktif'];
-                if (val !== undefined && val !== '' && val !== null) {
-                    const numVal = parseFloat(val);
-                    if (numVal >= 1 && numVal <= 12) index = numVal;
-                    if (numVal > price) price = numVal; 
-                }
-            });
-            return { index, price };
         }
 
         function switchTab(tabName, el) {
@@ -1059,10 +1096,11 @@
 
             const settings = getSettings();
             const activeMonthLimit = settings.index; 
-            const globalPrice = settings.price;     
 
             if (PAYMENT_MODE === 'single') {
                 // RENDER SINGLE MODE
+                const globalPrice = settings.price; 
+
                 STATE.headers.forEach(h => {
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
@@ -1104,11 +1142,14 @@
 
                     let allPaid = true;
                     let monthTotal = 0;
+                    
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
+                        const standardPrice = STATE.sheetPrices[sheet] || 0;
+                        
                         monthTotal += val;
-                        if (val !== globalPrice) allPaid = false;
+                        if (val !== standardPrice) allPaid = false;
                     });
 
                     const div = document.createElement('div');
@@ -1147,6 +1188,7 @@
             setTimeout(() => overlay.classList.add('active'), 10);
         }
 
+        // --- FITUR BARU: AUTO FILL KURANG (MULTI MODE SPECIFIC) ---
         function autoFillKurang() {
             if (!STATE.currentEdit) return;
 
@@ -1155,9 +1197,7 @@
 
             if (valKurang <= 0) return showToast("Tidak ada tagihan (Kurang).");
 
-            const settings = getSettings();
-            const globalPrice = settings.price; 
-
+            // Cari bulan pertama yang belum lunas
             let targetMonthDiv = null;
             const monthDivs = document.querySelectorAll(PAYMENT_MODE === 'multi' ? '.month-row-multi' : '.month-row');
 
@@ -1172,22 +1212,28 @@
             if (!targetMonthDiv) return showToast("Semua bulan sudah terisi penuh.");
 
             if (PAYMENT_MODE === 'single') {
+                const globalPrice = getSettings().price;
                 const input = targetMonthDiv.querySelector('.month-input');
                 if (input) {
                     input.value = valKurang;
                     input.dispatchEvent(new Event('input'));
                 }
             } else {
+                // --- LOGIC MULTI MODE: ISI SESUAI HARGA SPESIFIK BULAN AKTIF ---
                 let sisa = valKurang;
                 
-                MULTI_SHEETS.forEach((sheet, idx) => {
+                MULTI_SHEETS.forEach((sheet) => {
                     const input = document.getElementById(`month-input-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
                     if (!input) return;
 
-                    if (sisa >= globalPrice) {
-                        input.value = globalPrice;
-                        sisa -= globalPrice;
+                    // Gunakan harga spesifik dari STATE.sheetPrices
+                    const standardPrice = STATE.sheetPrices[sheet] || 0;
+
+                    if (sisa >= standardPrice) {
+                        input.value = standardPrice;
+                        sisa -= standardPrice;
                     } else if (sisa > 0) {
+                        // Jika sisa kurang dari harga standar, masukkan sisa ke kolom ini
                         input.value = sisa;
                         sisa = 0;
                     } else {
@@ -1246,12 +1292,16 @@
 
         function toggleMultiMonthMode(month, checkbox) {
             const rowDiv = checkbox.closest('.month-row-multi');
-            const globalPrice = getSettings().price;
             const inputs = rowDiv.querySelectorAll('.mini-input');
 
             if (checkbox.checked) {
                 inputs.forEach(input => {
-                    input.value = globalPrice;
+                    // Ambil sheet name dari ID input (format: month-input-Month-Sheet)
+                    const idParts = input.id.split('-');
+                    const sheetName = idParts[3];
+                    const sheetPrice = STATE.sheetPrices[sheetName] || 0;
+                    
+                    input.value = sheetPrice;
                     input.disabled = true;
                 });
                 rowDiv.classList.add('active-month');
@@ -1269,10 +1319,14 @@
             const checkbox = document.getElementById(`check-${month}`);
             const inputs = rowDiv.querySelectorAll('.mini-input');
 
-            const globalPrice = getSettings().price;
             let allMatch = true;
             inputs.forEach(inp => {
-                if (parseFloat(inp.value) !== globalPrice) allMatch = false;
+                // Ambil sheet name dari ID input
+                const idParts = inp.id.split('-');
+                const sheetName = idParts[3];
+                const sheetPrice = STATE.sheetPrices[sheetName] || 0;
+
+                if (parseFloat(inp.value) !== sheetPrice) allMatch = false;
             });
 
             if (allMatch) {
@@ -1296,11 +1350,14 @@
             if(targetRow) {
                 const cb = targetRow.querySelector('input[type="checkbox"]');
                 const inputs = targetRow.querySelectorAll('.mini-input');
-                const globalPrice = getSettings().price;
                 
                 let allPaid = true;
                 inputs.forEach(inp => {
-                    if (parseFloat(inp.value) !== globalPrice) allPaid = false;
+                    const idParts = inp.id.split('-');
+                    const sheetName = idParts[3];
+                    const sheetPrice = STATE.sheetPrices[sheetName] || 0;
+
+                    if (parseFloat(inp.value) !== sheetPrice) allPaid = false;
                 });
 
                 cb.checked = allPaid;
