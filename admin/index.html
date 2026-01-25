@@ -60,9 +60,8 @@
         .info-blok { font-size: 0.85rem; color: var(--secondary); font-weight: 500; display: flex; align-items: center; gap: 0.25rem; }
         
         .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .badge.readonly { cursor: default; }
         .kurang-badge { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .kurang-badge:hover:not(.readonly) { background: var(--danger); color: white; }
+        .kurang-badge:hover { background: var(--danger); color: white; }
         .lunas-badge { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 
         /* --- REKAP & RIWAYAT --- */
@@ -114,7 +113,7 @@
         .note-2025 { padding: 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; color: var(--text-main); }
         .note-2025 span { font-weight: 700; color: var(--danger); }
 
-        /* --- MODAL PENGATURAN --- */
+        /* --- MODAL PENGATURAN (REDESIGN) --- */
         .modal-settings { height: auto; min-height: 300px; max-height: 90vh; }
         .modal-header-simple { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
@@ -125,16 +124,7 @@
         .btn-logout { width: 100%; padding: 1rem; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-logout:hover { background: #fecaca; }
 
-        /* --- STYLE: BAGIKAN LINK --- */
-        .share-box { margin-top: 1.5rem; margin-bottom: 2rem; background: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); }
-        .share-box h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.25rem; font-weight: 600; }
-        .share-box p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4; }
-        .share-input-wrapper { display: flex; gap: 8px; }
-        .share-input { flex: 1; padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; color: var(--text-muted); background: #fff; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .btn-copy { white-space: nowrap; padding: 0.6rem 1rem; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 500; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; transition: 0.2s;}
-        .btn-copy:hover { background: var(--primary-dark); }
-
-        /* --- STYLE: UPDATE PASSWORD --- */
+        /* --- NEW STYLE: TOMBOL UPDATE PASSWORD KEREN & TENGAH --- */
         .btn-update-pass {
             display: block;
             width: 100%;
@@ -197,18 +187,17 @@
             
             <div class="input-group hidden">
                 <label>URL Web App</label>
-                <!-- GANTI URL INI SETELAH DEPLOY BARU -->
                 <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwopjwy5tR4Q1q3q8oHOYZ83VKaDGekoM8hULbX-5jb460XCFREvv9cDZRVb50voHmaOw/exec" readonly>
             </div>
             
             <div class="input-group">
-                <label>Pengurus</label>
+                <label>Nama Sheet</label>
                 <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: Jimpitan">
             </div>
 
             <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password">
+                <label>Password Sheet (API Token)</label>
+                <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password Sheet">
             </div>
             
             <button class="btn-login" onclick="doLogin()">Masuk Dashboard</button>
@@ -269,6 +258,7 @@
             <span>Riwayat</span>
         </div>
         <div class="nav-item" onclick="openSettingsModal()">
+            <!-- ICON GEAR (RODA GIGI) -->
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
             <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             <span>Pengaturan</span>
@@ -279,7 +269,9 @@
     <div id="edit-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header-bg">
+                <!-- Tombol Close Edit -->
                 <button class="btn-close-edit" onclick="closeModal('edit-modal')">&times;</button>
+                
                 <img id="modal-avatar" src="" class="modal-profile-img" alt="Profile">
                 <div class="modal-profile-name" id="modal-nama">Nama Warga</div>
                 <div class="modal-profile-blok" id="modal-blok">Blok A1</div>
@@ -313,20 +305,7 @@
                     <span>🚪</span> Keluar Akun
                 </button>
 
-                <!-- FITUR BAGIKAN LINK -->
-                <div class="share-box">
-                    <h4>🔗 Bagikan Link (Lihat Saja)</h4>
-                    <p>Link ini memungkinkan orang lain melihat data <b id="share-sheet-name">Jimpitan</b> tanpa perlu login.</p>
-                    <div class="share-input-wrapper">
-                        <input type="text" id="share-link-input" class="share-input" readonly>
-                        <button class="btn-copy" onclick="copyShareLink()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            Copy
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-section-title" style="margin-top: 0;">Ganti Password Sheet</div>
+                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password Sheet</div>
                 <form id="settings-form" onsubmit="event.preventDefault(); updateTokenAction();">
                     <input type="hidden" id="set-sheet-target" value="">
                     <div class="input-group">
@@ -338,6 +317,7 @@
                         <input type="password" id="new-token" class="input-field" placeholder="Masukkan password baru">
                     </div>
                     
+                    <!-- CLASS BARU: btn-update-pass -->
                     <button type="submit" class="btn-update-pass">Update Password</button>
                 </form>
             </div>
@@ -350,52 +330,17 @@
         const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const FORMULA_COLS = ["Total", "Sudah_Bayar", "Kurang", "Bulan_Aktif", "Timestamp", "Foto", "ID", "Created", "Email", "Telp"]; 
         let APP_CONFIG = { url: '', token: '', sheet: '' };
-        let IS_PUBLIC_MODE = false;
         let STATE = { data: [], headers: [], currentEdit: null };
 
         // --- INIT & AUTH ---
         window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            let publicSheet = null;
-
-            // 1. Cek parameter standar ?sheet=Nama
-            if (urlParams.has('sheet')) {
-                publicSheet = urlParams.get('sheet');
-            } else {
-                // 2. Fallback: Cek key apa saja yang ada di URL (misal: ?Jimpitan)
-                for (const [key, value] of urlParams.entries()) {
-                    // Abaikan parameter sistem lain
-                    if(key !== 'nocache' && !value) {
-                        publicSheet = key;
-                        break;
-                    }
-                }
-            }
-
-            // 3. Jika URL share ditemukan, masuk mode Public
-            if (publicSheet) {
-                IS_PUBLIC_MODE = true;
-                APP_CONFIG.url = window.location.href.split('?')[0];
-                APP_CONFIG.sheet = publicSheet;
-                APP_CONFIG.token = ''; // Public tidak butuh token
-                
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('main-nav').style.display = 'none';
-                
-                const headerTitle = document.querySelector('#header-title');
-                if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet + " (Lihat Saja)";
-                
-                fetchData();
-            } else {
-                // 4. Mode Login Biasa
-                const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
-                if (stored) {
-                    APP_CONFIG = stored;
-                    document.getElementById('app-url').value = stored.url || '';
-                    document.getElementById('api-token').value = stored.token || '';
-                    document.getElementById('sheet-name').value = stored.sheet || '';
-                    if(stored.token) doLogin(true);
-                }
+            const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
+            if (stored) {
+                APP_CONFIG = stored;
+                document.getElementById('app-url').value = stored.url || '';
+                document.getElementById('api-token').value = stored.token || '';
+                document.getElementById('sheet-name').value = stored.sheet || '';
+                if(stored.token) doLogin(true);
             }
         });
 
@@ -426,29 +371,14 @@
             } finally { toggleLoading(false); }
         }
 
-        function handleLogout() { 
-            localStorage.removeItem('gas_dashboard_config'); 
-            if(IS_PUBLIC_MODE) {
-                window.location.href = window.location.href.split('?')[0];
-            } else {
-                location.reload(); 
-            }
-        }
+        function handleLogout() { localStorage.removeItem('gas_dashboard_config'); location.reload(); }
 
         // --- DATA FETCHING & SAVING ---
         async function fetchData() {
             const url = new URL(APP_CONFIG.url);
+            url.searchParams.append('token', APP_CONFIG.token);
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
-            
-            // Tambahkan nocache agar data selalu fresh (mengatasi data kosong di share link)
-            url.searchParams.append('nocache', new Date().getTime());
-
-            if (IS_PUBLIC_MODE) {
-                url.searchParams.append('mode', 'public');
-            } else {
-                url.searchParams.append('token', APP_CONFIG.token);
-            }
             
             const res = await fetch(url.toString());
             const json = await res.json();
@@ -467,8 +397,6 @@
         }
 
         async function saveData() {
-            if (IS_PUBLIC_MODE) return showToast("❌ Mode Publik: Tidak bisa mengubah data.");
-
             const params = { Blok: STATE.currentEdit['Blok'] };
             let totalPembayaran = 0;
 
@@ -522,8 +450,6 @@
 
         // --- LOGIC UPDATE TOKEN ---
         async function updateTokenAction() {
-            if (IS_PUBLIC_MODE) return showToast("❌ Tidak bisa ubah password di mode publik.");
-
             const oldToken = document.getElementById('old-token').value.trim();
             const newToken = document.getElementById('new-token').value.trim();
             const sheetTarget = document.getElementById('set-sheet-target').value; 
@@ -587,12 +513,7 @@
 
             try {
                 const url = new URL(APP_CONFIG.url);
-                if (!IS_PUBLIC_MODE) {
-                    url.searchParams.append('token', APP_CONFIG.token); 
-                } else {
-                    url.searchParams.append('mode', 'public');
-                }
-                
+                url.searchParams.append('token', APP_CONFIG.token); 
                 url.searchParams.append('sheet', 'Riwayat'); 
                 url.searchParams.append('action', 'get-data');
                 
@@ -611,13 +532,23 @@
                 }
 
                 const sheetName = APP_CONFIG.sheet;
-                
-                // Filter: Hanya tampilkan log pembayaran untuk sheet ini, DAN sembunyikan log password
+
+                // ==========================================
+                // FILTER LOGIC: HIDE PASSWORD LOGS
+                // ==========================================
                 const filteredData = data.filter(row => {
+                    // 1. Pastikan ada isi kolom Pesan
                     if (!row.Pesan) return false;
-                    if (row.Pesan.toLowerCase().includes("password")) return false;
+
+                    // 2. Jika ada kata 'Password' (case-insensitive), JANGAN TAMPILKAN
+                    if (row.Pesan.toLowerCase().includes("password")) {
+                        return false;
+                    }
+
+                    // 3. Hanya tampilkan jika pesan terkait dengan sheet yang sedang dibuka
                     return row.Pesan.includes(sheetName);
                 }).reverse();
+                // ==========================================
 
                 container.innerHTML = '';
                 filteredData.forEach(row => {
@@ -657,8 +588,6 @@
 
         // --- NAVIGATION ---
         function switchTab(tabName, el) {
-            if (IS_PUBLIC_MODE) return;
-
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             if(el) el.classList.add('active');
@@ -703,15 +632,10 @@
 
                 let badgeHTML = '';
                 if (kurang <= 0) {
-                    badgeHTML = `<div class="badge lunas-badge readonly">✅ Lunas</div>`;
+                    badgeHTML = `<div class="badge lunas-badge">✅ Lunas</div>`;
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
-                    
-                    if (IS_PUBLIC_MODE) {
-                        badgeHTML = `<div class="badge kurang-badge readonly">${fmtKurang}</div>`;
-                    } else {
-                        badgeHTML = `<div class="badge kurang-badge" onclick="openEdit('${blok}')">${fmtKurang}</div>`;
-                    }
+                    badgeHTML = `<div class="badge kurang-badge" onclick="openEdit('${blok}')">${fmtKurang}</div>`;
                 }
 
                 const div = document.createElement('div');
@@ -756,8 +680,6 @@
 
         // --- MODAL ---
         function openEdit(blokId) {
-            if (IS_PUBLIC_MODE) return;
-
             const row = STATE.data.find(r => r['Blok'] == blokId);
             if (!row) return;
             STATE.currentEdit = row;
@@ -884,7 +806,6 @@
         }
 
         function openSettingsModal() {
-            if (IS_PUBLIC_MODE) return;
             if (APP_CONFIG.sheet === 'Riwayat') {
                 showToast("⚠️ Sheet Riwayat bersifat Publik, password tidak bisa diganti.");
                 return;
@@ -892,34 +813,9 @@
 
             document.getElementById('set-sheet-target').value = APP_CONFIG.sheet;
             
-            // --- GENERATE SHARE LINK ---
-            const baseUrl = window.location.href.split('?')[0];
-            const shareUrl = baseUrl + '?' + APP_CONFIG.sheet;
-            const shareInput = document.getElementById('share-link-input');
-            const shareName = document.getElementById('share-sheet-name');
-            
-            if(shareInput) shareInput.value = shareUrl;
-            if(shareName) shareName.innerText = APP_CONFIG.sheet;
-            // ------------------------------
-
             const overlay = document.getElementById('settings-modal');
             overlay.style.display = 'flex';
             setTimeout(() => overlay.classList.add('active'), 10);
-        }
-
-        function copyShareLink() {
-            const shareInput = document.getElementById('share-link-input');
-            if(shareInput) {
-                shareInput.select();
-                shareInput.setSelectionRange(0, 99999); // Mobile support
-                navigator.clipboard.writeText(shareInput.value).then(() => {
-                    showToast("✅ Link berhasil disalin!");
-                }).catch(err => {
-                    // Fallback
-                    document.execCommand('copy');
-                    showToast("✅ Link berhasil disalin!");
-                });
-            }
         }
 
         function filterCards() {
