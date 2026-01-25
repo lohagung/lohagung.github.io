@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Warga - Final (Responsive Popup)</title>
+    <title>Dashboard Warga - Modern Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -22,164 +22,89 @@
         
         .brand { font-weight: 600; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
         .brand-logo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg-body); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
-        .header-actions button { background: transparent; border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); }
-        .header-actions button:hover { background: #f8fafc; color: var(--text-main); }
 
-        main { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        main { flex: 1; overflow-y: auto; padding: 1.5rem; position: relative; }
 
+        /* --- LOGIN --- */
         #login-view { height: 100%; display: flex; justify-content: center; align-items: center; padding: 1rem; }
         .login-card { background: var(--bg-card); padding: 2.5rem; border-radius: var(--radius); box-shadow: var(--shadow); width: 100%; max-width: 400px; text-align: center; }
         .input-group { margin-bottom: 1.25rem; text-align: left; }
         .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-        .input-field { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; background-color: #fff; color: #333;}
+        .input-field { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.95rem; background-color: #fff; color: #333; transition: 0.2s;}
         .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .input-field:read-only { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: var(--border); }
-        .btn-login { width: 100%; padding: 0.85rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 500; cursor: pointer; }
+        .btn-login { width: 100%; padding: 0.85rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .btn-login:hover { background: var(--primary-dark); }
 
-        #dashboard-view { display: none; }
+        /* --- VIEW SECTIONS --- */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* --- SEARCH & STATS --- */
         .search-container { margin-bottom: 1.5rem; position: sticky; top: 0; z-index: 10; background: var(--bg-body); padding-bottom: 5px; }
         .search-input { width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 50px; background: var(--bg-card); box-shadow: var(--shadow); font-size: 1rem; padding-left: 3.5rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 1.2rem center; background-size: 1.2rem; }
         
-        /* Stats Cards */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
         .stat-card { background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 5px solid var(--primary); }
         .stat-card.tunggakan { border-left-color: var(--danger); }
         .stat-title { font-size: 0.85rem; color: var(--secondary); font-weight: 500; margin-bottom: 0.25rem; }
         .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
 
-        /* Resident Card Grid (Pembayaran) */
-        .card-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 0.8rem; 
-            padding-bottom: 2rem; 
-        }
-        
-        .warga-card { 
-            background: var(--bg-card); 
-            border-radius: var(--radius); 
-            padding: 0rem 1.5rem 0rem 0rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 1rem; 
-            box-shadow: var(--shadow); 
-            transition: transform 0.2s; 
-            border: 1px solid transparent; 
-            height: auto;
-        }
+        /* --- CARDS --- */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.8rem; padding-bottom: 2rem; }
+        .warga-card { background: var(--bg-card); border-radius: var(--radius); padding: 0rem 1.5rem 0rem 0rem; display: flex; align-items: center; gap: 1rem; box-shadow: var(--shadow); transition: transform 0.2s; border: 1px solid transparent; height: auto; }
         .warga-card:hover { transform: translateY(-2px); border-color: var(--primary); }
-        
-        .avatar { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 0.8rem 0 0 0.8rem; 
-            padding: 0; 
-            object-fit: cover; 
-            border: none; 
-            flex-shrink: 0; 
-            background-color: #e2e8f0; 
-        }
+        .avatar { width: 60px; height: 60px; border-radius: 0.8rem 0 0 0.8rem; padding: 0; object-fit: cover; border: none; flex-shrink: 0; background-color: #e2e8f0; }
         .info { flex: 1; min-width: 0; }
         .info-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .info-blok { font-size: 0.85rem; color: var(--secondary); font-weight: 500; display: flex; align-items: center; gap: 0.25rem; }
         
-        /* Badges */
         .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .kurang-badge { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
         .kurang-badge:hover { background: var(--danger); color: white; }
         .lunas-badge { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
-        .lunas-badge:hover { filter: brightness(0.95); }
 
-        /* Rekap Styles */
+        /* --- REKAP & RIWAYAT --- */
         .rekap-list { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
         .rekap-item { display: flex; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); align-items: center; }
         .rekap-item:last-child { border-bottom: none; }
         .rekap-month { font-weight: 600; color: var(--text-main); }
         .rekap-total { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
 
-        /* Riwayat Styles */
         .riwayat-list { display: flex; flex-direction: column; gap: 1rem; }
         .riwayat-item { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--primary); box-shadow: var(--shadow); }
         .riwayat-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; }
         .riwayat-msg { font-size: 0.95rem; color: var(--text-main); line-height: 1.4; }
 
-        /* --- MODAL RESPONSIVE UPDATE --- */
+        /* --- MODAL EDIT --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; }
-        
-        .modal { 
-            background: var(--bg-card); 
-            width: 95%; /* Update Mobile Width */
-            max-width: 500px; /* Sedikit lebih sempit agar lega */
-            height: 85vh; /* FIX: Batas tinggi modal agar tidak lewat layar */
-            border-radius: 20px; 
-            padding: 0; 
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
-            display: flex; /* FIX: Flexbox layout */
-            flex-direction: column; 
-            overflow: hidden; /* FIX: Sembunyikan overflow di kontainer utama */
-            transform: scale(0.9); 
-            transition: transform 0.3s; 
-        }
-        
+        .modal { background: var(--bg-card); width: 95%; max-width: 500px; height: 85vh; border-radius: 20px; padding: 0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: scale(0.9); transition: transform 0.3s; display: flex; flex-direction: column; }
         .modal-overlay.active .modal { transform: scale(1); }
         
-        .modal-header-bg { 
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-            padding: 2rem 2rem 1rem 2rem; 
-            color: white; 
-            text-align: center; 
-            border-radius: 20px 20px 0 0; 
-            flex-shrink: 0; /* FIX: Jangan mengecil header */
-        }
+        .modal-header-bg { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 2rem 2rem 1rem 2rem; color: white; text-align: center; border-radius: 20px 20px 0 0; flex-shrink: 0; position: relative; }
+        .btn-close-edit { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .btn-close-edit:hover { background: rgba(255,255,255,0.4); }
+
         .modal-profile-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); object-fit: cover; background: #fff; margin-bottom: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .modal-profile-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.2rem; }
         .modal-profile-blok { font-size: 0.9rem; opacity: 0.9; background: rgba(255,255,255,0.2); display: inline-block; padding: 2px 10px; border-radius: 12px; }
 
-        .modal-body { 
-            padding: 1.5rem 2rem; 
-            flex: 1; /* FIX: Ambil sisa ruang */
-            overflow-y: auto; /* FIX: Aktifkan scroll vertikal */
-            -webkit-overflow-scrolling: touch; /* FIX: Scroll halus di iOS */
-            padding-bottom: 3rem; /* FIX: Extra padding di bawah agar konten tidak tertutup tombol */
-        }
+        .modal-body { padding: 1.5rem 2rem; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 3rem; }
 
         .form-section-title { font-size: 0.8rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; margin: 1.5rem 0 0.5rem 0; font-weight: 600; border-left: 3px solid var(--primary); padding-left: 8px; }
         
-        .month-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; background: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); transition: 0.2s; flex-wrap: nowrap; /* FIX: Jangan wrap baris bulan */}
-        }
+        .month-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; background: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); transition: 0.2s; flex-wrap: nowrap; }
         .month-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
-        .month-label { width: 80px; /* Update: Kurangi sedikit label */ font-size: 0.85rem; font-weight: 500; color: var(--text-main); flex-shrink: 0;}
-        .month-input { 
-            flex: 1; /* FIX: Ambil sisa lebar */
-            padding: 0.5rem; 
-            border: 1px solid var(--border); 
-            border-radius: 6px; 
-            text-align: right; 
-            font-family: inherit; 
-            font-size: 0.9rem; 
-            transition: 0.2s;
-            width: 100%; /* FIX: Pastikan input lebar penuh */
-            min-width: 0;
-        }
+        .month-label { width: 80px; font-size: 0.85rem; font-weight: 500; color: var(--text-main); flex-shrink: 0;}
+        .month-input { flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-family: inherit; font-size: 0.9rem; transition: 0.2s; min-width: 0; width: 100%; }
         .month-input:disabled { background-color: #f1f5f9; color: #64748b; }
         
         .month-row.active-month { border-color: var(--primary); background: rgba(79, 70, 229, 0.03); box-shadow: 0 2px 4px rgba(79, 70, 229, 0.05); }
         .month-row.active-month .month-label { color: var(--primary); font-weight: 600; }
         .month-row.active-month .month-checkbox { transform: scale(1.1); }
 
-        .modal-actions { 
-            margin-top: 0; /* FIX: Hapus margin top agar menempel di bawah konten scroll */
-            padding: 1rem 2rem 1.5rem; /* Update padding */
-            display: flex; 
-            gap: 1rem; 
-            background: var(--bg-card); /* FIX: Background agar konten di atasnya transparan */
-            border-top: 1px solid var(--border); /* FIX: Garis pemisah */
-            flex-shrink: 0; /* FIX: Jangan mengecil tombol */
-        }
-
+        .modal-actions { margin-top: 0; padding: 1rem 2rem 1.5rem 1.5rem 2rem; background: var(--bg-card); border-top: 1px solid var(--border); display: flex; gap: 1rem; flex-shrink: 0; }
         .btn { flex: 1; padding: 0.85rem; border-radius: 10px; font-weight: 500; cursor: pointer; border: none; font-size: 0.95rem; }
         .btn-cancel { background: #f1f5f9; color: var(--text-muted); }
         .btn-save { background: var(--success); color: white; box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3); }
@@ -188,7 +113,45 @@
         .note-2025 { padding: 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; color: var(--text-main); }
         .note-2025 span { font-weight: 700; color: var(--danger); }
 
-        /* BOTTOM NAV */
+        /* --- MODAL PENGATURAN (REDESIGN) --- */
+        .modal-settings { height: auto; min-height: 300px; max-height: 90vh; }
+        .modal-header-simple { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
+        .btn-close-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-close-icon:hover { background: #f1f5f9; color: var(--danger); }
+        
+        .settings-body { padding: 1.5rem; }
+        .btn-logout { width: 100%; padding: 1rem; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-logout:hover { background: #fecaca; }
+
+        /* --- NEW STYLE: TOMBOL UPDATE PASSWORD KEREN & TENGAH --- */
+        .btn-update-pass {
+            display: block;
+            width: 100%;
+            max-width: 280px;
+            margin: 1.5rem auto 0 auto;
+            background: linear-gradient(135deg, var(--primary), #312e81);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 50px; /* Bentuk kapsul */
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(67, 56, 202, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .btn-update-pass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 56, 202, 0.6);
+        }
+        .btn-update-pass:active {
+            transform: translateY(0);
+        }
+
+        /* --- BOTTOM NAV --- */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg-card); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: none; justify-content: space-around; padding: 0.8rem 0; z-index: 50; border-top: 1px solid var(--border); }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--secondary); font-size: 0.75rem; cursor: pointer; transition: 0.2s; flex: 1; }
         .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; stroke: currentColor; stroke-width: 2; fill: none; }
@@ -203,10 +166,6 @@
         .toast-container { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; text-align: center; font-size: 0.9rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Views */
-        .view-section { display: none; }
-        .view-section.active { display: block; }
     </style>
 </head>
 <body>
@@ -218,9 +177,6 @@
         <div class="brand">
             <img src="https://avatars.githubusercontent.com/u/61934361?v=4" class="brand-logo" alt="Logo">
             <span id="header-title">Manajemen Warga</span>
-        </div>
-        <div class="header-actions">
-            <button onclick="handleLogout()">Keluar</button>
         </div>
     </header>
 
@@ -236,7 +192,7 @@
             
             <div class="input-group">
                 <label>Nama Sheet</label>
-                <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: 2026">
+                <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: Jimpitan">
             </div>
 
             <div class="input-group">
@@ -255,7 +211,6 @@
                 <input type="text" id="search-box" class="search-input" placeholder="Cari Blok atau Nama..." onkeyup="filterCards()">
             </div>
 
-            <!-- Kartu Ringkasan Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-title">Pemasukan</div>
@@ -274,16 +229,16 @@
         <!-- VIEW 2: REKAP -->
         <section id="view-rekap" class="view-section">
             <h2 style="margin-bottom: 1.5rem;">Rekapitulasi Bulanan</h2>
-            <div class="rekap-list" id="rekap-container">
-                <!-- List rekap akan dirender di sini -->
-            </div>
+            <div class="rekap-list" id="rekap-container"></div>
         </section>
 
         <!-- VIEW 3: RIWAYAT -->
         <section id="view-riwayat" class="view-section">
             <h2 style="margin-bottom: 1.5rem;">Riwayat Pembayaran (<span id="riwayat-sheet-name"></span>)</h2>
             <div id="riwayat-container" class="riwayat-list">
-                <!-- List riwayat akan dirender di sini -->
+                <div style="text-align: center; padding: 2rem; color: var(--secondary);">
+                    <p>Klik tab Riwayat untuk memuat data...</p>
+                </div>
             </div>
         </section>
     </main>
@@ -295,12 +250,18 @@
             <span>Pembayaran</span>
         </div>
         <div class="nav-item" onclick="switchTab('rekap', this)">
-            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l1 1"></path></svg>
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l3.5-6m4.5 6l1 1"></path></svg>
             <span>Rekap</span>
         </div>
         <div class="nav-item" onclick="switchTab('riwayat', this)">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>Riwayat</span>
+        </div>
+        <div class="nav-item" onclick="openSettingsModal()">
+            <!-- ICON GEAR (RODA GIGI) -->
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+            <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            <span>Pengaturan</span>
         </div>
     </nav>
 
@@ -308,6 +269,9 @@
     <div id="edit-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header-bg">
+                <!-- Tombol Close Edit -->
+                <button class="btn-close-edit" onclick="closeModal('edit-modal')">&times;</button>
+                
                 <img id="modal-avatar" src="" class="modal-profile-img" alt="Profile">
                 <div class="modal-profile-name" id="modal-nama">Nama Warga</div>
                 <div class="modal-profile-blok" id="modal-blok">Blok A1</div>
@@ -315,19 +279,47 @@
             
             <div class="modal-body">
                 <form id="edit-form" onsubmit="event.preventDefault(); saveData();">
-                    
                     <div id="general-fields" style="margin-bottom: 1rem;"></div>
-
                     <div class="form-section-title">Status Pembayaran Bulanan</div>
                     <div id="monthly-fields"></div>
-
                 </form>
                 
-                <!-- Tombol dikeluarkan dari form agar tetap di bawah scroll -->
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('edit-modal')">Batal</button>
                     <button type="button" class="btn btn-save" onclick="document.getElementById('edit-form').requestSubmit()">Bayar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal modal-settings">
+            <div class="modal-header-simple">
+                <div class="modal-title">Pengaturan Sistem</div>
+                <button class="btn-close-icon" onclick="closeModal('settings-modal')">&times;</button>
+            </div>
+            
+            <div class="settings-body">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <span>🚪</span> Keluar Akun
+                </button>
+
+                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password Sheet</div>
+                <form id="settings-form" onsubmit="event.preventDefault(); updateTokenAction();">
+                    <input type="hidden" id="set-sheet-target" value="">
+                    <div class="input-group">
+                        <label>Password Lama</label>
+                        <input type="password" id="old-token" class="input-field" placeholder="Masukkan password saat ini">
+                    </div>
+                    <div class="input-group">
+                        <label>Password Baru</label>
+                        <input type="password" id="new-token" class="input-field" placeholder="Masukkan password baru">
+                    </div>
+                    
+                    <!-- CLASS BARU: btn-update-pass -->
+                    <button type="submit" class="btn-update-pass">Update Password</button>
+                </form>
             </div>
         </div>
     </div>
@@ -366,9 +358,11 @@
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-nav').style.display = 'flex';
                 
-                const headerTitle = document.getElementById('header-title');
+                const headerTitle = document.querySelector('#header-title');
+                const riwayatTitle = document.getElementById('riwayat-sheet-name');
+                
                 if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet;
-                document.getElementById('riwayat-sheet-name').innerText = APP_CONFIG.sheet;
+                if(riwayatTitle) riwayatTitle.innerText = APP_CONFIG.sheet;
 
                 if (!silent) showToast("Login Berhasil");
             } catch (e) {
@@ -395,7 +389,6 @@
             
             renderCards(STATE.data);
             updateSummaryCards(); 
-            renderRekap(); 
             
             const currentTab = document.querySelector('.view-section.active').id;
             if(currentTab === 'view-riwayat') {
@@ -432,7 +425,7 @@
 
             params['sheet_log'] = 'Riwayat';     
             params['Tanggal'] = tanggalHariIni; 
-            params['Pesan'] = pesanLog;         
+            params['Pesan'] = pesanLog; 
 
             toggleLoading(true);
             try {
@@ -448,10 +441,42 @@
                 if (!json.success) throw new Error(json.message);
                 
                 showToast("✅ Pembayaran Berhasil!");
-                closeModal();
+                closeModal('edit-modal');
                 fetchData();
             } catch (e) {
                 showToast("❌ Gagal simpan: " + e.message);
+            } finally { toggleLoading(false); }
+        }
+
+        // --- LOGIC UPDATE TOKEN ---
+        async function updateTokenAction() {
+            const oldToken = document.getElementById('old-token').value.trim();
+            const newToken = document.getElementById('new-token').value.trim();
+            const sheetTarget = document.getElementById('set-sheet-target').value; 
+
+            if (!oldToken || !newToken) return showToast("Isi token lama dan baru wajib");
+            if (oldToken !== APP_CONFIG.token) return showToast("Token lama salah");
+
+            toggleLoading(true);
+            try {
+                const url = new URL(APP_CONFIG.url);
+                url.searchParams.append('token', APP_CONFIG.token); 
+                url.searchParams.append('sheet_target', sheetTarget);
+                url.searchParams.append('new_token', newToken);
+                url.searchParams.append('action', 'update-token');
+                
+                const res = await fetch(url.toString());
+                const json = await res.json();
+                
+                if (json.success) {
+                    showToast("✅ Token Berhasil Diupdate! Silakan Refresh.");
+                    document.getElementById('settings-form').reset();
+                    closeModal('settings-modal');
+                } else {
+                    showToast("Gagal: " + json.message);
+                }
+            } catch (e) {
+                showToast("Error: " + e.message);
             } finally { toggleLoading(false); }
         }
 
@@ -488,7 +513,7 @@
 
             try {
                 const url = new URL(APP_CONFIG.url);
-                url.searchParams.append('token', APP_CONFIG.token);
+                url.searchParams.append('token', APP_CONFIG.token); 
                 url.searchParams.append('sheet', 'Riwayat'); 
                 url.searchParams.append('action', 'get-data');
                 
@@ -496,7 +521,7 @@
                 const json = await res.json();
 
                 if (!json.success) {
-                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Cek password sheet "Riwayat" di Code.gs.<br>Error: ${json.message}</p></div>`;
+                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Error: ${json.message}</p></div>`;
                     return;
                 }
 
@@ -532,7 +557,7 @@
             }
         }
 
-        // --- CORE LOGIC: SETTINGS (INDEX & PRICE) ---
+        // --- CORE LOGIC SETTINGS (INDEX & PRICE) ---
         function getSettings() {
             let index = 12; 
             let price = 0;
@@ -551,7 +576,7 @@
         function switchTab(tabName, el) {
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
-            el.classList.add('active');
+            if(el) el.classList.add('active');
 
             const views = document.querySelectorAll('.view-section');
             views.forEach(v => v.classList.remove('active'));
@@ -564,10 +589,12 @@
             } else if (tabName === 'riwayat') {
                 document.getElementById('view-riwayat').classList.add('active');
                 fetchRiwayat();
+            } else if (tabName === 'settings') {
+                openSettingsModal();
             }
         }
 
-        // --- RENDER CARDS (TAB PEMBAYARAN) ---
+        // --- RENDER CARDS ---
         function renderCards(data) {
             const container = document.getElementById('card-container');
             container.innerHTML = '';
@@ -630,11 +657,14 @@
             const fmtBayar = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalSudahBayar);
             const fmtTunggakan = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(totalKurang);
 
-            document.getElementById('stat-pemasukan').innerText = fmtBayar;
-            document.getElementById('stat-tunggakan').innerText = fmtTunggakan;
+            const statPemasukan = document.getElementById('stat-pemasukan');
+            if(statPemasukan) statPemasukan.innerText = fmtBayar;
+
+            const statTunggakan = document.getElementById('stat-tunggakan');
+            if(statTunggakan) statTunggakan.innerText = fmtTunggakan;
         }
 
-        // --- MODAL & LOGIC ---
+        // --- MODAL ---
         function openEdit(blokId) {
             const row = STATE.data.find(r => r['Blok'] == blokId);
             if (!row) return;
@@ -646,10 +676,15 @@
             const imgUrl = getVal(row, idxImg);
             const avatarSrc = (imgUrl && imgUrl.startsWith('http')) ? imgUrl : DEFAULT_IMG;
 
-            document.getElementById('modal-nama').innerText = nama;
-            document.getElementById('modal-blok').innerText = blokId;
-            document.getElementById('modal-avatar').src = avatarSrc;
-            document.getElementById('modal-avatar').onerror = function() { this.src = DEFAULT_IMG; };
+            const modalAvatar = document.getElementById('modal-avatar');
+            const modalNama = document.getElementById('modal-nama');
+            const modalBlok = document.getElementById('modal-blok');
+            
+            if(modalAvatar) modalAvatar.src = avatarSrc;
+            if(modalAvatar) modalAvatar.onerror = function() { this.src = DEFAULT_IMG; };
+
+            if(modalNama) modalNama.innerText = nama;
+            if(modalBlok) modalBlok.innerText = blokId;
 
             const generalContainer = document.getElementById('general-fields');
             const monthlyContainer = document.getElementById('monthly-fields');
@@ -750,10 +785,23 @@
             }
         }
 
-        function closeModal() {
-            const overlay = document.getElementById('edit-modal');
+        function closeModal(modalId) {
+            const overlay = document.getElementById(modalId);
             overlay.classList.remove('active');
             setTimeout(() => overlay.style.display = 'none', 300);
+        }
+
+        function openSettingsModal() {
+            if (APP_CONFIG.sheet === 'Riwayat') {
+                showToast("⚠️ Sheet Riwayat bersifat Publik, password tidak bisa diganti.");
+                return;
+            }
+
+            document.getElementById('set-sheet-target').value = APP_CONFIG.sheet;
+            
+            const overlay = document.getElementById('settings-modal');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
         }
 
         function filterCards() {
