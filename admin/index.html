@@ -114,7 +114,7 @@
         .note-2025 { padding: 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; color: var(--text-main); }
         .note-2025 span { font-weight: 700; color: var(--danger); }
 
-        /* --- MODAL PENGATURAN (REDESIGN) --- */
+        /* --- MODAL PENGATURAN --- */
         .modal-settings { height: auto; min-height: 300px; max-height: 90vh; }
         .modal-header-simple { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .modal-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
@@ -125,7 +125,7 @@
         .btn-logout { width: 100%; padding: 1rem; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .btn-logout:hover { background: #fecaca; }
 
-        /* --- STYLE BARU: BAGIKAN LINK --- */
+        /* --- STYLE: BAGIKAN LINK --- */
         .share-box { margin-top: 1.5rem; margin-bottom: 2rem; background: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid var(--border); }
         .share-box h4 { font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.25rem; font-weight: 600; }
         .share-box p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4; }
@@ -197,16 +197,15 @@
             
             <div class="input-group hidden">
                 <label>URL Web App</label>
+                <!-- GANTI URL INI SETELAH DEPLOY BARU -->
                 <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwopjwy5tR4Q1q3q8oHOYZ83VKaDGekoM8hULbX-5jb460XCFREvv9cDZRVb50voHmaOw/exec" readonly>
             </div>
             
-            <!-- PERUBAHAN: Label "Nama Sheet" -> "Pengurus" -->
             <div class="input-group">
                 <label>Pengurus</label>
                 <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: Jimpitan">
             </div>
 
-            <!-- PERUBAHAN: Label "Password Sheet (API Token)" -> "Password" -->
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password">
@@ -270,7 +269,6 @@
             <span>Riwayat</span>
         </div>
         <div class="nav-item" onclick="openSettingsModal()">
-            <!-- ICON GEAR (RODA GIGI) -->
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
             <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             <span>Pengaturan</span>
@@ -315,7 +313,7 @@
                     <span>🚪</span> Keluar Akun
                 </button>
 
-                <!-- FITUR BARU: BAGIKAN LINK -->
+                <!-- FITUR BAGIKAN LINK -->
                 <div class="share-box">
                     <h4>🔗 Bagikan Link (Lihat Saja)</h4>
                     <p>Link ini memungkinkan orang lain melihat data <b id="share-sheet-name">Jimpitan</b> tanpa perlu login.</p>
@@ -357,14 +355,16 @@
 
         // --- INIT & AUTH ---
         window.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
+            const urlParams = new URLSearchParams(window.location.search);
             let publicSheet = null;
 
-            // Deteksi Public Mode
-            if(params.has('sheet')) {
-                publicSheet = params.get('sheet');
+            // 1. Cek parameter standar ?sheet=Nama
+            if (urlParams.has('sheet')) {
+                publicSheet = urlParams.get('sheet');
             } else {
-                for (const [key, value] of params.entries()) {
+                // 2. Fallback: Cek key apa saja yang ada di URL (misal: ?Jimpitan)
+                for (const [key, value] of urlParams.entries()) {
+                    // Abaikan parameter sistem lain
                     if(key !== 'nocache' && !value) {
                         publicSheet = key;
                         break;
@@ -372,11 +372,12 @@
                 }
             }
 
+            // 3. Jika URL share ditemukan, masuk mode Public
             if (publicSheet) {
                 IS_PUBLIC_MODE = true;
                 APP_CONFIG.url = window.location.href.split('?')[0];
                 APP_CONFIG.sheet = publicSheet;
-                APP_CONFIG.token = '';
+                APP_CONFIG.token = ''; // Public tidak butuh token
                 
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-nav').style.display = 'none';
@@ -386,6 +387,7 @@
                 
                 fetchData();
             } else {
+                // 4. Mode Login Biasa
                 const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
                 if (stored) {
                     APP_CONFIG = stored;
@@ -439,6 +441,9 @@
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
             
+            // Tambahkan nocache agar data selalu fresh (mengatasi data kosong di share link)
+            url.searchParams.append('nocache', new Date().getTime());
+
             if (IS_PUBLIC_MODE) {
                 url.searchParams.append('mode', 'public');
             } else {
@@ -606,6 +611,8 @@
                 }
 
                 const sheetName = APP_CONFIG.sheet;
+                
+                // Filter: Hanya tampilkan log pembayaran untuk sheet ini, DAN sembunyikan log password
                 const filteredData = data.filter(row => {
                     if (!row.Pesan) return false;
                     if (row.Pesan.toLowerCase().includes("password")) return false;
@@ -699,6 +706,7 @@
                     badgeHTML = `<div class="badge lunas-badge readonly">✅ Lunas</div>`;
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
+                    
                     if (IS_PUBLIC_MODE) {
                         badgeHTML = `<div class="badge kurang-badge readonly">${fmtKurang}</div>`;
                     } else {
@@ -899,7 +907,6 @@
             setTimeout(() => overlay.classList.add('active'), 10);
         }
 
-        // --- FITUR BARU: COPY LINK ---
         function copyShareLink() {
             const shareInput = document.getElementById('share-link-input');
             if(shareInput) {
