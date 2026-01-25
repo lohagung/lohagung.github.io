@@ -134,7 +134,7 @@
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 50px; /* Bentuk kapsul */
+            border-radius: 50px;
             font-weight: 600;
             font-size: 1rem;
             box-shadow: 0 4px 15px rgba(67, 56, 202, 0.4);
@@ -532,9 +532,23 @@
                 }
 
                 const sheetName = APP_CONFIG.sheet;
+
+                // ==========================================
+                // FILTER LOGIC: HIDE PASSWORD LOGS
+                // ==========================================
                 const filteredData = data.filter(row => {
-                    return row.Pesan && row.Pesan.includes(sheetName);
+                    // 1. Pastikan ada isi kolom Pesan
+                    if (!row.Pesan) return false;
+
+                    // 2. Jika ada kata 'Password' (case-insensitive), JANGAN TAMPILKAN
+                    if (row.Pesan.toLowerCase().includes("password")) {
+                        return false;
+                    }
+
+                    // 3. Hanya tampilkan jika pesan terkait dengan sheet yang sedang dibuka
+                    return row.Pesan.includes(sheetName);
                 }).reverse();
+                // ==========================================
 
                 container.innerHTML = '';
                 filteredData.forEach(row => {
