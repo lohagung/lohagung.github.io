@@ -137,9 +137,41 @@
         }
         .month-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .month-multi-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; width: 100%; margin-top: 0.5rem; }
-        .mini-group { display: flex; flex-direction: column; }
-        .mini-label { font-size: 0.65rem; color: var(--secondary); margin-bottom: 2px; text-align: center; }
+        
+        .mini-group { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 2px; 
+        }
         .mini-input { width: 100%; padding: 0.4rem; border: 1px solid var(--border); border-radius: 4px; text-align: center; font-size: 0.8rem; }
+        
+        /* Checkbox Mini Group Styling */
+        .mini-group-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            gap: 4px;
+        }
+        .mini-checkbox {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        .mini-label-row {
+            font-size: 0.65rem; 
+            color: var(--secondary); 
+            margin-bottom: 2px; 
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
         .month-input:disabled, .mini-input:disabled { background-color: #f1f5f9; color: #64748b; }
         
@@ -542,8 +574,6 @@
 
             const results = await Promise.all(promises);
             
-            // Cek jika ada sheet error (bukan data kosong)
-            const errorSheets = [];
             results.forEach(res => {
                 STATE.multiDataCache[res.sheet] = res.data;
             });
@@ -554,20 +584,17 @@
             results.forEach(res => {
                 const sheetData = res.data;
                 
-                // Logging jika data kosong tapi bukan error fetch
                 if (sheetData.length === 0) {
                     console.warn(`Sheet ${res.sheet} kosong atau tidak ada header.`);
                 }
 
                 sheetData.forEach(row => {
-                    // Cari Blok dengan lebih banyak variasi
                     const blokKey = getKey(row, ['blok', 'block', 'no', 'no rumah', 'unit', 'nomor']);
                     if (!blokKey) return;
                     
                     const blok = row[blokKey];
                     if (!blok || String(blok).trim() === "") return;
 
-                    // Cari Nama & Foto
                     const namaKey = getKey(row, ['nama', 'pemilik', 'name', 'warga']);
                     const fotoKey = getKey(row, ['foto', 'gambar', 'image', 'url', 'pic']);
                     
@@ -582,7 +609,6 @@
                             _rawData: {}
                         });
                     } else {
-                        // PERBAIKAN: Jika Nama di sheet pertama kosong, ambil dari sheet sekarang
                         const existing = mergedMap.get(blok);
                         if (!existing.Nama || existing.Nama === '-') existing.Nama = currentNama;
                         if (!existing.Foto || existing.Foto === '') existing.Foto = currentFoto;
@@ -595,7 +621,6 @@
             STATE.data = Array.from(mergedMap.values());
             STATE.headers = ['Blok', 'Nama', 'Foto', 'Kurang_Total'];
 
-            // Jika akhirnya tetap kosong
             if (STATE.data.length === 0) {
                 showToast("⚠️ Data gabungan kosong. Pastikan ke-4 sheet ada header 'Blok' yang sama.");
             }
@@ -767,33 +792,23 @@
             let sourceData = STATE.data;
             
             if (PAYMENT_MODE === 'multi') {
-                // --- UPDATE LOGIC: Ambil harga spesifik per sheet dari Row T5 (Spreadsheet Row 5) ---
-                // Spreadsheet Row 1: Headers (Removed via shift)
-                // Spreadsheet Row 2: Array Index 0
-                // Spreadsheet Row 3: Array Index 1
-                // Spreadsheet Row 4: Array Index 2
-                // Spreadsheet Row 5: Array Index 3  <-- TARGET INI
-                
-                STATE.sheetPrices = {}; // Reset prices
+                STATE.sheetPrices = {}; 
                 
                 MULTI_SHEETS.forEach(sheetName => {
                     let specificPrice = 0;
                     const sheetData = STATE.multiDataCache[sheetName] || [];
                     
+                    // Target Array Index 3 (Spreadsheet Row 5)
                     if (sheetData.length > 3) {
-                        // Target Array Index 3 (Spreadsheet Row 5)
                         const rowT5 = sheetData[3];
                         
                         let foundPrice = 0;
                         if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) {
                             foundPrice = parseFloat(rowT5['Bulan_Aktif']);
                         } else {
-                            // Fallback jika Row 5 kosong/tidak valid
-                            for(let i=0; i<sheetData.length; i++) {
-                                if (sheetData[i]['Bulan_Aktif'] && !isNaN(sheetData[i]['Bulan_Aktif'])) {
-                                    foundPrice = parseFloat(sheetData[i]['Bulan_Aktif']);
-                                    break;
-                                }
+                            const firstData = sheetData[0];
+                            if (firstData && firstData['Bulan_Aktif'] && !isNaN(firstData['Bulan_Aktif'])) {
+                                foundPrice = parseFloat(firstData['Bulan_Aktif']);
                             }
                         }
                         specificPrice = foundPrice;
@@ -802,7 +817,6 @@
                     STATE.sheetPrices[sheetName] = specificPrice;
                 });
                 
-                // Ambil index bulan aktif dari salah satu sheet (misal Kas)
                 sourceData = STATE.multiDataCache["Kas"] || [];
             }
 
@@ -969,8 +983,15 @@
                 }
                 
                 let badgeHTML = '';
+                // --- LOGIC PERBAIKAN: LUNAS + SALDO ---
                 if (kurang <= 0) {
-                    badgeHTML = `<div class="badge lunas-badge readonly">✅ Lunas</div>`;
+                    let lunasText = "✅Lunas";
+                    // Jika minus (ada saldo/kelebihan)
+                    if (kurang < 0) {
+                        const saldoStr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.abs(kurang));
+                        lunasText += `: +${saldoStr}`;
+                    }
+                    badgeHTML = `<div class="badge lunas-badge readonly">${lunasText}</div>`;
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
                     
@@ -1105,7 +1126,7 @@
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
                     if (h === '2025') {
-                         const val = row[h] || 0;
+                         const val = row[h] ||0;
                          const fmtVal = new Intl.NumberFormat('id-ID').format(val);
                          const div = document.createElement('div');
                          div.className = 'form-group';
@@ -1140,25 +1161,22 @@
                 MONTHS.forEach((month, index) => {
                     if (index >= activeMonthLimit) return;
 
-                    let allPaid = true;
                     let monthTotal = 0;
                     
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
-                        const standardPrice = STATE.sheetPrices[sheet] || 0;
-                        
                         monthTotal += val;
-                        if (val !== standardPrice) allPaid = false;
                     });
 
                     const div = document.createElement('div');
-                    div.className = `month-row-multi ${allPaid ? 'active-month' : ''}`;
+                    div.className = `month-row-multi`; // Hapus active-month logic di sini karena sekarang individual checkbox
+                    
                     div.innerHTML = `
                         <div class="month-header">
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <input type="checkbox" id="check-${month}" class="month-checkbox" onchange="toggleMultiMonthMode('${month}', this)" ${allPaid ? 'checked' : ''}>
-                                <label class="month-label" style="width:auto; color: ${allPaid ? 'var(--primary)' : 'inherit'}; font-weight:${allPaid ? '600':'500'}">${month}</label>
+                                <!-- Hapus Checkbox utama bulan karena sekarang ada per sheet -->
+                                <label class="month-label" style="width:auto;">${month}</label>
                             </div>
                             <div style="font-size:0.75rem; color:var(--secondary)">Total: ${new Intl.NumberFormat('id-ID').format(monthTotal)}</div>
                         </div>
@@ -1170,13 +1188,19 @@
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
+                        const standardPrice = STATE.sheetPrices[sheet] || 0;
+                        const isChecked = (val === standardPrice);
                         
+                        // Checkbox Per Sheet
                         const group = document.createElement('div');
-                        group.className = 'mini-group';
+                        group.className = 'mini-group'; // Ubah struktur di sini
                         group.innerHTML = `
-                            <label class="mini-label">${sheet}</label>
+                            <div class="mini-group-wrapper">
+                                <input type="checkbox" id="check-${month}-${sheet}" class="mini-checkbox" onchange="toggleMultiSheetMode('${month}', '${sheet}', this)" ${isChecked ? 'checked' : ''}>
+                                <label class="mini-label-row">${sheet}</label>
+                            </div>
                             <input type="number" id="month-input-${month}-${sheet}" class="mini-input" value="${val}" 
-                                oninput="handleMultiManualInput('${month}', this)" ${allPaid ? 'disabled' : ''}>
+                                oninput="handleMultiManualInput('${month}', '${sheet}', this)" ${isChecked ? 'disabled' : ''}>
                         `;
                         inputsContainer.appendChild(group);
                     });
@@ -1199,11 +1223,16 @@
 
             // Cari bulan pertama yang belum lunas
             let targetMonthDiv = null;
-            const monthDivs = document.querySelectorAll(PAYMENT_MODE === 'multi' ? '.month-row-multi' : '.month-row');
+            const monthDivs = document.querySelectorAll('.month-row-multi');
 
             for (let div of monthDivs) {
-                const cb = div.querySelector('input[type="checkbox"]');
-                if (cb && !cb.checked) {
+                // Logic: Cek apakah semua checkbox di bulan ini sudah ceklis?
+                // Jika tidak, ini adalah target
+                const allCbs = div.querySelectorAll('.mini-checkbox');
+                let allChecked = true;
+                allCbs.forEach(cb => { if(!cb.checked) allChecked = false; });
+                
+                if (!allChecked) {
                     targetMonthDiv = div;
                     break;
                 }
@@ -1211,40 +1240,37 @@
 
             if (!targetMonthDiv) return showToast("Semua bulan sudah terisi penuh.");
 
-            if (PAYMENT_MODE === 'single') {
-                const globalPrice = getSettings().price;
-                const input = targetMonthDiv.querySelector('.month-input');
-                if (input) {
-                    input.value = valKurang;
-                    input.dispatchEvent(new Event('input'));
+            // --- LOGIC MULTI MODE: ISI SESUAI HARGA SPESIFIK ---
+            let sisa = valKurang;
+            
+            MULTI_SHEETS.forEach((sheet) => {
+                const input = document.getElementById(`month-input-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
+                const checkbox = document.getElementById(`check-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
+                
+                if (!input) return;
+
+                // Gunakan harga spesifik dari STATE.sheetPrices
+                const standardPrice = STATE.sheetPrices[sheet] || 0;
+
+                // Jika checkbox sudah tercentang (sudah lunas), lewati
+                if (checkbox.checked) return;
+
+                if (sisa >= standardPrice) {
+                    input.value = standardPrice;
+                    sisa -= standardPrice;
+                    // Centang otomatis jika pas
+                    checkbox.checked = true;
+                    input.disabled = true;
+                } else if (sisa > 0) {
+                    // Jika sisa kurang dari harga standar, masukkan sisa ke kolom ini
+                    input.value = sisa;
+                    sisa = 0;
+                } else {
+                    input.value = 0;
                 }
-            } else {
-                // --- LOGIC MULTI MODE: ISI SESUAI HARGA SPESIFIK BULAN AKTIF ---
-                let sisa = valKurang;
                 
-                MULTI_SHEETS.forEach((sheet) => {
-                    const input = document.getElementById(`month-input-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
-                    if (!input) return;
-
-                    // Gunakan harga spesifik dari STATE.sheetPrices
-                    const standardPrice = STATE.sheetPrices[sheet] || 0;
-
-                    if (sisa >= standardPrice) {
-                        input.value = standardPrice;
-                        sisa -= standardPrice;
-                    } else if (sisa > 0) {
-                        // Jika sisa kurang dari harga standar, masukkan sisa ke kolom ini
-                        input.value = sisa;
-                        sisa = 0;
-                    } else {
-                        input.value = 0;
-                    }
-                    
-                    input.dispatchEvent(new Event('input'));
-                });
-                
-                checkMultiMonthStatus(getMonthFromDiv(targetMonthDiv));
-            }
+                input.dispatchEvent(new Event('input'));
+            });
             
             showToast("Nilai Kurang dimasukkan ke input.");
         }
@@ -1290,57 +1316,45 @@
             }
         }
 
-        function toggleMultiMonthMode(month, checkbox) {
-            const rowDiv = checkbox.closest('.month-row-multi');
-            const inputs = rowDiv.querySelectorAll('.mini-input');
-
+        // --- UPDATE: MULTI MODE FUNCTIONS ---
+        
+        // 1. Toggle Checkbox per Sheet
+        function toggleMultiSheetMode(month, sheetName, checkbox) {
+            const input = document.getElementById(`month-input-${month}-${sheetName}`);
+            const sheetPrice = STATE.sheetPrices[sheetName] || 0;
+            
             if (checkbox.checked) {
-                inputs.forEach(input => {
-                    // Ambil sheet name dari ID input (format: month-input-Month-Sheet)
-                    const idParts = input.id.split('-');
-                    const sheetName = idParts[3];
-                    const sheetPrice = STATE.sheetPrices[sheetName] || 0;
-                    
-                    input.value = sheetPrice;
-                    input.disabled = true;
-                });
-                rowDiv.classList.add('active-month');
+                input.value = sheetPrice;
+                input.disabled = true;
             } else {
-                inputs.forEach(input => {
-                    input.value = 0;
-                    input.disabled = false;
-                });
-                rowDiv.classList.remove('active-month');
+                input.value = 0;
+                input.disabled = false;
+                input.focus();
             }
+            
+            // Update status checkbox utama bulan (jika diperlukan) atau visual lain?
+            // Kita biarkan saja checkbox individu bekerja.
         }
 
-        function handleMultiManualInput(month, input) {
-            const rowDiv = input.closest('.month-row-multi');
-            const checkbox = document.getElementById(`check-${month}`);
-            const inputs = rowDiv.querySelectorAll('.mini-input');
+        // 2. Handle Input Manual Multi (per sheet)
+        function handleMultiManualInput(month, sheetName, input) {
+            const checkbox = document.getElementById(`check-${month}-${sheetName}`);
+            const sheetPrice = STATE.sheetPrices[sheetName] || 0;
+            const currentVal = parseFloat(input.value) || 0;
 
-            let allMatch = true;
-            inputs.forEach(inp => {
-                // Ambil sheet name dari ID input
-                const idParts = inp.id.split('-');
-                const sheetName = idParts[3];
-                const sheetPrice = STATE.sheetPrices[sheetName] || 0;
-
-                if (parseFloat(inp.value) !== sheetPrice) allMatch = false;
-            });
-
-            if (allMatch) {
+            if (currentVal === sheetPrice) {
                 checkbox.checked = true;
-                inputs.forEach(inp => inp.disabled = true);
-                rowDiv.classList.add('active-month');
+                input.disabled = true;
             } else {
                 checkbox.checked = false;
-                inputs.forEach(inp => inp.disabled = false);
-                rowDiv.classList.remove('active-month');
+                input.disabled = false;
             }
+
+            // Opsional: Hitung ulang total bulan untuk update header total
+            checkMultiMonthTotal(month);
         }
 
-        function checkMultiMonthStatus(month) {
+        function checkMultiMonthTotal(month) {
             const rows = document.querySelectorAll('.month-row-multi');
             let targetRow;
             rows.forEach(r => {
@@ -1348,26 +1362,12 @@
             });
 
             if(targetRow) {
-                const cb = targetRow.querySelector('input[type="checkbox"]');
                 const inputs = targetRow.querySelectorAll('.mini-input');
+                let total = 0;
+                inputs.forEach(i => total += parseFloat(i.value) || 0);
                 
-                let allPaid = true;
-                inputs.forEach(inp => {
-                    const idParts = inp.id.split('-');
-                    const sheetName = idParts[3];
-                    const sheetPrice = STATE.sheetPrices[sheetName] || 0;
-
-                    if (parseFloat(inp.value) !== sheetPrice) allPaid = false;
-                });
-
-                cb.checked = allPaid;
-                if (allPaid) {
-                    targetRow.classList.add('active-month');
-                    inputs.forEach(i => i.disabled = true);
-                } else {
-                    targetRow.classList.remove('active-month');
-                    inputs.forEach(i => i.disabled = false);
-                }
+                const totalDiv = targetRow.querySelector('.month-header div:last-child');
+                if(totalDiv) totalDiv.innerText = "Total: " + new Intl.NumberFormat('id-ID').format(total);
             }
         }
 
