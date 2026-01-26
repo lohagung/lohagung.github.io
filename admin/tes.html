@@ -66,11 +66,58 @@
         .lunas-badge { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 
         /* --- REKAP & RIWAYAT --- */
-        .rekap-list { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-        .rekap-item { display: flex; justify-content: space-between; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); align-items: center; }
-        .rekap-item:last-child { border-bottom: none; }
+        .rekap-list { display: flex; flex-direction: column; gap: 0.8rem; background: var(--bg-card); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow); }
+        
+        .rekap-item { display: block; border-radius: 8px; background: #fff; border: 1px solid transparent; transition: 0.2s; }
+        
+        /* Header Accordion */
+        .rekap-header { 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0.8rem 1rem; 
+            border-radius: 8px; 
+            user-select: none;
+        }
+        .rekap-header:hover { background: #f8fafc; }
+        .rekap-header:active { background: #e2e8f0; }
+        
+        .rekap-item.expanded .rekap-header { background: #f1f5f9; }
+        
+        .rekap-chevron { 
+            font-size: 0.8rem; 
+            color: var(--secondary); 
+            transition: transform 0.3s ease; 
+        }
+        .rekap-item.expanded .rekap-chevron { 
+            transform: rotate(180deg); 
+        }
+
         .rekap-month { font-weight: 600; color: var(--text-main); }
         .rekap-total { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+
+        /* Details (Hidden by default) */
+        .rekap-details { 
+            display: none; 
+            padding: 0.5rem 1rem; 
+            background: #f8fafc; 
+            border-radius: 0 0 8px 8px; 
+            margin-bottom: 0.5rem; 
+            border-top: 1px dashed var(--border); 
+        }
+        .rekap-details.show { display: block; }
+
+        .rekap-sub-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 0.5rem 0; 
+            font-size: 0.9rem; 
+            color: var(--secondary); 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        .rekap-sub-item:last-child { border-bottom: none; }
+        .rekap-sub-val { font-weight: 600; color: var(--text-main); }
 
         .riwayat-list { display: flex; flex-direction: column; gap: 1rem; }
         .riwayat-item { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--primary); box-shadow: var(--shadow); }
@@ -574,6 +621,8 @@
 
             const results = await Promise.all(promises);
             
+            // Cek jika ada sheet error (bukan data kosong)
+            const errorSheets = [];
             results.forEach(res => {
                 STATE.multiDataCache[res.sheet] = res.data;
             });
@@ -589,12 +638,14 @@
                 }
 
                 sheetData.forEach(row => {
+                    // Cari Blok dengan lebih banyak variasi
                     const blokKey = getKey(row, ['blok', 'block', 'no', 'no rumah', 'unit', 'nomor']);
                     if (!blokKey) return;
                     
                     const blok = row[blokKey];
                     if (!blok || String(blok).trim() === "") return;
 
+                    // Cari Nama & Foto
                     const namaKey = getKey(row, ['nama', 'pemilik', 'name', 'warga']);
                     const fotoKey = getKey(row, ['foto', 'gambar', 'image', 'url', 'pic']);
                     
@@ -609,6 +660,7 @@
                             _rawData: {}
                         });
                     } else {
+                        // PERBAIKAN: Jika Nama di sheet pertama kosong, ambil dari sheet sekarang
                         const existing = mergedMap.get(blok);
                         if (!existing.Nama || existing.Nama === '-') existing.Nama = currentNama;
                         if (!existing.Foto || existing.Foto === '') existing.Foto = currentFoto;
@@ -792,23 +844,33 @@
             let sourceData = STATE.data;
             
             if (PAYMENT_MODE === 'multi') {
-                STATE.sheetPrices = {}; 
+                // --- UPDATE LOGIC: Ambil harga spesifik per sheet dari Row T5 (Spreadsheet Row 5) ---
+                // Spreadsheet Row 1: Headers (Removed via shift)
+                // Spreadsheet Row 2: Array Index 0
+                // Spreadsheet Row 3: Array Index 1
+                // Spreadsheet Row 4: Array Index 2
+                // Spreadsheet Row 5: Array Index 3  <-- TARGET INI
+                
+                STATE.sheetPrices = {}; // Reset prices
                 
                 MULTI_SHEETS.forEach(sheetName => {
                     let specificPrice = 0;
                     const sheetData = STATE.multiDataCache[sheetName] || [];
                     
-                    // Target Array Index 3 (Spreadsheet Row 5)
                     if (sheetData.length > 3) {
+                        // Target Array Index 3 (Spreadsheet Row 5)
                         const rowT5 = sheetData[3];
                         
                         let foundPrice = 0;
                         if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) {
                             foundPrice = parseFloat(rowT5['Bulan_Aktif']);
                         } else {
-                            const firstData = sheetData[0];
-                            if (firstData && firstData['Bulan_Aktif'] && !isNaN(firstData['Bulan_Aktif'])) {
-                                foundPrice = parseFloat(firstData['Bulan_Aktif']);
+                            // Fallback jika Row 5 kosong/tidak valid
+                            for(let i=0; i<sheetData.length; i++) {
+                                if (sheetData[i]['Bulan_Aktif'] && !isNaN(sheetData[i]['Bulan_Aktif'])) {
+                                    foundPrice = parseFloat(sheetData[i]['Bulan_Aktif']);
+                                    break;
+                                }
                             }
                         }
                         specificPrice = foundPrice;
@@ -817,6 +879,7 @@
                     STATE.sheetPrices[sheetName] = specificPrice;
                 });
                 
+                // Ambil index bulan aktif dari salah satu sheet (misal Kas)
                 sourceData = STATE.multiDataCache["Kas"] || [];
             }
 
@@ -834,35 +897,109 @@
         function renderRekap() {
             const container = document.getElementById('rekap-container');
             container.innerHTML = '';
-            
-            const totals = {};
-            MONTHS.forEach(m => totals[m] = 0);
+
+            if (PAYMENT_MODE === 'single') {
+                // LOGIC SINGLE MODE (SIMPLE LIST)
+                const totals = {};
+                MONTHS.forEach(m => totals[m] = 0);
+
+                STATE.data.forEach(row => {
+                    MONTHS.forEach(m => {
+                        totals[m] += parseFloat(row[m]) || 0;
+                    });
+                });
+
+                MONTHS.forEach(m => {
+                    const val = totals[m];
+                    const div = document.createElement('div');
+                    div.className = 'rekap-item';
+                    div.innerHTML = `
+                        <div class="rekap-month">${m}</div>
+                        <div class="rekap-total">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val)}</div>
+                    `;
+                    container.appendChild(div);
+                });
+                return;
+            }
+
+            // --- LOGIC MULTI MODE (ACCORDION) ---
+            // 1. Hitung Total Global per Bulan (untuk Header)
+            const grandTotals = {};
+            MONTHS.forEach(m => grandTotals[m] = 0);
+
+            // 2. Hitung Total per Sheet per Bulan (untuk Details)
+            const sheetTotals = {};
+            MULTI_SHEETS.forEach(s => { sheetTotals[s] = {}; MONTHS.forEach(m => sheetTotals[s][m] = 0); });
 
             STATE.data.forEach(row => {
                 MONTHS.forEach(m => {
-                    if (PAYMENT_MODE === 'multi') {
-                        let sumMonth = 0;
-                        MULTI_SHEETS.forEach(sheet => {
-                            const r = row._rawData[sheet];
-                            if (r) sumMonth += parseFloat(r[m]) || 0;
-                        });
-                        totals[m] += sumMonth;
-                    } else {
-                        totals[m] += parseFloat(row[m]) || 0;
-                    }
+                    MULTI_SHEETS.forEach(sheet => {
+                        const r = row._rawData[sheet];
+                        if (r) {
+                            const val = parseFloat(r[m]) || 0;
+                            sheetTotals[sheet][m] += val;
+                            grandTotals[m] += val;
+                        }
+                    });
                 });
             });
 
+            // 3. Render dengan Accordion
             MONTHS.forEach(m => {
-                const val = totals[m];
-                const div = document.createElement('div');
-                div.className = 'rekap-item';
-                div.innerHTML = `
-                    <div class="rekap-month">${m}</div>
-                    <div class="rekap-total">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val)}</div>
+                const total = grandTotals[m];
+                const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(total);
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'rekap-item';
+
+                // Header (Clickable)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'rekap-header';
+                headerDiv.onclick = function() { toggleRekap(this); };
+                headerDiv.innerHTML = `
+                    <span class="rekap-month">${m}</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="rekap-total">${fmtTotal}</span>
+                        <span class="rekap-chevron">▼</span>
+                    </div>
                 `;
-                container.appendChild(div);
+
+                // Details (Hidden by default)
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'rekap-details';
+
+                // Sub Items per Sheet
+                MULTI_SHEETS.forEach(sheet => {
+                    const sheetTotal = sheetTotals[sheet][m];
+                    const fmtSheet = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(sheetTotal);
+                    
+                    const subDiv = document.createElement('div');
+                    subDiv.className = 'rekap-sub-item';
+                    subDiv.innerHTML = `
+                        <span>${sheet}</span>
+                        <span class="rekap-sub-val">${fmtSheet}</span>
+                    `;
+                    detailsDiv.appendChild(subDiv);
+                });
+
+                itemDiv.appendChild(headerDiv);
+                itemDiv.appendChild(detailsDiv);
+                container.appendChild(itemDiv);
             });
+        }
+
+        // --- FUNGSI TOGGLE ACCORDION ---
+        function toggleRekap(headerElement) {
+            // 1. Collapse semua detail bulan lain
+            document.querySelectorAll('.rekap-details').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.rekap-item').forEach(el => el.classList.remove('expanded'));
+
+            // 2. Expand bulan yang diklik
+            const details = headerElement.nextElementSibling;
+            const item = headerElement.parentElement;
+            
+            details.classList.add('show');
+            item.classList.add('expanded');
         }
 
         async function fetchRiwayat() {
@@ -985,7 +1122,7 @@
                 let badgeHTML = '';
                 // --- LOGIC PERBAIKAN: LUNAS + SALDO ---
                 if (kurang <= 0) {
-                    let lunasText = "✅Lunas";
+                    let lunasText = "✅ Lunas";
                     // Jika minus (ada saldo/kelebihan)
                     if (kurang < 0) {
                         const saldoStr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.abs(kurang));
@@ -1126,7 +1263,7 @@
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
                     if (h === '2025') {
-                         const val = row[h] ||0;
+                         const val = row[h] || 0;
                          const fmtVal = new Intl.NumberFormat('id-ID').format(val);
                          const div = document.createElement('div');
                          div.className = 'form-group';
@@ -1166,7 +1303,10 @@
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
+                        const standardPrice = STATE.sheetPrices[sheet] || 0;
+                        
                         monthTotal += val;
+                        if (val !== standardPrice) allPaid = false;
                     });
 
                     const div = document.createElement('div');
@@ -1175,7 +1315,6 @@
                     div.innerHTML = `
                         <div class="month-header">
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <!-- Hapus Checkbox utama bulan karena sekarang ada per sheet -->
                                 <label class="month-label" style="width:auto;">${month}</label>
                             </div>
                             <div style="font-size:0.75rem; color:var(--secondary)">Total: ${new Intl.NumberFormat('id-ID').format(monthTotal)}</div>
@@ -1193,14 +1332,14 @@
                         
                         // Checkbox Per Sheet
                         const group = document.createElement('div');
-                        group.className = 'mini-group'; // Ubah struktur di sini
+                        group.className = 'mini-group'; 
                         group.innerHTML = `
                             <div class="mini-group-wrapper">
                                 <input type="checkbox" id="check-${month}-${sheet}" class="mini-checkbox" onchange="toggleMultiSheetMode('${month}', '${sheet}', this)" ${isChecked ? 'checked' : ''}>
                                 <label class="mini-label-row">${sheet}</label>
                             </div>
                             <input type="number" id="month-input-${month}-${sheet}" class="mini-input" value="${val}" 
-                                oninput="handleMultiManualInput('${month}', '${sheet}', this)" ${isChecked ? 'disabled' : ''}>
+                                oninput="handleMultiManualInput('${month}', this)" ${isChecked ? 'disabled' : ''}>
                         `;
                         inputsContainer.appendChild(group);
                     });
@@ -1223,16 +1362,11 @@
 
             // Cari bulan pertama yang belum lunas
             let targetMonthDiv = null;
-            const monthDivs = document.querySelectorAll('.month-row-multi');
+            const monthDivs = document.querySelectorAll(PAYMENT_MODE === 'multi' ? '.month-row-multi' : '.month-row');
 
             for (let div of monthDivs) {
-                // Logic: Cek apakah semua checkbox di bulan ini sudah ceklis?
-                // Jika tidak, ini adalah target
-                const allCbs = div.querySelectorAll('.mini-checkbox');
-                let allChecked = true;
-                allCbs.forEach(cb => { if(!cb.checked) allChecked = false; });
-                
-                if (!allChecked) {
+                const cb = div.querySelector('input[type="checkbox"]');
+                if (cb && !cb.checked) {
                     targetMonthDiv = div;
                     break;
                 }
@@ -1240,37 +1374,43 @@
 
             if (!targetMonthDiv) return showToast("Semua bulan sudah terisi penuh.");
 
-            // --- LOGIC MULTI MODE: ISI SESUAI HARGA SPESIFIK ---
-            let sisa = valKurang;
-            
-            MULTI_SHEETS.forEach((sheet) => {
-                const input = document.getElementById(`month-input-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
-                const checkbox = document.getElementById(`check-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
-                
-                if (!input) return;
-
-                // Gunakan harga spesifik dari STATE.sheetPrices
-                const standardPrice = STATE.sheetPrices[sheet] || 0;
-
-                // Jika checkbox sudah tercentang (sudah lunas), lewati
-                if (checkbox.checked) return;
-
-                if (sisa >= standardPrice) {
-                    input.value = standardPrice;
-                    sisa -= standardPrice;
-                    // Centang otomatis jika pas
-                    checkbox.checked = true;
-                    input.disabled = true;
-                } else if (sisa > 0) {
-                    // Jika sisa kurang dari harga standar, masukkan sisa ke kolom ini
-                    input.value = sisa;
-                    sisa = 0;
-                } else {
-                    input.value = 0;
+            if (PAYMENT_MODE === 'single') {
+                const globalPrice = getSettings().price;
+                const input = targetMonthDiv.querySelector('.month-input');
+                if (input) {
+                    input.value = valKurang;
+                    input.dispatchEvent(new Event('input'));
                 }
+            } else {
+                // --- LOGIC MULTI MODE: ISI SESUAI HARGA SPESIFIK BULAN AKTIF ---
+                let sisa = valKurang;
                 
-                input.dispatchEvent(new Event('input'));
-            });
+                MULTI_SHEETS.forEach((sheet) => {
+                    const input = document.getElementById(`month-input-${getMonthFromDiv(targetMonthDiv)}-${sheet}`);
+                    if (!input) return;
+
+                    // Gunakan harga spesifik dari STATE.sheetPrices
+                    const standardPrice = STATE.sheetPrices[sheet] || 0;
+
+                    // Jika checkbox sudah tercentang (sudah lunas), lewati
+                    if (document.getElementById(`check-${getMonthFromDiv(targetMonthDiv)}-${sheet}`).checked) return;
+
+                    if (sisa >= standardPrice) {
+                        input.value = standardPrice;
+                        sisa -= standardPrice;
+                    } else if (sisa > 0) {
+                        // Jika sisa kurang dari harga standar, masukkan sisa ke kolom ini
+                        input.value = sisa;
+                        sisa = 0;
+                    } else {
+                        input.value = 0;
+                    }
+                    
+                    input.dispatchEvent(new Event('input'));
+                });
+                
+                checkMultiMonthStatus(getMonthFromDiv(targetMonthDiv));
+            }
             
             showToast("Nilai Kurang dimasukkan ke input.");
         }
@@ -1316,9 +1456,6 @@
             }
         }
 
-        // --- UPDATE: MULTI MODE FUNCTIONS ---
-        
-        // 1. Toggle Checkbox per Sheet
         function toggleMultiSheetMode(month, sheetName, checkbox) {
             const input = document.getElementById(`month-input-${month}-${sheetName}`);
             const sheetPrice = STATE.sheetPrices[sheetName] || 0;
@@ -1336,7 +1473,6 @@
             // Kita biarkan saja checkbox individu bekerja.
         }
 
-        // 2. Handle Input Manual Multi (per sheet)
         function handleMultiManualInput(month, sheetName, input) {
             const checkbox = document.getElementById(`check-${month}-${sheetName}`);
             const sheetPrice = STATE.sheetPrices[sheetName] || 0;
