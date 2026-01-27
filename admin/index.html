@@ -6,195 +6,7 @@
     <title>Dashboard Warga LA6 & Kavling</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://la6.my.id/admin/style.css">
-    
-    <style>
-        /* Tambahan CSS untuk Rekap Multi & Modal Layout */
-        .rekap-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding-bottom: 2rem;
-        }
-
-        .rekap-item {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            overflow: hidden;
-            border: 1px solid #eee;
-        }
-
-        .rekap-header {
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            background: #fff;
-            transition: background 0.2s;
-        }
-
-        .rekap-header:active { background: #f8f9fa; }
-
-        .rekap-month { font-weight: 600; font-size: 1rem; color: #333; }
-        .rekap-total { font-weight: 700; color: var(--primary); font-size: 1rem; }
-
-        .rekap-chevron { font-size: 0.8rem; color: #aaa; transition: transform 0.3s ease; }
-        .rekap-item.expanded .rekap-chevron { transform: rotate(180deg); }
-
-        .rekap-details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f9fbfd; }
-        .rekap-details.show { max-height: 500px; border-top: 1px solid #eee; }
-
-        .rekap-sub-item {
-            padding: 0.8rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.9rem;
-        }
-        .rekap-sub-item:last-child { border-bottom: none; }
-
-        .rekap-sub-item span:first-child {
-            color: #555; font-weight: 500; display: flex; align-items: center; gap: 8px;
-        }
-        .rekap-sub-item span:first-child::before {
-            content: ''; display: block; width: 6px; height: 6px; border-radius: 50%; background: #ccc;
-        }
-        .sub-kas span:first-child::before { background: #3498db; }
-        .sub-sampah span:first-child::before { background: #2ecc71; }
-        .sub-konsumsi span:first-child::before { background: #f1c40f; }
-        .sub-arisan span:first-child::before { background: #9b59b6; }
-
-        .rekap-sub-val { font-weight: 600; color: #333; }
-        
-        /* Modal Layout & Inputs */
-        .modal { width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-
-        /* Container Row Bulan */
-        .month-row {
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .month-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .title-group { display: flex; align-items: center; gap: 6px; }
-
-        /* Lock Button Styling */
-        .btn-lock {
-            background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; color: #888; transition: color 0.2s;
-        }
-        .btn-lock:hover { color: #555; }
-        .btn-lock.locked { color: #e74c3c; } 
-        .btn-lock svg { width: 16px; height: 16px; fill: currentColor; }
-
-        /* Single Mode Controls (Jimpitan, Keamanan, Sosial) - UPDATE */
-        .month-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* Jarak antara checkbox dan input */
-            padding-left: 28px; 
-        }
-
-        /* Month Input Style (Single Mode) - BESAR & FULL WIDTH */
-        .month-input {
-            flex: 1; /* Memenuhi sisa lebar 100% */
-            text-align: right;
-            padding: 12px; /* Padding lebih besar */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 1.1rem; /* Font lebih besar */
-            font-weight: 500;
-            transition: border-color 0.2s;
-        }
-        .month-input:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        .month-input:disabled {
-            background-color: #f0f0f0;
-            color: #999;
-            cursor: not-allowed;
-        }
-
-        /* Multi Mode Grid Layout (Bendahara) - TIDAK TERPENGARUH */
-        .month-row-multi { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
-        
-        .month-multi-inputs { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
-            padding-left: 28px; 
-        }
-
-        /* Inputs & Checkbox alignment */
-        .input-group-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .mini-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 4px;
-            border-radius: 4px;
-            background: #fdfdfd;
-        }
-
-        .mini-checkbox, .month-checkbox {
-            width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0;
-        }
-
-        .month-label { font-weight: 500; color: #333; font-size: 0.95rem; }
-        .mini-label-row { font-size: 0.8rem; color: #444; flex-grow: 1; margin-left: 6px; margin-right: auto;}
-        
-        /* Mini Input (Multi Mode) - Style Terpisah */
-        .mini-input { width: 70px; text-align: right; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.85rem; }
-
-        .mini-input:disabled {
-            background-color: #f0f0f0;
-            color: #999;
-            cursor: not-allowed;
-        }
-
-        /* Protected Field Styling */
-        .protected-field {
-            margin-bottom: 10px;
-        }
-        .protected-field .form-label {
-            color: #888;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .protected-field .readonly-value {
-            padding: 8px 12px;
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* Icons Definition */
-        .svg-icon { display: none; }
-    </style>
-</head>
+    </head>
 <body>
 
     <!-- SVG Icons Definitions -->
@@ -223,9 +35,18 @@
                 <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwopjwy5tR4Q1q3q8oHOYZ83VKaDGekoM8hULbX-5jb460XCFREvv9cDZRVb50voHmaOw/exec" readonly>
             </div>
             
+            <!-- PERUBAHAN: Select List untuk Login -->
             <div class="input-group">
                 <label>Pengurus</label>
-                <input type="text" id="sheet-name" class="input-field" value="Jimpitan" placeholder="Contoh: Bendahara, Jimpitan">
+                <select id="sheet-name" class="input-field">
+                    <option value="Ketua">Ketua</option>
+                    <option value="Sekretaris">Sekretaris</option>
+                    <option value="Bendahara">Bendahara</option>
+                    <option value="Jimpitan">Jimpitan</option>
+                    <option value="Sosial">Sosial</option>
+                    <option value="Keamanan">Keamanan</option>
+                    <option value="Pembangunan">Pembangunan</option>
+                </select>
             </div>
 
             <div class="input-group">
@@ -244,6 +65,17 @@
                 <input type="text" id="search-box" class="search-input" placeholder="Cari Blok atau Nama..." onkeyup="filterCards()">
             </div>
 
+            <!-- Stats Grid telah dipindahkan ke tab Rekap -->
+
+            <div id="card-container" class="card-grid"></div>
+            <div id="empty-state" class="hidden" style="text-align: center; margin-top: 3rem; color: var(--secondary);"><p>Data tidak ditemukan.</p></div>
+        </section>
+
+        <!-- VIEW 2: REKAP -->
+        <section id="view-rekap" class="view-section">
+            <h2 style="margin-bottom: 1.5rem;">Rekapitulasi Bulanan</h2>
+            
+            <!-- Stats Grid dipindahkan ke sini -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-title">Uang Masuk 2026</div>
@@ -255,13 +87,6 @@
                 </div>
             </div>
 
-            <div id="card-container" class="card-grid"></div>
-            <div id="empty-state" class="hidden" style="text-align: center; margin-top: 3rem; color: var(--secondary);"><p>Data tidak ditemukan.</p></div>
-        </section>
-
-        <!-- VIEW 2: REKAP -->
-        <section id="view-rekap" class="view-section">
-            <h2 style="margin-bottom: 1.5rem;">Rekapitulasi Bulanan</h2>
             <div class="rekap-list" id="rekap-container"></div>
         </section>
 
@@ -283,7 +108,7 @@
             <span>Pembayaran</span>
         </div>
         <div class="nav-item" onclick="switchTab('rekap', this)">
-            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l3.5-6m4.5 6l1 1"></path></svg>
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l1 1"></path></svg>
             <span>Rekap</span>
         </div>
         <div class="nav-item" onclick="switchTab('riwayat', this)">
@@ -292,7 +117,7 @@
         </div>
         <div class="nav-item" onclick="openSettingsModal()">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-            <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             <span>Pengaturan</span>
         </div>
     </nav>
@@ -369,8 +194,14 @@
         const FORMULA_COLS = ["Total", "Sudah_Bayar", "Kurang", "Bulan_Aktif", "Timestamp", "Foto", "ID", "Created", "Email", "Telp"]; 
         const MULTI_SHEETS = ["Kas", "Sampah", "Konsumsi", "Arisan"];
         
-        // Indeks kolom yang dilindungi (0-based): F=5, J=9, L=11, N=13, P=15, R=17, T=19, V=21, X=23, Z=25, AB=27
+        // Indeks kolom yang dilindungi (F, J, L, N, P, R, T, V, X, Z, AB) -> (5, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27)
         const PROTECTED_INDICES = [5, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27];
+
+        // Pemetaan Absen Khusus Keamanan
+        const ABSEN_MAP = {
+            "Januari": 5, "Februari": 9, "Maret": 11, "April": 13, "Mei": 15,
+            "Juni": 17, "Juli": 19, "Agustus": 21, "September": 23, "Oktober": 25, "November": 27
+        };
         
         let APP_CONFIG = { url: '', token: '', sheet: '' };
         let IS_PUBLIC_MODE = false;
@@ -423,7 +254,7 @@
                     document.getElementById('app-url').value = stored.url || '';
                     document.getElementById('api-token').value = stored.token || '';
                     document.getElementById('sheet-name').value = stored.sheet || '';
-                    if(stored.token) doLogin(true);
+                    if(!stored.token) doLogin(true);
                 }
             }
         });
@@ -561,7 +392,7 @@
             let totalPembayaran = 0;
 
             STATE.headers.forEach((h, index) => {
-                // Skip Protected Columns
+                // Skip Protected Columns (Absen)
                 if (PROTECTED_INDICES.includes(index)) return;
 
                 if (!FORMULA_COLS.includes(h) && h !== 'Blok' && !MONTHS.includes(h) && h !== '2025') {
@@ -739,32 +570,48 @@
             const row = btn.closest('.month-row') || btn.closest('.month-row-multi');
             if(!row) return;
             
-            const inputs = row.querySelectorAll('input:not([type="hidden"])');
-            const isLocked = btn.classList.contains('locked');
+            // Logic Lock untuk Multi Mode: Kunci semua input di dalam row ini
+            if (PAYMENT_MODE === 'multi') {
+                const inputs = row.querySelectorAll('.multi-input-field');
+                const checkboxes = row.querySelectorAll('.mini-checkbox');
+                const isLocked = btn.classList.contains('locked');
 
-            if (isLocked) {
-                btn.classList.remove('locked');
-                btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
-                
-                const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-                if (PAYMENT_MODE === 'single') {
+                if (isLocked) {
+                    btn.classList.remove('locked');
+                    btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
+                    inputs.forEach(i => {
+                        // Enable hanya jika checkbox tidak checked
+                        const wrapper = i.closest('.multi-cat-box');
+                        const cb = wrapper.querySelector('.mini-checkbox');
+                        if(!cb.checked) i.disabled = false;
+                    });
+                    checkboxes.forEach(cb => cb.disabled = false);
+                } else {
+                    btn.classList.add('locked');
+                    btn.innerHTML = document.getElementById('icon-lock').outerHTML;
+                    inputs.forEach(i => i.disabled = true);
+                    checkboxes.forEach(cb => cb.disabled = true);
+                }
+            } else {
+                // Logic Lock Single Mode
+                const inputs = row.querySelectorAll('input:not([type="hidden"])');
+                const isLocked = btn.classList.contains('locked');
+
+                if (isLocked) {
+                    btn.classList.remove('locked');
+                    btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
+                    
+                    const checkboxes = row.querySelectorAll('input[type="checkbox"]');
                     if(checkboxes.length > 0 && checkboxes[0].checked) {
                         row.querySelectorAll('input[type="number"]').forEach(i => i.disabled = true);
                     } else {
                         inputs.forEach(i => i.disabled = false);
                     }
                 } else {
-                    checkboxes.forEach(cb => {
-                        const rowGroup = cb.closest('.mini-group');
-                        const numInput = rowGroup.querySelector('input[type="number"]');
-                        if(cb.checked) numInput.disabled = true;
-                        else { numInput.disabled = false; cb.disabled = false; }
-                    });
+                    btn.classList.add('locked');
+                    btn.innerHTML = document.getElementById('icon-lock').outerHTML;
+                    inputs.forEach(i => i.disabled = true);
                 }
-            } else {
-                btn.classList.add('locked');
-                btn.innerHTML = document.getElementById('icon-lock').outerHTML;
-                inputs.forEach(i => i.disabled = true);
             }
         }
 
@@ -773,17 +620,62 @@
             const container = document.getElementById('rekap-container');
             container.innerHTML = '';
             if (PAYMENT_MODE === 'single') {
-                const totals = {}; MONTHS.forEach(m => totals[m] = 0);
-                STATE.data.forEach(row => { MONTHS.forEach(m => { totals[m] += parseFloat(row[m]) || 0; }); });
-                MONTHS.forEach(m => {
-                    const val = totals[m];
-                    const div = document.createElement('div');
-                    div.className = 'rekap-item';
-                    div.innerHTML = `<div class="rekap-month" style="padding:1rem; border-bottom:1px solid #eee; font-weight:600;">${m}</div><div class="rekap-total" style="padding:1rem; text-align:right; font-weight:bold;">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val)}</div>`;
-                    container.appendChild(div);
+                const settings = getSettings();
+                const activeMonthLimit = settings.index; 
+
+                const table = document.createElement('table');
+                table.className = 'rekap-table';
+
+                // Header Tabel
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = `
+                    <th style="text-align:center; width: 15%;">No</th>
+                    <th style="text-align:left; width: 45%;">Bulan</th>
+                    <th style="text-align:right; width: 40%;">Total Pemasukan</th>
+                `;
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                let grandTotal = 0;
+
+                MONTHS.forEach((m, index) => {
+                    if (index >= activeMonthLimit) return;
+
+                    // Hitung total per bulan
+                    let monthTotal = 0;
+                    STATE.data.forEach(row => {
+                        monthTotal += parseFloat(row[m]) || 0;
+                    });
+                    grandTotal += monthTotal;
+
+                    const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(monthTotal);
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align:center;">${index + 1}</td>
+                        <td>${m}</td>
+                        <td>${fmtTotal}</td>
+                    `;
+                    tbody.appendChild(tr);
                 });
+
+                // Baris Total Akhir
+                const trGrand = document.createElement('tr');
+                trGrand.className = 'rekap-grand-total';
+                trGrand.innerHTML = `
+                    <td colspan="2" style="text-align:right; padding-right:20px;">Total Akhir</td>
+                    <td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(grandTotal)}</td>
+                `;
+                tbody.appendChild(trGrand);
+
+                table.appendChild(tbody);
+                container.appendChild(table);
                 return;
             }
+            
+            // MULTI MODE: TAMPILKAN ACCORDION
             const grandTotals = {}; MONTHS.forEach(m => grandTotals[m] = 0);
             const sheetTotals = {}; MULTI_SHEETS.forEach(s => { sheetTotals[s] = {}; MONTHS.forEach(m => sheetTotals[s][m] = 0); });
             STATE.data.forEach(row => {
@@ -838,18 +730,31 @@
 
         async function fetchRiwayat() {
             const container = document.getElementById('riwayat-container');
-            container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat...</p></div>';
+            container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat Data...</p></div>';
+
             try {
                 const url = new URL(APP_CONFIG.url);
+                url.searchParams.set('nocache', new Date().getTime());
+
                 if (!IS_PUBLIC_MODE) url.searchParams.append('token', APP_CONFIG.token); 
                 else url.searchParams.append('mode', 'public');
                 url.searchParams.append('sheet', 'Riwayat'); 
                 url.searchParams.append('action', 'get-data');
+                
                 const res = await fetch(url.toString());
                 const json = await res.json();
-                if (!json.success) { container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Error: ${json.message}</p></div>`; return; }
+                
+                if (!json.success) { 
+                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Error: ${json.message}</p></div>`; 
+                    return; 
+                }
+
                 const data = json.data;
-                if (data.length === 0) { container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; return; }
+                if (data.length === 0) { 
+                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; 
+                    return; 
+                }
+
                 const sheetName = APP_CONFIG.sheet;
                 const filteredData = data.filter(row => {
                     if (!row.Pesan) return false;
@@ -857,16 +762,22 @@
                     if (PAYMENT_MODE === 'multi') return MULTI_SHEETS.some(cat => row.Pesan.includes(cat));
                     else return row.Pesan.includes(sheetName);
                 }).reverse();
-                container.innerHTML = '';
-                filteredData.forEach(row => {
-                    let dateDisplay = row.Tanggal || row.Timestamp || "-";
-                    if (dateDisplay instanceof Date) dateDisplay = dateDisplay.toLocaleDateString('id-ID');
-                    const div = document.createElement('div');
-                    div.className = 'riwayat-item';
-                    div.innerHTML = `<div class="riwayat-date">${dateDisplay}</div><div class="riwayat-msg">${row.Pesan}</div>`;
-                    container.appendChild(div);
-                });
-            } catch (e) { container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Error: ${e.message}</p></div>`; }
+                
+                setTimeout(() => {
+                    container.innerHTML = '';
+                    
+                    filteredData.forEach(row => {
+                        let dateDisplay = row.Tanggal || row.Timestamp || "-";
+                        if (dateDisplay instanceof Date) dateDisplay = dateDisplay.toLocaleDateString('id-ID');
+                        const div = document.createElement('div');
+                        div.className = 'riwayat-item';
+                        div.innerHTML = `<div class="riwayat-date">${dateDisplay}</div><div class="riwayat-msg">${row.Pesan}</div>`;
+                        container.appendChild(div);
+                    });
+                }, 50);
+            } catch (e) { 
+                container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Error: ${e.message}</p></div>`; 
+            }
         }
 
         function switchTab(tabName, el) {
@@ -929,6 +840,10 @@
             if (sourceData.length > 0) {
                 if (PAYMENT_MODE === 'multi') {
                     sourceData.forEach(row => {
+                        // PERUBAHAN: Cek apakah kolom Nama ada
+                        const nama = row['Nama'];
+                        if (!nama || nama.trim() === "" || nama.toLowerCase() === '-') return;
+
                         MULTI_SHEETS.forEach(sheet => {
                             const r = row._rawData[sheet];
                             if (r) {
@@ -943,7 +858,13 @@
                     const headerKeys = STATE.headers;
                     const idxBayar = headerKeys.findIndex(h => h.toLowerCase().includes('sudah_bayar'));
                     const idxKurang = headerKeys.findIndex(h => h.toLowerCase().includes('kurang'));
+                    const idxNama = findIdx(['nama', 'pemilik', 'name']);
+
                     sourceData.forEach(row => {
+                        // PERUBAHAN: Cek apakah kolom Nama ada
+                        const nama = getVal(row, idxNama);
+                        if (!nama || nama.trim() === "" || nama.toLowerCase() === '-') return;
+
                         if (idxBayar !== -1) totalSudahBayar += parseFloat(row[headerKeys[idxBayar]]) || 0;
                         if (idxKurang !== -1) totalKurang += parseFloat(row[headerKeys[idxKurang]]) || 0;
                     });
@@ -1005,12 +926,11 @@
 
             if (PAYMENT_MODE === 'single') {
                 const globalPrice = settings.price; 
+                
                 STATE.headers.forEach((h, index) => {
-                    // SKIP LOGIC
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
                     
-                    // PROTECTED COLUMN LOGIC
                     if (PROTECTED_INDICES.includes(index)) {
                         const val = row[h] !== undefined ? row[h] : '';
                         const div = document.createElement('div');
@@ -1052,6 +972,15 @@
                     let lockClass = '';
                     if(isLocked) { iconHtml = document.getElementById('icon-lock').outerHTML; lockClass = 'locked'; }
 
+                    let absenHtml = '';
+                    if (ABSEN_MAP[month] !== undefined) {
+                        const absenIndex = ABSEN_MAP[month];
+                        const absenVal = row[STATE.headers[absenIndex]] || 0;
+                        if (absenVal && absenVal !== 0) {
+                            absenHtml = `<span class="absen-badge">${absenVal}x</span>`;
+                        }
+                    }
+
                     div.innerHTML = `
                         <div class="month-header">
                             <div class="title-group">
@@ -1062,14 +991,17 @@
                         </div>
                         <div class="month-controls">
                             <input type="checkbox" id="check-${month}" class="month-checkbox" onchange="toggleMonthMode('${month}', this)" ${isChecked ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-                            <input type="number" id="month-input-${month}" class="month-input" value="${monthVal}" oninput="handleManualInput('${month}', this)" ${isChecked || isLocked ? 'disabled' : ''}>
+                            <div class="input-wrapper">
+                                <input type="number" id="month-input-${month}" class="month-input" value="${monthVal}" oninput="handleManualInput('${month}', this)" ${isChecked || isLocked ? 'disabled' : ''}>
+                                ${absenHtml}
+                            </div>
                         </div>
                     `;
                     monthlyContainer.appendChild(div);
                 });
 
             } else {
-                // RENDER MULTI MODE
+                // RENDER MULTI MODE (UPDATED LAYOUT)
                 MONTHS.forEach((month, index) => {
                     if (index >= activeMonthLimit) return;
                     let monthTotal = 0;
@@ -1107,15 +1039,18 @@
                         const standardPrice = STATE.sheetPrices[sheet] || 0;
                         const isChecked = (val === standardPrice);
                         
+                        // --- UPDATED HTML STRUCTURE ---
                         const group = document.createElement('div');
-                        group.className = 'mini-group'; 
+                        group.className = 'multi-cat-box'; 
                         group.innerHTML = `
-                            <div class="input-group-wrapper">
+                            <div class="cat-header">
                                 <input type="checkbox" id="check-${month}-${sheet}" class="mini-checkbox" onchange="toggleMultiSheetMode('${month}', '${sheet}', this)" ${isChecked ? 'checked' : ''}>
-                                <label class="mini-label-row">${sheet}</label>
+                                <label class="cat-label">${sheet}</label>
                             </div>
-                            <input type="number" id="month-input-${month}-${sheet}" class="mini-input" value="${val}" 
+                            <div class="cat-input-box">
+                                <input type="number" id="month-input-${month}-${sheet}" class="multi-input-field" value="${val}" 
                                 oninput="handleMultiManualInput('${month}', '${sheet}', this)" ${isChecked ? 'disabled' : ''}>
+                            </div>
                         `;
                         inputsContainer.appendChild(group);
                     });
@@ -1242,7 +1177,7 @@
         }
 
         function toggleMultiSheetMode(month, sheetName, checkbox) {
-             const row = checkbox.closest('.month-row-multi');
+            const row = checkbox.closest('.month-row-multi');
             const lockBtn = row.querySelector('.btn-lock');
             if(lockBtn && lockBtn.classList.contains('locked')) return;
 
@@ -1289,7 +1224,8 @@
                 if (r.querySelector('.month-label').innerText === month) targetRow = r;
             });
             if(targetRow) {
-                const inputs = targetRow.querySelectorAll('.mini-input');
+                // Ambil semua input di dalam .month-multi-inputs
+                const inputs = targetRow.querySelectorAll('.multi-input-field');
                 let total = 0;
                 inputs.forEach(i => total += parseFloat(i.value) || 0);
                 const totalDiv = targetRow.querySelector('.month-header div:last-child');
