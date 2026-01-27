@@ -99,20 +99,42 @@
         .btn-lock.locked { color: #e74c3c; } 
         .btn-lock svg { width: 16px; height: 16px; fill: currentColor; }
 
-        /* Single Mode Controls */
+        /* Single Mode Controls (Jimpitan, Keamanan, Sosial) - UPDATE */
         .month-controls {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 15px; /* Jarak antara checkbox dan input */
             padding-left: 28px; 
         }
 
-        /* Multi Mode Grid Layout */
+        /* Month Input Style (Single Mode) - BESAR & FULL WIDTH */
+        .month-input {
+            flex: 1; /* Memenuhi sisa lebar 100% */
+            text-align: right;
+            padding: 12px; /* Padding lebih besar */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1.1rem; /* Font lebih besar */
+            font-weight: 500;
+            transition: border-color 0.2s;
+        }
+        .month-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .month-input:disabled {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        /* Multi Mode Grid Layout (Bendahara) - TIDAK TERPENGARUH */
         .month-row-multi { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
         
         .month-multi-inputs { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* 2 Kolom Sejajar */
+            grid-template-columns: 1fr 1fr; 
             gap: 8px; 
             padding-left: 28px; 
         }
@@ -136,16 +158,16 @@
         }
 
         .mini-checkbox, .month-checkbox {
-            width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0;
+            width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0;
         }
 
         .month-label { font-weight: 500; color: #333; font-size: 0.95rem; }
         .mini-label-row { font-size: 0.8rem; color: #444; flex-grow: 1; margin-left: 6px; margin-right: auto;}
         
-        .month-input { width: 110px; text-align: right; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; }
-        .mini-input { width: 70px; text-align: right; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.85rem; } 
+        /* Mini Input (Multi Mode) - Style Terpisah */
+        .mini-input { width: 70px; text-align: right; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.85rem; }
 
-        .month-input:disabled, .mini-input:disabled {
+        .mini-input:disabled {
             background-color: #f0f0f0;
             color: #999;
             cursor: not-allowed;
@@ -688,7 +710,6 @@
                 // Ambil Price dari Row 5 (Array Index 3) di kolom Bulan_Aktif (di bawah tulisan PerAbsen)
                 if (sourceData.length > 3) {
                     const priceRow = sourceData[3];
-                    // Prioritas kolom Bulan_Aktif, fallback PerAbsen
                     let priceVal = priceRow['Bulan_Aktif'];
                     if (!priceVal) priceVal = priceRow['PerAbsen'];
 
@@ -703,7 +724,7 @@
                 const val = row['Bulan_Aktif'];
                 if (val !== undefined && val !== '' && val !== null) {
                     const numVal = parseFloat(val);
-                    if (numVal >= 1 && numVal <= 12) index = numVal;
+                    if (numVal >=1 && numVal <= 12) index = numVal;
                     // Hapus logika update price di sini agar tidak bentrok dengan harga baris 5
                 }
             });
@@ -985,6 +1006,7 @@
             if (PAYMENT_MODE === 'single') {
                 const globalPrice = settings.price; 
                 STATE.headers.forEach((h, index) => {
+                    // SKIP LOGIC
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
                     
@@ -1064,7 +1086,6 @@
                     const isLocked = false; 
                     const div = document.createElement('div');
                     div.className = `month-row-multi`; 
-                    
                     let iconHtml = document.getElementById('icon-unlock').outerHTML;
 
                     div.innerHTML = `
