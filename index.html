@@ -1,610 +1,622 @@
 <!DOCTYPE html>
-    <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>LA6</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <style>
-            
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow: hidden; height: 100vh; }
-        
-        /* HILANGKAN SCROLLBAR (GLOBAL & DOWNLOAD) */
-        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; display: none; }
-        html { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .prose img { max-width: 100%; border-radius: 8px; }
-        .prose iframe { width: 100%; border-radius: 8px; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* LAYOUT FIX: Flexbox untuk mempertahankan Fixed Navbar & Mepet Bawah */
-        #app-container { 
-            width: 100%; 
-            height: 100%; 
-            max-width: 480px; 
-            margin: 0 auto; 
-            background-color: #f9fafb; 
-            position: relative; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden;
-        }
-        
-        #app-canvas { 
-            flex: 1; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
-            position: relative;
-            /* Padding bawah dihapus (0px) agar navbar mepet bawah full */
-            padding-bottom: 0px !important; 
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Navbar Container Fixed di Bawah */
-        #bottom-nav-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            width: 100%;
-        }
-
-        #sheet-content { min-height: 300px; }
-        
-        .editor-shortcut { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; color: #1d4ed8; font-size: 13px; font-weight: 500; margin: 4px; cursor: pointer; user-select: none; }
-        .editor-shortcut:hover { background-color: #dbeafe; }
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Iuran RT</title>
     
-        </style>
-    </head>
-    <body>
-        <div id="app-container">
-            <div id="app-canvas"></div>
-            <!-- Bottom Nav Container (Fixed) -->
-            <div id="bottom-nav-container"></div>
-        </div>
+    <!-- FAVICON (Ikon Web) -->
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/61934361?v=4">
 
-        <!-- MODALS -->
-        <div id="about-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm z-[200]">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col">
-                <div class="p-6"><h3 class="text-lg font-bold text-center mb-2" id="about-title">Tentang</h3><div id="about-content" class="text-sm text-gray-600 text-center leading-relaxed"></div></div>
-                <div class="p-4 border-t flex justify-center"><button onclick="document.getElementById('about-modal').classList.add('hidden')" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Tutup</button></div>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABEL CSS --- */
+        :root {
+            --primary: #4f46e5; --primary-dark: #4338ca; --secondary: #64748b;
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+            --danger: #ef4444; --danger-light: #fef2f2; --border: #e2e8f0;
+            --success: #22c55e; --success-light: #dcfce7;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --loader-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding-bottom: 80px;
+        }
+
+        /* HEADER */
+        header { 
+            background: linear-gradient(90deg, #115e59 0%, #000000 100%);
+            padding: 1rem 1.5rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+            position: sticky; 
+            top: 0; 
+            z-index: 20; 
+        }
+
+        .brand { 
+            font-weight: 600; 
+            font-size: 1.2rem; 
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .brand-logo { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.5); 
+            background-color: #ffffff; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* MAIN */
+        main { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 1.5rem; 
+            width: 100%; 
+        }
+
+        /* --- LOADING OVERLAY BARU --- */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--loader-bg); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-content {
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        /* Lingkaran Loading Atas */
+        .spinner-circle {
+            width: 60px; height: 60px;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+        
+        .spinner-circle svg {
+            width: 100%; height: 100%;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .spinner-circle circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 4;
+            stroke-dasharray: 150, 200;
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes dash {
+            0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+            50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+            100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+        }
+
+        /* Teks Status Utama */
+        .loading-status-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            min-height: 1.5em; /* Mencegah layout jump */
+        }
+
+        /* Container List Item */
+        .loading-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center; /* Center items */
+        }
+
+        /* Item Individual (Kapsul) */
+        .loading-item {
+            background: #fff;
+            color: var(--secondary);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            
+            /* Animasi Masuk */
+            opacity: 0;
+            transform: translateX(-30px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Status Aktif (Sedang diproses) */
+        .loading-item.active {
+            opacity: 1;
+            transform: translateX(0) scale(1.05);
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Status Selesai (Sudah lewat) */
+        .loading-item.done {
+            opacity: 0.6;
+            transform: translateX(0) scale(1);
+            color: var(--success);
+            background: var(--success-light);
+            border-color: var(--success);
+        }
+
+        /* Icon checkmark kecil */
+        .check-icon {
+            display: none;
+            width: 16px; height: 16px;
+        }
+        .loading-item.done .check-icon { display: block; }
+
+        /* SEARCH */
+        .search-container { margin-bottom: 1.5rem; }
+        .search-input { 
+            width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 50px; 
+            background: var(--bg-card); box-shadow: var(--shadow); font-size: 1rem; 
+            padding-left: 3.5rem; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E"); 
+            background-repeat: no-repeat; background-position: 1.2rem center; background-size: 1.2rem; 
+        }
+
+        /* CARD GRID */
+        .card-grid { display: flex; flex-direction: column; gap: 0.8rem; padding-bottom: 2rem; }
+        
+        .warga-card { 
+            background: var(--bg-card); 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+            border: 1px solid transparent; 
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden; 
+        }
+
+        .warga-card.active {
+            border-color: var(--primary);
+            transform: scale(1.01);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            padding: 1rem; 
+            padding-right: 1.5rem;
+            display: flex; 
+            align-items: center; 
+            gap: 1rem;
+        }
+
+        .avatar { 
+            width: 50px; height: 50px; border-radius: 12px; object-fit: cover; 
+            flex-shrink: 0; background-color: #e2e8f0; 
+        }
+        .info { flex: 1; min-width: 0; }
+        .info-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .info-blok { font-size: 0.8rem; color: var(--secondary); font-weight: 500; }
+
+        /* BADGES */
+        .badge { padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+        .badge-green { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-red { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* Detail Section */
+        .details-section {
+            max-height: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            border-top: 1px solid transparent;
+        }
+
+        .warga-card.active .details-section {
+            max-height: 500px; 
+            border-top-color: #e2e8f0;
+            padding: 1rem 1rem 1.5rem 1rem;
+        }
+
+        .detail-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .detail-label { color: var(--secondary); }
+        .detail-value { font-weight: 600; color: var(--text-main); }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+
+        .hidden { display: none !important; }
+        #empty-state { text-align: center; margin-top: 3rem; color: var(--secondary); }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOADING OVERLAY (Didesain ulang) -->
+    <div id="loading-overlay">
+        <div class="loader-content">
+            <div class="spinner-circle">
+                <svg viewBox="25 25 50 50">
+                    <circle cx="50" cy="50" r="20"></circle>
+                </svg>
             </div>
+            <div class="loading-status-text" id="loading-text">Menginisialisasi...</div>
+            <ul class="loading-list" id="loading-list">
+                <!-- Item akan di-generate via JS -->
+            </ul>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand">
+            <img 
+                src="https://avatars.githubusercontent.com/u/61934361?v=4" 
+                class="brand-logo" 
+                alt="Logo RT"
+            >
+            <span id="header-title">Total Iuran RT</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <input type="text" id="search-box" class="search-input" placeholder="Cari Nama atau Blok..." onkeyup="filterCards()">
         </div>
 
-        <div id="sheet-detail-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 flex flex-col max-h-[85vh]">
-                <div class="p-4 border-b bg-blue-50 rounded-t-xl flex justify-between items-center">
-                    <div><h3 class="font-bold text-blue-900">Detail Data</h3></div>
-                    <button onclick="window.closeSheetDetail()" class="text-blue-900/50 hover:text-blue-900 p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-                <div id="sheet-detail-content" class="p-4 overflow-y-auto"></div>
-            </div>
+        <div id="card-container" class="card-grid">
+            <!-- Data akan dimuat di sini -->
         </div>
+        <div id="empty-state" class="hidden"><p>Data tidak ditemukan.</p></div>
+    </main>
 
-        <script>
-            // FORMAT RUPIAH HELPER
-            function formatRupiah(amount) {
-                if (!amount) return 'Rp 0';
-                let numberString = String(amount).replace(/[^0-9]/g, '');
-                if (numberString === '') return 'Rp 0';
-                return 'Rp ' + parseInt(numberString).toLocaleString('en-US');
-            }
-
-            const appData = {"components":[{"id":"1768772944321536","type":"header","data":{"title":"LA6 & Kavling","subtitle":"RT 09","showAvatar":true,"avatarType":"custom","customAvatarUrl":"https://avatars.githubusercontent.com/u/61934361?v=4","colorEnd":"black","gradientEnabled":true,"gradientStart":"black","gradientEnd":"teal-800","aboutContent":"Aplikasi khusus untuk warga RT 09 RW 23 Jaten, Karanganyar. Aplikasi di rancang sangat sederhana agar mudah digunakan oleh warga."}},{"id":"176877294432428","type":"hero","data":{"label":"Saldo RT 09","amount":"Rp 54,500,000","colorFrom":"blue-600","colorTo":"blue-800","sheetLink":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetName":"Saldo","sheetRowIndex":8,"sheetColIndex":"1","dataSource":"sheet"}},{"id":"1768772944326634","type":"grid-menu","data":{"cols":"grid-cols-4","items":[{"label":"Bendahara","icon":"wallet","color":"bg-purple-500","action":"sheet","content":"<h3>Informasi RT</h3><p>Selamat datang di aplikasi warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Kas","sheetName":"Kas","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Sampah","sheetName":"Sampah","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Konsumsi","sheetName":"Konsumsi","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true},{"label":"Arisan","sheetName":"Arisan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Jimpitan","icon":"banknote","color":"bg-orange-500","action":"sheet","content":"<h3>Profil Pengurus</h3><p>Data struktur RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Jimpitan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Sosial","icon":"heart","color":"bg-green-500","action":"sheet","content":"<h3>Laporan Keuangan</h3><p>Rincian kas RT.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Sosial","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Keamanan","icon":"lock","color":"bg-red-500","action":"sheet","content":"<h3>Bantuan Sosial</h3><p>Info bantuan warga.</p>","link":"https://docs.google.com/spreadsheets/d/1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0/edit?gid=0#gid=0","sheetConfig":{"tabs":[{"label":"Data Utama","sheetName":"Keamanan","layout":"list","hiddenColumns":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,19],"columnOrder":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],"enableSearch":true}]}},{"label":"Data Warga","icon":"users","color":"bg-green-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Ronda","icon":"clock","color":"bg-red-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Jadwal Arisan","icon":"calendar","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Pengurus RT","icon":"user","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"PKK","icon":"heart","color":"bg-blue-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Dawis","icon":"sun","color":"bg-purple-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Kerja Bakti","icon":"coffee","color":"bg-orange-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""},{"label":"Lainya..","icon":"list","color":"bg-gray-500","action":"content","submenu":[],"link":"","sheetConfig":null,"content":""}]}},{"id":"1769199066426500","type":"promo","data":{"title":"Jangan Lupa Datang!","subtitle":"Rapat/Arisan RT Tanggal 25 Januari 2026","badge":"Info Arisa RT","ctaText":"Konfirmasi Kehadiran","gradientFrom":"purple-600","gradientTo":"pink-600","imageUrl":"https://la6.my.id/file/a7.jpg"}},{"id":"1768967821241747","type":"org-structure","data":{"title":"Struktur Organisasi","members":[{"name":"Bayu Adi Nugroho","role":"Ketua RT","photo":"https://la6.my.id/file/a11.jpg","content":""},{"name":"Ariyanto","role":"Penasehat RT","photo":"https://la6.my.id/file/a9.jpg","content":""},{"name":"Arif Fajar Santoso","role":"Sekretaris","photo":"https://la6.my.id/file/a7.jpg","content":""},{"name":"Budi Setiawan","role":"Bendahara","photo":"https://la6.my.id/file/c7.jpg","content":""},{"name":"M. Dicky","role":"Seksi Jimpitan","photo":"https://la6.my.id/file/b7.jpg","content":""},{"name":"Thomas Hendra","role":"Seksi Sosial","photo":"https://la6.my.id/file/b9.jpg","content":""},{"name":"Wahyudi","role":"Seksi Keamanan","photo":"https://la6.my.id/file/ra1.jpg","content":""},{"name":"Hari Susanto","role":"Seksi Keamanan 2","photo":"https://la6.my.id/file/a12.jpg","content":""},{"name":"Eko Santoso","role":"Seksi Kebersihan","photo":"https://la6.my.id/file/a4b.jpg","content":""},{"name":"Heru","role":"Seksi Kebersihan 2","photo":"https://la6.my.id/file/kavc9.jpg","content":""}]}},{"id":"1768772944331","type":"navbar","data":{"items":[{"label":"Beranda","icon":"home","active":true,"linkType":"home"},{"label":"Laporan","icon":"file-text","active":false,"linkType":"grid","linkTarget":{"compId":"1768772944326634","itemIndex":2}},{"label":"Akun","icon":"user","active":false,"linkType":"home"}],"bgType":"gradient","gradientStart":"black","gradientEnd":"teal-800"}},{"id":"1769225696037865","type":"video-collection","data":{"title":"Video Kerja Bakti Warga","items":[{"url":"https://youtube.com/watch?v=d64y_Edop48"},{"url":"https://youtube.com/watch?v=Ap0luXkr_ao"},{"url":"https://youtube.com/watch?v=t49RKnq8yiA"},{"url":"https://youtube.com/watch?v=0BzygDo7e5U"}]}},{"id":"1769199111121612","type":"price-list","data":{"title":"Iuran Warga","mode":"grid","items":[{"name":"Kas","desc":"Perbulan","price":"Rp 2.000","color":"bg-gray-100 text-gray-800"},{"name":"Konsumsi","desc":"Perbulan","price":"Rp 5000","color":"bg-blue-600 text-white"},{"name":"Sampah","desc":"Perbulan","price":"Rp 18.000","color":"bg-gray-100 text-gray-800"},{"name":"Arisan","desc":"Perbulan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"},{"name":"Jimpitan","desc":"Perhari","price":"Rp 1000","color":"bg-gray-100 text-gray-800"},{"name":"Sosial","desc":"Perbulan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"},{"name":"Denda Ronda","desc":"Rp 25.000 untuk Bulanan","price":"Rp 5000","color":"bg-gray-100 text-gray-800"}]}}]};
-            let isEditMode = false; 
-            let previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null };
-            window.previewSheetRows = []; window.previewSheetHeaders = []; window.userProfileFallback = 'https://via.placeholder.com/40';
-
-            window.cleanSheetData = function cleanSheetData(json) {
-            let headersSource = []; let dataRows = json.table.rows;
-            const colsHaveLabels = json.table.cols.some(c => c.label && c.label.trim() !== '');
-            if (colsHaveLabels) { headersSource = json.table.cols; } else { if (json.table.rows.length > 0) { headersSource = json.table.rows[0].c || []; dataRows = json.table.rows.slice(1); } }
-            return { headers: headersSource, data: dataRows };
+    <script>
+        // --- KONFIGURASI SPREADSHEET ---
+        const SHEET_ID = '1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0';
+        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan'];
+        
+        const TARGET_COLS = {
+            nama: 'Nama',
+            blok: 'Blok',
+            foto: 'Foto',
+            kurang: 'Kurang'
         };
-            window.generateComponentHTML = function generateComponentHTML(comp, isEdit) {
-            if (comp.type === 'header') {
-                let avatarSrc = `https://api.dicebear.com/7.x/avataaars/svg?seed=${comp.id}`;
-                if(comp.data.avatarType === 'custom' && comp.data.customAvatarUrl) avatarSrc = comp.data.customAvatarUrl;
-                let containerClass = "px-6 py-4 flex justify-between items-center shadow-sm";
-                let textClass = "text-gray-800"; let subtitleClass = "text-xs text-gray-500"; let iconColorClass = "text-gray-600";
-                
-                if (comp.data.gradientEnabled) { containerClass += ` bg-gradient-to-l from-${comp.data.gradientStart} to-${comp.data.gradientEnd}`; textClass = "text-white"; subtitleClass = "text-xs text-white/80"; iconColorClass = "text-white"; }
-                const aboutClickAttr = !isEdit ? `onclick="openAboutModal('${comp.id}')"` : '';
-                return `<div class="${containerClass}"><div class="flex items-center gap-3">${comp.data.showAvatar?`<div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-white/20"><img src="${avatarSrc}" class="w-full h-full object-cover"></div>`:''}<div><p class="${subtitleClass}">${comp.data.subtitle}</p><h1 class="text-lg font-bold ${textClass}">${comp.data.title}</h1></div></div><i data-lucide="info" class="w-5 h-5 ${iconColorClass} cursor-pointer" ${aboutClickAttr}></i></div>`;
-            }
-            if (comp.type === 'grid-menu') {
-                const items = comp.data.items.map((i, idx) => {
-                    let clickAttr = '';
-                    if (!isEdit) { 
-                        if (i.action === 'sheet' && i.link) clickAttr = `onclick='openPreviewSheet("${encodeURIComponent(i.link)}", "${i.label.replace(/'/g, "\\'")}", ${JSON.stringify(i.sheetConfig || null).replace(/"/g, '&quot;')})'`; 
-                        else if (i.action === 'content') clickAttr = `onclick='previewState={view:"content", title:"${i.label.replace(/'/g, "\\'")}", data:\`${i.content||""}\`}; renderCanvas();'`; 
-                        else if (i.action === 'submenu' && i.submenu?.length > 0) clickAttr = `onclick="openPreviewSubmenu(${idx}, '${comp.id}', '${i.label.replace(/'/g, "\\'")}')"`;
-                    }
-                    return `<div ${clickAttr} class="flex flex-col items-center gap-2 group cursor-pointer active:scale-95 transition-transform relative">${isEdit && ((i.submenu?.length > 0) || i.link || i.content) ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white"></div>' : ''}<div class="${i.color} w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200"><i data-lucide="${i.icon}" class="w-6 h-6 text-white"></i></div><span class="text-[11px] font-medium text-gray-600 text-center leading-tight">${i.label}</span></div>`;
-                }).join(''); 
-                return `<div class="px-6 py-6"><div class="grid ${comp.data.cols} gap-4">${items}</div></div>`;
-            }
-            // UPDATED ORG STRUCTURE HTML
-            if (comp.type === 'org-structure') {
-                if (isEdit) {
-                    const members = comp.data.members.map((m, idx) => {
-                        return `<div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 group">
-                            <img src="${m.photo || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-gray-100">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-800 text-sm">${m.name}</h4>
-                                <p class="text-xs text-blue-600 font-medium">${m.role}</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="openOrgMemberEditor('${comp.id}', ${idx})" class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                                <button onclick="removeOrgMember('${comp.id}', ${idx})" class="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>`;
-                    }).join('');
-                    return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="space-y-3">${members}</div></div>`;
-                } else {
-                    const limitedMembers = comp.data.members.slice(0, 3);
-                    const members = limitedMembers.map((m, idx) => {
-                         return `<div class="flex items-center gap-4 bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-3 last:mb-0 cursor-pointer active:scale-95 transition" onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')">
-                            <img src="${m.photo || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-gray-100">
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-800 text-sm">${m.name}</h4>
-                                <p class="text-xs text-blue-600 font-medium">${m.role}</p>
-                            </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
-                        </div>`;
-                    }).join('');
-                    
-                    let btnHtml = '';
-                    if (comp.data.members.length > 3) {
-                        btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">Lihat Semua (${comp.data.members.length})</button>`;
-                    } else if (comp.data.members.length > 0) {
-                         btnHtml = `<button onclick="openOrgList('${comp.id}', '${comp.data.title.replace(/'/g, "\\'")}')" class="w-full py-2 mt-2 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Lihat Detail Struktur</button>`;
-                    }
 
-                    return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm flex justify-between items-center">${comp.data.title} <span class="text-[10px] font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${comp.data.members.length} Anggota</span></h3><div class="space-y-3">${members}</div>${btnHtml}</div>`;
-                }
-            }
-            // END UPDATED ORG STRUCTURE
+        const DEFAULT_IMG = 'https://avatars.githubusercontent.com/u/61934361?v=4';
+        let allData = [];
+        let loadingAnimationInterval = null;
 
-            if (comp.type === 'photo-album') {
-                const photos = comp.data.items.map((p, idx) => `<div class="relative group cursor-pointer"><img src="${p.url}" class="w-full aspect-square object-cover rounded-lg shadow-sm"><div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white rounded-lg"><i data-lucide="zoom-in" class="w-6 h-6"></i></div></div>`).join('');
-                return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="grid grid-cols-2 gap-3">${photos}</div></div>`;
-            }
-            if (comp.type === 'video-collection') {
-                const videos = comp.data.items.map((v, idx) => {
-                    let thumb = v.url.includes('youtu.be') ? `https://img.youtube.com/vi/${v.url.split('/').pop()}/mqdefault.jpg` : (v.url.includes('youtube.com') ? `https://img.youtube.com/vi/${v.url.split('v=')[1].split('&')[0]}/mqdefault.jpg` : 'https://via.placeholder.com/320x180');
-                    return `<div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-sm"><img src="${thumb}" class="w-full aspect-video object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center"><div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1"><i data-lucide="play" class="w-4 h-4 text-gray-800 fill-current"></i></div></div></div>`;
-                }).join('');
-                return `<div class="px-6 py-6"><h3 class="font-bold text-gray-800 mb-4 text-sm">${comp.data.title}</h3><div class="grid grid-cols-2 gap-3">${videos}</div></div>`;
-            }
-            // END NEW COMPONENTS
-
-            if (comp.type === 'image-banner') return `<div class="px-6 py-4"><div class="w-full ${comp.data.height} ${comp.data.rounded} overflow-hidden shadow-sm relative bg-gray-200"><img src="${comp.data.url}" class="w-full h-full object-cover"></div></div>`;
-            if (comp.type === 'hero') {
-                const displayAmount = formatRupiah(comp.data.amount);
-                return `<div class="px-6 pt-4" id="hero-container-${comp.id}">
-                    <div class="bg-gradient-to-r from-${comp.data.colorFrom} to-${comp.data.colorTo} rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-                        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-                        <div>
-                            <p class="text-white/80 text-sm mb-1 font-medium">${comp.data.label}</p>
-                            <h2 class="text-3xl font-bold tracking-tight hero-balance-amount" data-src="${comp.data.dataSource}">${displayAmount}</h2>
-                        </div>
-                    </div>
-                </div>`;
-            }
-            if (comp.type === 'list-transaksi') { 
-                const items = comp.data.items.map(i => {
-                    let formattedRight = i.right;
-                    if (typeof i.right === 'string' && (i.right.includes('Rp') || !isNaN(i.right.replace(/[^0-9]/g, '')))) {
-                        formattedRight = formatRupiah(i.right);
-                    }
-                    return `<div class="p-3 flex justify-between border-b border-gray-50 items-center hover:bg-gray-50 transition"><div class="flex gap-3 items-center"><div class="w-9 h-9 rounded-full ${i.colorIcon} flex items-center justify-center"><i data-lucide="${i.icon}" class="w-4 h-4"></i></div><div><h4 class="font-semibold text-sm text-gray-800">${i.title}</h4><p class="text-[10px] text-gray-400">${i.sub}</p></div></div><span class="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-md">${formattedRight}</span></div>`;
-                }).join('');
-                return `<div class="px-6 mb-4"><div class="flex justify-between items-center mb-2"><h3 class="text-sm font-bold text-gray-800">${comp.data.title}</h3></div><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-1 overflow-hidden">${items}</div></div>`; 
-            }
-            if (comp.type === 'info-card') { let c = comp.data.type === 'alert' ? 'red' : comp.data.type === 'health' ? 'green' : 'blue'; return `<div class="px-6 mb-4"><div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-${c}-500"><div class="flex justify-between mb-1"><span class="bg-${c}-50 text-${c}-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${comp.data.type}</span><span class="text-xs text-gray-400">${comp.data.date}</span></div><h3 class="font-bold text-gray-800 text-sm">${comp.data.title}</h3><p class="text-xs text-gray-500 mt-1">${comp.data.text}</p></div></div>`; }
+        // --- FUNGSI ANIMASI LOADING BARU ---
+        function startLoadingAnimation() {
+            const listContainer = document.getElementById('loading-list');
+            const statusText = document.getElementById('loading-text');
             
-            // --- NEW COMPONENT HTML GENERATION ---
-            if (comp.type === 'promo') {
-                return `<div class="px-6 py-4">
-                    <div class="relative rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-${comp.data.gradientFrom} to-${comp.data.gradientTo} text-white p-5 flex flex-col justify-center min-h-[160px]">
-                        <img src="${comp.data.imageUrl}" class="absolute right-[-20px] top-[-20px] w-40 h-40 object-cover opacity-30 rounded-full mix-blend-overlay">
-                        <div class="relative z-10">
-                            <div class="inline-block bg-yellow-400 text-black text-[10px] font-black px-2 py-1 rounded mb-2 transform -rotate-2 shadow-sm">${comp.data.badge}</div>
-                            <h2 class="text-2xl font-black mb-1 leading-tight">${comp.data.title}</h2>
-                            <p class="text-white/90 text-xs mb-3">${comp.data.subtitle}</p>
-                            <button class="bg-white text-${comp.data.gradientFrom.split('-')[0]}-600 text-xs font-bold py-2 px-4 rounded-full shadow-sm hover:bg-gray-50 transition-colors">${comp.data.ctaText}</button>
-                        </div>
-                    </div>
-                </div>`;
-            }
-            if (comp.type === 'price-list') {
-                const isGrid = comp.data.mode === 'grid';
-                const items = comp.data.items.map((item, idx) => {
-                    const cardClass = isGrid ? 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col text-center' : 'bg-white p-4 mb-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between';
-                    const nameClass = isGrid ? 'font-bold text-gray-800 text-sm mb-1' : 'font-bold text-gray-800 text-sm';
-                    const priceClass = isGrid ? `text-lg font-black ${item.color} my-2` : `text-lg font-black ${item.color}`;
-                    
-                    return `<div class="${cardClass} group">
-                        <div class="${nameClass}">${item.name}</div>
-                        ${!isGrid ? `<p class="text-[10px] text-gray-500 max-w-[150px]">${item.desc}</p>` : ''}
-                        <div class="${priceClass}">${item.price}</div>
-                        ${isGrid ? `<p class="text-[10px] text-gray-500 mb-3">${item.desc}</p>` : ''}
-                        <button class="${isGrid ? 'mt-auto w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-lg' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg'}">Pilih</button>
-                    </div>`;
-                }).join('');
-                
-                const container = isGrid ? `<div class="grid grid-cols-2 gap-3">${items}</div>` : `<div>${items}</div>`;
-                return `<div class="px-6 py-4"><h3 class="text-sm font-bold text-gray-800 mb-3">${comp.data.title}</h3>${container}</div>`;
-            }
-            if (comp.type === 'payment-history') {
-                const items = comp.data.items.map((item) => {
-                    let statusBadge = '';
-                    if(item.status === 'success') statusBadge = `<span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-full">Sukses</span>`;
-                    else if(item.status === 'pending') statusBadge = `<span class="bg-yellow-100 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded-full">Pending</span>`;
-                    else statusBadge = `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 rounded-full">Gagal</span>`;
-                    
-                    return `<div class="flex items-center gap-3 mb-3 pb-3 border-b border-gray-50 last:border-0">
-                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
-                            <i data-lucide="file-text" class="w-4 h-4"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-sm text-gray-800 truncate">${item.name}</h4>
-                            <p class="text-[10px] text-gray-400">${item.date}</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-bold text-gray-800">${item.amount}</div>
-                            <div class="mt-1">${statusBadge}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-                return `<div class="px-6 py-4"><h3 class="text-sm font-bold text-gray-800 mb-3">${comp.data.title}</h3><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">${items}</div></div>`;
-            }
-            // --- END NEW COMPONENT HTML ---
-
-            // --- CLEAN & PROFESSIONAL NAVBAR LOGIC (UPDATED) ---
-            if (comp.type === 'navbar') {
-                let containerClass = `w-full h-[70px] flex justify-around items-center px-2 backdrop-blur-sm border-t transition-colors duration-300 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]`;
-                if (comp.data.bgType === 'gradient') {
-                    containerClass += ` bg-gradient-to-r from-${comp.data.gradientStart} to-${comp.data.gradientEnd} border-t-0`;
-                } else {
-                    containerClass += ` bg-${comp.data.bgColor} border-t border-gray-200`;
-                }
-                const items = comp.data.items.map((i, idx) => {
-                    let clickAttr = '';
-                    if (!isEdit) clickAttr = `onclick="handleNavbarClick('${comp.id}', ${idx})"`;
-                    const isGradient = comp.data.bgType === 'gradient';
-                    const activeClass = isGradient ? 'text-white' : 'text-blue-600';
-                    const inactiveClass = isGradient ? 'text-white/60' : 'text-gray-400';
-                    return `<div ${clickAttr} class="flex-1 flex flex-col items-center justify-center gap-1 h-full cursor-pointer group select-none">
-                                <i data-lucide="${i.icon}" class="w-6 h-6 transition-transform group-active:scale-90 ${i.active ? activeClass : inactiveClass}"></i>
-                                <span class="text-[10px] font-medium tracking-wide ${i.active ? activeClass : inactiveClass}">${i.label}</span>
-                            </div>`;
-                }).join('');
-                return `<div class="${containerClass}">${items}</div>`;
-            }
-            // END NAVBAR LOGIC
-
-            // FIXED: SEARCH BAR INPUT
-            if (comp.type === 'search-bar') return `<div class="px-6 py-2"><div class="relative"><i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i><input type="text" placeholder="${comp.data.placeholder}" class="w-full pl-10 pr-4 py-2 ${comp.data.bg} border border-gray-200 rounded-xl text-sm text-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div></div>`;
+            // Bersihkan list
+            listContainer.innerHTML = '';
             
-            if (comp.type === 'button') return `<div class="px-6 py-2 flex ${comp.data.width === 'w-auto' ? 'justify-start' : 'justify-center'}"><button class="${comp.data.color} ${comp.data.width} text-white py-3 px-6 rounded-xl font-semibold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">${comp.data.label} ${comp.data.icon ? `<i data-lucide="${comp.data.icon}" class="w-4 h-4"></i>` : ''}</button></div>`;
-            if (comp.type === 'text-block') return `<div class="px-6 py-2 ${comp.data.align}"><p class="${comp.data.size} ${comp.data.weight} ${comp.data.color}">${comp.data.text}</p></div>`;
-            return '';
-        };
-            window.renderCanvas = function renderCanvas() { if (isEditMode) renderEditMode(); else renderPreviewMode(); lucide.createIcons(); };
-            window.renderPreviewMode = function renderPreviewMode() {
-            const canvas = document.getElementById('app-canvas'); const navContainer = document.getElementById('bottom-nav-container');
-            
-            // Logic khusus untuk Struktur Organisasi View Modes
-            if (previewState.view === 'org-list' || previewState.view === 'org-member') {
-                navContainer.innerHTML = ''; 
-                let contentHTML = '';
-                
-                if (previewState.view === 'org-list') {
-                    // Full Grid View
-                    const comp = appData.components.find(c => c.id === previewState.orgSourceId);
-                    if(!comp) return previewHome(); // Safety fallback
+            // Generate HTML Item untuk setiap sheet
+            SHEET_NAMES.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.className = 'loading-item';
+                li.id = `load-item-${index}`;
+                li.innerHTML = `
+                    <span>${name}</span>
+                    <svg class="check-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                `;
+                listContainer.appendChild(li);
+            });
 
-                    contentHTML = `<div class="p-4 min-h-screen bg-gray-50"><h2 class="text-lg font-bold text-gray-800 mb-4">${comp.data.title}</h2>`;
-                    contentHTML += `<div class="grid grid-cols-2 gap-3">`;
-                    
-                    comp.data.members.forEach((m, idx) => {
-                         contentHTML += `
-                            <div onclick="openOrgMemberDetail('${comp.id}', ${idx})" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer active:scale-95 transition">
-                                <img src="${m.photo || 'https://via.placeholder.com/100'}" class="w-16 h-16 rounded-full object-cover mb-2 bg-gray-100">
-                                <h4 class="font-bold text-gray-800 text-sm line-clamp-1">${m.name}</h4>
-                                <p class="text-[10px] text-blue-600 font-medium">${m.role}</p>
-                            </div>`;
-                    });
-                    contentHTML += `</div></div>`;
-                } 
-                else if (previewState.view === 'org-member') {
-                    // Single Member Detail View
-                    const member = previewState.data; 
-                    contentHTML = `<div class="p-6 bg-white min-h-screen">
-                        <div class="flex flex-col items-center mb-6">
-                            <img src="${member.photo}" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg mb-4 bg-gray-100">
-                            <h2 class="text-xl font-bold text-gray-800">${member.name}</h2>
-                            <p class="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full mt-1">${member.role}</p>
-                        </div>
-                        <div class="prose prose-sm max-w-none">
-                            ${member.content || '<p class="text-center text-gray-400">Tidak ada detail informasi.</p>'}
-                        </div>
-                    </div>`; 
+            // Jalankan urutan animasi
+            let currentIndex = 0;
+            
+            function processNext() {
+                if (currentIndex >= SHEET_NAMES.length) {
+                    // Semua selesai
+                    statusText.textContent = "Menyatukan data...";
+                    return;
                 }
 
-                canvas.innerHTML = `<div class="min-h-full bg-gray-50 animate-fade-in">
-                    <header class="px-6 py-4 bg-white shadow-sm flex items-center gap-3 sticky top-0 z-40">
-                        <button onclick="handleOrgBack()" class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"><i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i></button>
-                        <h2 class="text-lg font-bold text-gray-800">${previewState.title}</h2>
-                    </header>
-                    ${contentHTML}
-                </div>`;
-                return; // Skip normal rendering
+                // Tampilkan item saat ini
+                const currentItem = document.getElementById(`load-item-${currentIndex}`);
+                const sheetName = SHEET_NAMES[currentIndex];
+                
+                // Update Teks
+                statusText.textContent = `Memproses ${sheetName}...`;
+                
+                // Efek Visual
+                if(currentIndex > 0) {
+                    const prevItem = document.getElementById(`load-item-${currentIndex - 1}`);
+                    prevItem.classList.remove('active');
+                    prevItem.classList.add('done');
+                }
+                
+                currentItem.classList.add('active');
+
+                currentIndex++;
+                
+                // Ke item berikutnya dalam 600ms
+                loadingAnimationInterval = setTimeout(processNext, 600);
             }
 
-            // Normal View Mode (Home, Sheet, Content, Submenu)
-            if (previewState.view === 'home') {
-                canvas.innerHTML = ''; navContainer.innerHTML = ''; navContainer.style.pointerEvents = 'auto';
-                appData.components.forEach(comp => {
-                    const el = document.createElement('div');
-                    if (comp.type === 'navbar') { el.className = `w-full h-[70px]`; el.innerHTML = generateComponentHTML(comp, false); navContainer.appendChild(el); } 
-                    else { if(comp.type === 'header') el.className = 'sticky top-0 z-30 border-b border-gray-50'; el.innerHTML = generateComponentHTML(comp, false); canvas.appendChild(el); }
-                });
-                
-                // Trigger Hero Updates in Preview
-                appData.components.filter(c => c.type === 'hero').forEach(comp => {
-                    if(comp.data.dataSource === 'sheet') updateHeroPreview(comp.id, comp.data);
-                });
+            // Mulai setelah jeda singkat
+            setTimeout(processNext, 400);
+        }
+
+        // --- FUNGSI HENTIKAN LOADING ---
+        function stopLoadingAnimation() {
+            clearTimeout(loadingAnimationInterval);
+            
+            // Pastikan semua item terlihat 'selesai'
+            const items = document.querySelectorAll('.loading-item');
+            items.forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('done');
+            });
+            
+            document.getElementById('loading-text').textContent = "Selesai!";
+            
+            // Fade out overlay
+            setTimeout(() => {
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                }, 500);
+            }, 500);
+        }
+
+        // --- SET BULAN SAAT INI ---
+        function setHeaderDate() {
+            const date = new Date();
+            const options = { month: 'long' };
+            const monthName = date.toLocaleDateString('id-ID', options);
+            document.getElementById('header-title').textContent = `Total Iuran RT ${monthName}`;
+        }
+
+        // --- FUNGSI FORMAT NILAI ---
+        function formatValue(value) {
+            const formatter = new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR', 
+                maximumFractionDigits: 0 
+            });
+
+            if (value < 0) {
+                const absVal = Math.abs(value);
+                return {
+                    text: `Saldo : ${formatter.format(absVal)}`,
+                    className: 'text-green',
+                    badgeClass: 'badge-green'
+                };
+            } else if (value === 0) {
+                return {
+                    text: '✔️ Lunas',
+                    className: 'text-green',
+                    badgeClass: 'badge-green'
+                };
             } else {
-                navContainer.innerHTML = ''; let contentHTML = '';
-                if (previewState.view === 'sheet') {
-                    const tabs = previewState.config && previewState.config.tabs ? previewState.config.tabs : [{ label: 'Data', layout: 'list', hiddenColumns: [], columnOrder: [], enableSearch: false }];
-                    let searchHTML = '';
-                    if (tabs[previewState.activeTabIdx || 0].enableSearch) {
-                        searchHTML = `<div class="p-4 bg-white border-b sticky top-0 z-20"><div class="relative"><i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-gray-400"></i><input type="text" oninput="handlePreviewSearch(this.value)" placeholder="Cari data..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></div></div>`;
-                    }
-                    let bottomTabBar = '';
-                    if(tabs.length > 1) {
-                        bottomTabBar = `<div class="sticky pb-4 bottom-0 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 pt-2"><div class="flex justify-around items-center px-2">${tabs.map((t, idx) => `<button onclick="switchPreviewTab(${idx})" class="flex flex-col items-center justify-center gap-1 w-full active:scale-95 transition-transform group"><div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors ${idx === previewState.activeTabIdx ? 'bg-blue-100 text-blue-600' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'}"><span class="text-sm font-bold">${t.label.charAt(0)}</span></div><span class="text-[10px] font-medium ${idx === previewState.activeTabIdx ? 'text-blue-600' : 'text-gray-500'}">${t.label}</span></button>`).join('')}</div></div>`;
-                    }
-                    contentHTML = `${searchHTML}<div id="sheet-content" class="p-4 min-h-[300px] pb-24"><div class="text-center py-10"><div class="loader mx-auto mb-2"></div><p class="text-xs text-gray-500">Memuat Data...</p></div></div>${bottomTabBar}`;
-                    setTimeout(() => loadSheetPreview(previewState.data, tabs[previewState.activeTabIdx || 0]), 100); 
-                    window.currentPreviewTabs = tabs; window.currentPreviewUrl = previewState.data;
-                } else if (previewState.view === 'content') { contentHTML = `<div class="p-6 prose prose-sm max-w-none bg-white min-h-screen">${previewState.data || '<p>Belum ada konten.</p>'}</div>`; } 
-                else if (previewState.view === 'submenu') { contentHTML = `<div class="p-6 space-y-3">` + previewState.data.map(sub => `<div onclick="handleSubClick('${sub.action}', '${sub.link}', '${sub.content ? sub.content.replace(/'/g, "\\'") : ''}', '${sub.label}')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer active:scale-95"><div class="${sub.color||'bg-blue-500'} w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white"><i data-lucide="${sub.icon}"></i></div><span class="font-medium text-gray-700">${sub.label}</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 ml-auto"></i></div>`).join('') + `</div>`; }
-                
-                canvas.innerHTML = `<div class="min-h-full bg-gray-50 animate-fade-in"><header class="px-6 py-4 bg-white shadow-sm flex items-center gap-3 sticky top-0 z-40"><button onclick="previewHome()" class="p-2 -ml-2 hover:bg-gray-100 rounded-full transition"><i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i></button><h2 class="text-lg font-bold text-gray-800">${previewState.title}</h2></header>${contentHTML}</div>`;
-            }
-        };
-            window.previewHome = function previewHome() { previewState = { view: 'home', title: '', data: null, config: null, content: null, activeTabIdx: 0, orgSourceId: null }; const navComp = appData.components.find(c => c.type === 'navbar'); if(navComp) navComp.data.items.forEach((item, idx) => item.active = (idx === 0)); renderCanvas(); };
-            window.handleNavbarClick = function(navId, itemIndex) {
-            const navComp = appData.components.find(c => c.id === navId);
-            if(navComp) { navComp.data.items.forEach((item, idx) => { item.active = (idx === itemIndex); }); }
-            const item = navComp.data.items[itemIndex];
-            if (item.linkType === 'home') previewHome();
-            else if (item.linkType === 'grid' && item.linkTarget) {
-                const targetComp = appData.components.find(c => c.id === item.linkTarget.compId);
-                if (targetComp) {
-                    const targetItem = targetComp.data.items[item.linkTarget.itemIndex];
-                    if (targetItem) {
-                        if (targetItem.action === 'content') previewState = { view: 'content', title: targetItem.label, data: targetItem.content || '' };
-                        else if (targetItem.action === 'sheet') openPreviewSheet(encodeURIComponent(targetItem.link), targetItem.label, targetItem.sheetConfig);
-                        else if (targetItem.action === 'submenu') openPreviewSubmenu(item.linkTarget.itemIndex, item.linkTarget.compId, targetItem.label);
-                    }
-                }
-            }
-            renderCanvas();
-        };
-            window.openPreviewSubmenu = function openPreviewSubmenu(idx, compId, label) {
-            const comp = appData.components.find(c => c.id === compId);
-            if(!comp || !comp.data.items[idx]) return;
-            const items = comp.data.items[idx].submenu;
-            previewState = { view: 'submenu', title: label, data: items };
-            renderCanvas();
-        };
-            window.handleSubClick = function(action, link, content, label) {
-            if (action === 'content') { previewState = { view: 'content', title: label, data: content }; renderCanvas(); } 
-            else if (action === 'sheet' && link) openPreviewSheet(link, label, null); 
-        };
-            window.openPreviewSheet = function openPreviewSheet(url, title, config) {
-            previewState.view = 'sheet'; previewState.title = title; previewState.data = decodeURIComponent(url); previewState.config = config; previewState.activeTabIdx = 0; renderCanvas();
-        };
-            window.switchPreviewTab = function switchPreviewTab(idx) { previewState.activeTabIdx = idx; renderCanvas(); };
-            window.loadSheetPreview = async function loadSheetPreview(url, tabConfig) {
-            const container = document.getElementById('sheet-content');
-            if(!url) { container.innerHTML = '<div class="text-red-500 text-center p-4">Link Sheet belum diset.</div>'; return; }
-            try {
-                container.innerHTML = '<div class="text-center py-10"><div class="loader mx-auto mb-2"></div><p class="text-xs text-gray-500">Memuat Data...</p></div>';
-                let sheetId = url.match(/\/d\/(.*?)(\/|$)/)?.[1]; let gid = '0'; if(url.includes('gid=')) gid = url.split('gid=')[1].split('&')[0];
-                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`; if(tabConfig.sheetName) apiUrl += `&sheet=${encodeURIComponent(tabConfig.sheetName)}`; else apiUrl += `&gid=${gid}`;
-                const res = await fetch(apiUrl); const txt = await res.text(); const jsonStart = txt.indexOf('{'); const jsonEnd = txt.lastIndexOf('}') + 1; const json = JSON.parse(txt.substring(jsonStart, jsonEnd)); 
-                const { headers: source, data: cleanData } = cleanSheetData(json);
-                window.previewSheetRows = cleanData;
-                let order = tabConfig.columnOrder && tabConfig.columnOrder.length > 0 ? tabConfig.columnOrder : source.map((_,i)=>i);
-                window.previewSheetHeaders = source.map((cell, idx) => ({ index: idx, label: (cell && (cell.v || cell.label)) ? (cell.v || cell.label) : 'Kolom ' + (idx+1) }));
-                renderSheetListContent(order, tabConfig);
-            } catch (e) { console.error(e); container.innerHTML = '<div class="text-red-500 text-center p-4">Gagal memuat data. Cek koneksi atau link.</div>'; } 
-        };
-            window.renderSheetListContent = function renderSheetListContent(order, tabConfig, rowIndices = null) {
-            const container = document.getElementById('sheet-content');
-            const rowsToProcess = rowIndices ? rowIndices.map(i => window.previewSheetRows[i]) : window.previewSheetRows;
-            const headerComp = appData.components.find(c => c.type === 'header');
-            let fallbackAvatar = 'https://via.placeholder.com/40';
-            if (headerComp && headerComp.data) {
-                if (headerComp.data.avatarType === 'custom' && headerComp.data.customAvatarUrl) { fallbackAvatar = headerComp.data.customAvatarUrl; } 
-                else { fallbackAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${headerComp.id}`; }
-            }
-            window.userProfileFallback = fallbackAvatar;
-            let html = tabConfig.layout === 'grid' ? '<div class="grid grid-cols-2 gap-3">' : '<div class="space-y-3">';
-            rowsToProcess.forEach((row) => {
-        if(!row.c) return; 
-        let displayCells = [];
-        order.forEach(colIndex => { 
-            if (!row.c || colIndex >= row.c.length) return; 
-            if(tabConfig.hiddenColumns && tabConfig.hiddenColumns.includes(colIndex)) return; 
-            const cell = row.c[colIndex]; 
-            if(cell && cell.v !== null) displayCells.push(cell.v); 
-        }); 
-        if(displayCells.length > 0) { 
-            const imageCell = displayCells.find(d => typeof d === 'string' && (d.match(/^https?:\/\//) || d.startsWith('data:image')));
-            const iconOrImage = imageCell ? `<img src="${imageCell}" onerror="this.onerror=null;this.src='${window.userProfileFallback}'" class="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-blue-600"><i data-lucide="user" class="w-5 h-5"></i></div>`;
-            let textValues = displayCells.filter(c => c !== imageCell); 
-            let title = textValues[0] || 'No Data';
-            let subtitle = textValues[1] ? textValues[1] : '';
-            if(tabConfig.layout === 'grid') { 
-                html += `<div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col h-full">
-                            <div class="flex justify-between items-start mb-2">${iconOrImage}</div>
-                            <h4 class="font-bold text-gray-800 text-xs mb-1 truncate">${title}</h4>
-                         </div>`; 
-            } else { 
-                let rightLabel = textValues[2] || 'Info';
-                if (typeof rightLabel === 'string' && (rightLabel.includes('Rp') || !isNaN(rightLabel.replace(/[^0-9]/g, '')))) {
-                    rightLabel = formatRupiah(rightLabel);
-                }
-                const rIndexOriginal = window.previewSheetRows.indexOf(row); 
-                html += `<div onclick="openSheetDetail(${rIndexOriginal})" class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center gap-3 cursor-pointer active:bg-gray-50 transition">
-                            ${iconOrImage}
-                            <div class="flex flex-col flex-1 min-w-0">
-                                <h4 class="font-bold text-gray-800 text-sm truncate">${title}</h4>
-                                <p class="text-xs text-gray-500 truncate">${subtitle}</p>
-                            </div>
-                            <div class="ml-2 px-3 py-1 bg-red-600 text-white font-bold text-sm rounded shadow-sm whitespace-nowrap shrink-0">
-                                ${rightLabel}
-                            </div>
-                         </div>`; 
+                return {
+                    text: formatter.format(value),
+                    className: 'text-red',
+                    badgeClass: 'badge-red'
+                };
             }
         }
-    });
-    html += '</div>'; 
-    container.innerHTML = html; 
-    lucide.createIcons(); 
-};
-            window.handlePreviewSearch = function handlePreviewSearch(query) {
-            if (!window.previewSheetRows || window.previewSheetRows.length === 0) return;
-            const config = previewState.config.tabs[previewState.activeTabIdx || 0];
-            let order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
-            const lowerQuery = query.toLowerCase();
-            const filteredIndices = window.previewSheetRows.map((row, rIdx) => {
-                let isMatch = false;
-                for(let colIndex of order) {
-                    if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) continue;
-                    const cell = row.c && row.c[colIndex];
-                    if (cell && cell.v) { if(String(cell.v).toLowerCase().includes(lowerQuery)) { isMatch = true; break; } }
-                }
-                return isMatch ? rIdx : -1;
-            }).filter(idx => idx!==-1);
-            renderSheetListContent(order, config, filteredIndices);
-        };
-            window.openSheetDetail = function openSheetDetail(rowIndex) {
-    const row = window.previewSheetRows[rowIndex]; const config = previewState.config.tabs[previewState.activeTabIdx || 0];
-    const order = config.columnOrder && config.columnOrder.length > 0 ? config.columnOrder : window.previewSheetHeaders.map(h=>h.index);
-    let html = '<div class="space-y-3">';
-    order.forEach(colIndex => {
-        if(config.hiddenColumns && config.hiddenColumns.includes(colIndex)) return;
-        const headerInfo = window.previewSheetHeaders.find(h => h.index === colIndex); const label = headerInfo ? headerInfo.label : 'Kolom';
-        const cell = row.c && row.c[colIndex]; const value = cell ? (cell.v || '') : '';
-        const isImage = typeof value === 'string' && (value.match(/^https?:\/\//) || value.startsWith('data:image'));
-        if (isImage) html += `<div class="flex justify-between items-start pb-2 border-b border-gray-100"><span class="text-xs font-bold text-gray-500 uppercase">${label}</span><img src="${value}" class="w-16 h-16 rounded object-cover border border-gray-200"></div>`;
-        else html += `<div class="pb-2 border-b border-gray-100"><div class="text-[10px] text-gray-400 uppercase mb-1">${label}</div><div class="text-sm text-gray-800 leading-relaxed">${value}</div>`;
-    });
-    html += '</div>'; document.getElementById('sheet-detail-content').innerHTML = html; document.getElementById('sheet-detail-modal').classList.remove('hidden');
-};
-            window.closeSheetDetail = function closeSheetDetail() { document.getElementById('sheet-detail-modal').classList.add('hidden'); };
-            window.openAboutModal = function openAboutModal(compId) {
-            const comp = appData.components.find(c => c.id === compId);
-            if(comp && comp.data && comp.data.aboutContent) {
-                document.getElementById('about-title').innerText = comp.data.title || "Tentang Aplikasi";
-                document.getElementById('about-content').innerHTML = comp.data.aboutContent;
-                document.getElementById('about-modal').classList.remove('hidden');
-            }
-        };
-            window.updateHeroPreview = async function(id, data) {
-            const container = document.getElementById(`hero-container-${id}`);
-            if(!container) return;
-            const textEl = container.querySelector('.hero-balance-amount');
-            if(!textEl) return;
-            textEl.innerText = 'Loading...';
+
+        // --- FUNGSI AMBIL SATU SHEET ---
+        async function fetchSingleSheet(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}`;
             try {
-                if(!data.sheetLink) throw new Error('No Link');
-                const sheetId = data.sheetLink.match(/\/d\/(.*?)(\/|$)/)[1];
-                let apiUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
-                if (data.sheetName) apiUrl += `&sheet=${encodeURIComponent(data.sheetName)}`; else apiUrl += `&gid=0`;
-                const res = await fetch(apiUrl); const txt = await res.text(); const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}')+1)); 
-                const rowIndex = data.sheetRowIndex - 1; const colIndex = data.sheetColIndex;
-                if(json.table.rows[rowIndex] && json.table.rows[rowIndex].c[colIndex]) { const val = json.table.rows[rowIndex].c[colIndex].v; textEl.innerText = formatRupiah(val); } else { textEl.innerText = 'Data Not Found'; }
-            } catch(e) { console.warn("Hero Sheet Fetch Error", e); textEl.innerText = 'Error'; }
-        };
-
-            // --- ORGANIZATION STRUCTURE FUNCTIONS ---
-            window.openOrgList = function openOrgList(compId, title) {
-            previewState = { view: 'org-list', title: title, data: null, config: null, content: null, orgSourceId: compId };
-            renderCanvas();
-        };
-            window.openOrgMemberDetail = function openOrgMemberDetail(compId, memberIdx) {
-            const comp = appData.components.find(c => c.id === compId);
-            if(comp && comp.data.members[memberIdx]) {
-                previewState = { view: 'org-member', title: comp.data.members[memberIdx].name, data: comp.data.members[memberIdx], orgSourceId: compId };
-                renderCanvas();
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Gagal akses sheet: ${sheetName}`);
+                const text = await response.text();
+                const jsonString = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/);
+                if (!jsonString) throw new Error(`Format error di sheet: ${sheetName}`);
+                return JSON.parse(jsonString[1]);
+            } catch (error) {
+                console.warn(error.message);
+                return null; 
             }
-        };
-            window.handleOrgBack = function handleOrgBack() {
-            if (previewState.view === 'org-member') {
-                const comp = appData.components.find(c => c.id === previewState.orgSourceId);
-                if(comp) {
-                    previewState = { view: 'org-list', title: comp.data.title, data: null, config: null, content: null, orgSourceId: comp.id };
-                    renderCanvas();
-                } else {
-                    previewHome();
-                }
-            } else if (previewState.view === 'org-list') {
-                previewHome();
-            }
-        };
+        }
 
-            // Handle Shortcut Clicks in exported content
-            document.body.addEventListener('click', function(e) {
-                const target = e.target.closest('.editor-shortcut');
-                if(target) {
-                    const compId = target.dataset.compId;
-                    const itemIdx = parseInt(target.dataset.itemIdx);
-                    const comp = appData.components.find(c => c.id === compId);
-                    if(comp && comp.data.items[itemIdx]) {
-                        const item = comp.data.items[itemIdx];
-                        if(item.action === 'content') {
-                            previewState = { view: 'content', title: item.label, data: item.content || '' };
-                            renderCanvas();
-                        } else if(item.action === 'sheet') {
-                            openPreviewSheet(encodeURIComponent(item.link), item.label, item.sheetConfig);
-                        } else if(item.action === 'submenu') {
-                            openPreviewSubmenu(itemIdx, compId, item.label);
+        // --- FUNGSI UTAMA AMBIL DATA ---
+        async function fetchData() {
+            setHeaderDate();
+            
+            // Mulai animasi loading visual
+            startLoadingAnimation();
+
+            try {
+                const promises = SHEET_NAMES.map(name => fetchSingleSheet(name));
+                const results = await Promise.all(promises);
+
+                let combinedData = {};
+
+                results.forEach((json, index) => {
+                    if (!json) return;
+
+                    const sheetName = SHEET_NAMES[index];
+                    const table = json.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const indices = {
+                        nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                        blok: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase()),
+                        foto: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.foto.toLowerCase()),
+                        kurang: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.kurang.toLowerCase())
+                    };
+
+                    if (indices.nama === -1) return;
+
+                    rows.forEach(row => {
+                        const c = row.c;
+                        const getVal = (idx) => (idx !== -1 && c[idx] && c[idx].v !== null) ? c[idx].v : '';
+
+                        const nama = getVal(indices.nama);
+                        if (!nama) return;
+
+                        const blok = getVal(indices.blok);
+                        const foto = getVal(indices.foto);
+                        const kurang = parseFloat(getVal(indices.kurang)) || 0;
+
+                        const uniqueKey = `${nama}_${blok}`;
+
+                        if (combinedData[uniqueKey]) {
+                            combinedData[uniqueKey].totalKurang += kurang;
+                            combinedData[uniqueKey].details[sheetName] = kurang;
+                            
+                            if (!combinedData[uniqueKey].foto && foto) {
+                                combinedData[uniqueKey].foto = foto;
+                            }
+                        } else {
+                            combinedData[uniqueKey] = {
+                                nama,
+                                blok,
+                                foto,
+                                totalKurang: kurang,
+                                details: { [sheetName]: kurang }
+                            };
                         }
-                    }
-                }
-            });
+                    });
+                });
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const headerComp = appData.components.find(c => c.type === 'header');
-                if (headerComp && headerComp.data) {
-                    if (headerComp.data.avatarType === 'custom' && headerComp.data.customAvatarUrl) { window.userProfileFallback = headerComp.data.customAvatarUrl; } 
-                    else { window.userProfileFallback = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + headerComp.id; }
+                allData = Object.values(combinedData);
+                allData.sort((a, b) => a.nama.localeCompare(b.nama));
+                renderCards(allData);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading-text').textContent = "Terjadi Kesalahan!";
+                document.getElementById('loading-text').style.color = "red";
+                
+                document.getElementById('card-container').innerHTML = `
+                    <div style="text-align:center; color: var(--danger); padding: 2rem;">
+                        <p><b>Terjadi kesalahan sistem.</b></p>
+                        <p style="font-size:0.8rem; margin-top:10px;">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                // Matikan animasi loading, biarkan tampilan konten muncul
+                stopLoadingAnimation();
+            }
+        }
+
+        // --- FUNGSI RENDER ---
+        function renderCards(data) {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('empty-state').classList.add('hidden');
+
+            data.forEach(item => {
+                let avatarSrc = DEFAULT_IMG;
+                if (item.foto && item.foto.startsWith('http')) {
+                    avatarSrc = item.foto;
                 }
-                window.renderCanvas();
-                lucide.createIcons();
+
+                const mainFormat = formatValue(item.totalKurang);
+
+                let detailsHTML = `<ul class="detail-list">`;
+                SHEET_NAMES.forEach(sheet => {
+                    const val = item.details[sheet] || 0;
+                    const itemFormat = formatValue(val);
+                    
+                    detailsHTML += `
+                        <li class="detail-item">
+                            <span class="detail-label">${sheet}</span>
+                            <span class="detail-value ${itemFormat.className}">${itemFormat.text}</span>
+                        </li>
+                    `;
+                });
+                detailsHTML += `</ul>`;
+
+                const card = document.createElement('div');
+                card.className = 'warga-card';
+                card.onclick = function() { toggleCard(this); };
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${avatarSrc}" class="avatar" alt="${item.nama}" onerror="this.src='${DEFAULT_IMG}'">
+                        <div class="info">
+                            <div class="info-name">${item.nama}</div>
+                            <div class="info-blok">Blok ${item.blok}</div>
+                        </div>
+                        <div class="badge ${mainFormat.badgeClass}">${mainFormat.text}</div>
+                    </div>
+                    <div class="details-section">
+                        ${detailsHTML}
+                    </div>
+                `;
+                container.appendChild(card);
             });
-        </script>
-    </body>
-    </html>
+        }
+
+        function toggleCard(element) {
+            const isActive = element.classList.contains('active');
+            const allCards = document.querySelectorAll('.warga-card');
+            allCards.forEach(card => card.classList.remove('active'));
+            if (!isActive) element.classList.add('active');
+        }
+
+        function filterCards() {
+            const term = document.getElementById('search-box').value.toLowerCase();
+            const filtered = allData.filter(item => 
+                item.nama.toLowerCase().includes(term) || 
+                item.blok.toLowerCase().includes(term)
+            );
+            renderCards(filtered);
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+    </script>
+</body>
+</html>
