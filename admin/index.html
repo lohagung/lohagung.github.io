@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Warga LA6 & Kavling</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://la6.my.id/admin/style.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- SVG Icons Definitions -->
     <div style="display:none;">
         <svg id="icon-lock" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6z"/></svg>
         <svg id="icon-unlock" viewBox="0 0 24 24"><path d="M12 17a2 2 0 100-4 2 2 0 000 4zm6-9h-1V6a5 5 0 00-10 0v1H4v10a2 2 0 002 2h12a2 2 0 002-2V8h-2V7zM7 6a3 3 0 016 0v2H7V6zm11 11H6V9h12v8z"/></svg>
     </div>
 
+    <div id="intro-screen"><div id="intro-text" class="intro-word"></div></div>
     <div id="loading-overlay"><div class="spinner"></div></div>
     <div id="toast-container" class="toast-container"></div>
 
@@ -28,15 +26,14 @@
 
     <section id="login-view">
         <div class="login-card">
-            <h2 style="margin-bottom: 0.5rem;">Login Admin</h2>
-            <p style="margin-bottom: 2rem; color: var(--secondary); font-size: 0.9rem;">Masuk untuk mengelola data warga</p>
+            <h2 style="margin-bottom: 0.5rem; text-align: center;">Login Admin</h2>
+            <p style="margin-bottom: 2rem; color: var(--secondary); font-size: 0.9rem; text-align: center;">Masuk untuk mengelola data warga</p>
             
             <div class="input-group hidden">
                 <label>URL Web App</label>
-                <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwopjwy5tR4Q1q3q8oHOYZ83VKaDGekoM8hULbX-5jb460XCFREvv9cDZRVb50voHmaOw/exec" readonly>
+                <input type="url" id="app-url" class="input-field" value="https://script.google.com/macros/s/AKfycbwbBnvx5gzI6xrOzsFaiVP9t4Onn5x1hufHO2Xfj2R_d0N0joHrubMylGOlK0HkW1YwDw/exec" readonly>
             </div>
             
-            <!-- PERUBAHAN: Select List untuk Login -->
             <div class="input-group">
                 <label>Pengurus</label>
                 <select id="sheet-name" class="input-field">
@@ -47,6 +44,10 @@
                     <option value="Sosial">Sosial</option>
                     <option value="Keamanan">Keamanan</option>
                     <option value="Pembangunan">Pembangunan</option>
+                    <option value="Kas">Kas</option>
+                    <option value="Sampah">Sampah</option>
+                    <option value="Konsumsi">Konsumsi</option>
+                    <option value="Arisan">Arisan</option>
                 </select>
             </div>
 
@@ -55,50 +56,39 @@
                 <input type="password" id="api-token" class="input-field" placeholder="Masukkan Password">
             </div>
             
-            <button class="btn-login" onclick="doLogin()">Masuk Dashboard</button>
+            <button class="btn btn-login" onclick="doLogin()">Masuk Dashboard</button>
         </div>
     </section>
 
-    <!-- PERUBAHAN: Sembunyikan main content secara default agar tertutup login screen -->
     <main id="main-content" style="display: none;">
-        
-        <!-- VIEW 1: PEMBAYARAN -->
         <section id="view-pembayaran" class="view-section active">
             <div class="search-container">
                 <input type="text" id="search-box" class="search-input" placeholder="Cari Blok atau Nama..." onkeyup="filterCards()">
             </div>
-
-            <!-- Stats Grid telah dipindahkan ke tab Rekap -->
-
             <div id="card-container" class="card-grid"></div>
             <div id="empty-state" class="hidden" style="text-align: center; margin-top: 3rem; color: var(--secondary);"><p>Data tidak ditemukan.</p></div>
         </section>
 
-        <!-- VIEW 2: REKAP -->
         <section id="view-rekap" class="view-section">
             <h2 style="margin-bottom: 1.5rem;">Rekapitulasi Bulanan</h2>
-            
-            <!-- Stats Grid dipindahkan ke sini -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-title">Uang Masuk 2026</div>
+                    <div class="stat-title">Uang Masuk</div>
                     <div class="stat-value" id="stat-pemasukan">Rp 0</div>
                 </div>
                 <div class="stat-card tunggakan">
                     <div class="stat-title">Tunggakan</div>
-                    <div class="stat-value" id="stat-tunggakan" style="color: var(--danger);">Rp 0</div>
+                    <div class="stat-value text-danger" id="stat-tunggakan">Rp 0</div>
                 </div>
             </div>
-
             <div class="rekap-list" id="rekap-container"></div>
         </section>
 
-        <!-- VIEW 3: RIWAYAT -->
         <section id="view-riwayat" class="view-section">
             <h2 style="margin-bottom: 1.5rem;">Riwayat Pembayaran (<span id="riwayat-sheet-name"></span>)</h2>
-            <div id="riwayat-container" class="riwayat-list">
+            <div id="riwayat-container" class="rekap-list">
                 <div style="text-align: center; padding: 2rem; color: var(--secondary);">
-                    <p>Klik tab Riwayat untuk memuat data...</p>
+                    <p>Memuat Data...</p>
                 </div>
             </div>
         </section>
@@ -111,7 +101,7 @@
             <span>Pembayaran</span>
         </div>
         <div class="nav-item" onclick="switchTab('rekap', this)">
-            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l1 1"></path></svg>
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l1 1"></path></svg>
             <span>Rekap</span>
         </div>
         <div class="nav-item" onclick="switchTab('riwayat', this)">
@@ -134,21 +124,17 @@
                 <div class="modal-profile-name" id="modal-nama">Nama Warga</div>
                 <div class="modal-profile-blok" id="modal-blok">Blok A1</div>
             </div>
-            
             <div class="modal-body">
                 <form id="edit-form" onsubmit="event.preventDefault(); saveData();">
                     <div id="general-fields" style="margin-bottom: 1rem; display: none;"></div>
-                    
                     <div class="form-section-title">
                         <span>Pembayaran</span>
                         <span id="btn-kurang-modal" class="kurang-text-link" onclick="autoFillKurang()">Rp 0</span>
                     </div>
-                    
                     <div id="monthly-fields"></div>
                 </form>
-                
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-save" onclick="document.getElementById('edit-form').requestSubmit()">Bayar</button>
+                <div class="modal-actions" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-primary btn-save" onclick="document.getElementById('edit-form').requestSubmit()">Bayar</button>
                 </div>
             </div>
         </div>
@@ -157,24 +143,17 @@
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay">
         <div class="modal modal-settings">
-            <div class="modal-header-simple">
-                <div class="modal-title">Pengaturan Sistem</div>
-                <button class="btn-close-icon" onclick="closeModal('settings-modal')">&times;</button>
+            <div class="modal-header-bg" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-title" style="font-weight: 600; color: white;">Pengaturan Sistem</div>
+                <button class="btn-close-edit" onclick="closeModal('settings-modal')">&times;</button>
             </div>
-            
             <div class="settings-body">
                 <div class="settings-buttons-row">
-                    <button class="btn-share" onclick="shareSheet()">
-                        <span>🔗</span> Bagikan
-                    </button>
-                    <button class="btn-logout" onclick="handleLogout()">
-                        <span>🚪</span> Keluar Akun
-                    </button>
+                    <button class="btn btn-share" onclick="shareSheet()"><span>🔗</span> Bagikan</button>
+                    <button class="btn btn-logout" onclick="handleLogout()"><span>🚪</span> Keluar Akun</button>
                 </div>
-
-                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password Sheet</div>
+                <div class="form-section-title" style="margin-top: 2rem;">Ganti Password</div>
                 <form id="settings-form" onsubmit="event.preventDefault(); updateTokenAction();">
-                    <input type="hidden" id="set-sheet-target" value="">
                     <div class="input-group">
                         <label>Password Lama</label>
                         <input type="password" id="old-token" class="input-field" placeholder="Masukkan password saat ini">
@@ -183,8 +162,7 @@
                         <label>Password Baru</label>
                         <input type="password" id="new-token" class="input-field" placeholder="Masukkan password baru">
                     </div>
-                    
-                    <button type="submit" class="btn-update-pass">Update Password</button>
+                    <button type="submit" class="btn btn-primary btn-update-pass">Update Password</button>
                 </form>
             </div>
         </div>
@@ -192,33 +170,20 @@
 
     <script>
         // --- CONFIGURATION ---
+        const RIWAYAT_CONFIG = { id: "1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0", gid: "1197798619" };
         const DEFAULT_IMG = "https://avatars.githubusercontent.com/u/61934361?v=4"; 
         const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         const FORMULA_COLS = ["Total", "Sudah_Bayar", "Kurang", "Bulan_Aktif", "Timestamp", "Foto", "ID", "Created", "Email", "Telp"]; 
         const MULTI_SHEETS = ["Kas", "Sampah", "Konsumsi", "Arisan"];
-        
-        // Indeks kolom yang dilindungi (F, J, L, N, P, R, T, V, X, Z, AB) -> (5, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27)
         const PROTECTED_INDICES = [5, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27];
-
-        // Pemetaan Absen Khusus Keamanan
-        const ABSEN_MAP = {
-            "Januari": 5, "Februari": 9, "Maret": 11, "April": 13, "Mei": 15,
-            "Juni": 17, "Juli": 19, "Agustus": 21, "September": 23, "Oktober": 25, "November": 27
-        };
+        const ABSEN_MAP = { "Januari": 5, "Februari": 9, "Maret": 11, "April": 13, "Mei": 15, "Juni": 17, "Juli": 19, "Agustus": 21, "September": 23, "Oktober": 25, "November": 27 };
         
-        let APP_CONFIG = { url: '', token: '', sheet: '' };
+        let APP_CONFIG = { url: '', token: '', sheet: '' }; // 'token' sekarang adalah Session Token
         let IS_PUBLIC_MODE = false;
         let PAYMENT_MODE = 'single'; 
         
-        let STATE = { 
-            data: [], 
-            headers: [], 
-            currentEdit: null,
-            multiDataCache: {},
-            sheetPrices: {}
-        };
+        let STATE = { data: [], headers: [], currentEdit: null, multiDataCache: {}, sheetPrices: {}, riwayatData: [] };
 
-        // --- HELPER ---
         function getKey(obj, candidates) {
             if (!obj) return null;
             const keys = Object.keys(obj);
@@ -229,71 +194,109 @@
             return null;
         }
 
-        // --- INIT & AUTH ---
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             let publicSheet = null;
             if(params.has('sheet')) publicSheet = params.get('sheet');
-            else {
-                for (const [key, value] of params.entries()) {
-                    if(key !== 'nocache' && !value) { publicSheet = key; break; }
-                }
-            }
+            else { for (const [key, value] of params.entries()) { if(key !== 'nocache' && !value) { publicSheet = key; break; } } }
 
             if (publicSheet) {
-                // Public Mode Setup
                 IS_PUBLIC_MODE = true;
                 APP_CONFIG.url = window.location.href.split('?')[0]; 
                 APP_CONFIG.sheet = publicSheet;
                 APP_CONFIG.token = ''; 
-                
-                // UI Handling: Show Dashboard directly
                 document.getElementById('login-view').classList.add('hidden');
                 document.getElementById('main-content').style.display = 'block';
-                // Note: Public mode doesn't show header/nav based on previous logic usually
-                
                 const headerTitle = document.querySelector('#header-title');
                 if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet + " (Lihat Saja)";
                 fetchData(); 
             } else {
-                // Admin Mode Setup
-                const stored = JSON.parse(localStorage.getItem('gas_dashboard_config'));
-                if (stored && stored.url && stored.token && stored.sheet) {
-                    // Auto Login Logic
-                    APP_CONFIG = stored;
-                    document.getElementById('app-url').value = stored.url || '';
-                    document.getElementById('api-token').value = stored.token || '';
-                    document.getElementById('sheet-name').value = stored.sheet || '';
-                    
-                    // Panggil Login Otomatis
-                    doLogin(true);
-                } else {
-                    // Tampilkan form login siap diisi
-                    document.getElementById('login-view').classList.remove('hidden');
-                }
+                // Cek session di memory (tidak persist di localstorage demi keamanan session based)
+                // Tapi kita simpan URL app
+                const storedUrl = localStorage.getItem('gas_app_url');
+                if (storedUrl) document.getElementById('app-url').value = storedUrl;
+                
+                document.getElementById('login-view').classList.remove('hidden');
             }
         });
 
+        // --- SECURE LOGIN LOGIC ---
         async function doLogin(silent = false) {
             APP_CONFIG.url = document.getElementById('app-url').value.trim();
-            APP_CONFIG.token = document.getElementById('api-token').value.trim();
-            APP_CONFIG.sheet = document.getElementById('sheet-name').value.trim();
+            // Username = Sheet Name (Role)
+            const username = document.getElementById('sheet-name').value.trim();
+            const password = document.getElementById('api-token').value.trim(); // Password asli
 
-            if (!APP_CONFIG.url || !APP_CONFIG.token || !APP_CONFIG.sheet) {
+            if (!APP_CONFIG.url || !username || !password) {
                 if(!silent) showToast("Mohon isi data login lengkap");
                 return resetToLogin();
             }
             
-            if (APP_CONFIG.sheet.toLowerCase() === 'bendahara') PAYMENT_MODE = 'multi';
+            // Simpan URL untuk reload berikutnya
+            localStorage.setItem('gas_app_url', APP_CONFIG.url);
+
+            if (username.toLowerCase() === 'bendahara') PAYMENT_MODE = 'multi';
             else PAYMENT_MODE = 'single';
 
-            localStorage.setItem('gas_dashboard_config', JSON.stringify(APP_CONFIG));
+            // UI Loading & Intro
+            document.getElementById('login-view').classList.add('hidden');
+            const introScreen = document.getElementById('intro-screen');
+            const introText = document.getElementById('intro-text');
+            introScreen.classList.add('active');
+
+            const introData = [
+                { text: "Loh agung 6", bg: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)", color: "#fff" },
+                { text: "Kavling", bg: "linear-gradient(135deg, #8e44ad 0%, #c0392b 100%)", color: "#fff" },
+                { text: "Kas", bg: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)", color: "#fff" },
+                { text: "Arisan", bg: "linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%)", color: "#fff" },
+                { text: "Sampah", bg: "linear-gradient(135deg, #d38312 0%, #a83279 100%)", color: "#fff" },
+                { text: "Konsumsi", bg: "linear-gradient(135deg, #FDC830 0%, #F37335 100%)", color: "#fff" },
+                { text: "Jimpitan", bg: "linear-gradient(135deg, #00b09b 0%, #96c93d 100%)", color: "#fff" },
+                { text: "Sosial", bg: "linear-gradient(135deg, #cc2b5e 0%, #753a88 100%)", color: "#fff" },
+                { text: "Keamanan", bg: "linear-gradient(135deg, #23074d 0%, #cc5333 100%)", color: "#fff" }
+            ];
+
+            let currentIndex = 0;
+            let animationInterval;
+            function showNextIntro() {
+                const item = introData[currentIndex];
+                introScreen.style.background = item.bg;
+                introText.style.color = item.color;
+                introText.innerText = item.text;
+                introText.style.animation = 'none';
+                introText.offsetHeight; 
+                introText.style.animation = null;
+                currentIndex = (currentIndex + 1) % introData.length;
+            }
+            showNextIntro();
+            animationInterval = setInterval(showNextIntro, 800);
+
             toggleLoading(true);
             try {
-                await fetchData();
+                // 1. REQUEST LOGIN KE SERVER
+                const loginUrl = new URL(APP_CONFIG.url);
+                loginUrl.searchParams.append('action', 'login');
+                loginUrl.searchParams.append('username', username);
+                loginUrl.searchParams.append('password', password);
                 
-                // Success Login: Show Dashboard, Hide Login
-                document.getElementById('login-view').classList.add('hidden');
+                const loginRes = await fetch(loginUrl.toString());
+                const loginJson = await loginRes.json();
+                
+                if (!loginJson.success) {
+                    throw new Error(loginJson.message);
+                }
+                
+                // 2. SIMPAN SESSION TOKEN
+                APP_CONFIG.token = loginJson.data.token; // Ini Session Token, bukan Password
+                APP_CONFIG.sheet = username;
+
+                // 3. FETCH DATA UTAMA
+                await fetchData();
+                fetchRiwayat(true); 
+                
+                // Selesai Loading
+                clearInterval(animationInterval);
+                introScreen.classList.remove('active');
                 document.getElementById('main-content').style.display = 'block';
                 document.getElementById('main-nav').style.display = 'flex';
                 document.getElementById('main-header').classList.remove('hidden');
@@ -302,18 +305,22 @@
                 const riwayatTitle = document.getElementById('riwayat-sheet-name');
                 let titleText = APP_CONFIG.sheet;
                 if (PAYMENT_MODE === 'multi') titleText = "Bendahara (Multi)";
-                
                 if(headerTitle) headerTitle.innerText = titleText;
                 if(riwayatTitle) riwayatTitle.innerText = titleText;
+                
                 if (!silent) showToast("Login Berhasil");
             } catch (e) {
                 console.error(e);
+                clearInterval(animationInterval);
+                introScreen.classList.remove('active');
+                document.getElementById('api-token').value = ''; // Clear password input on error
+                
                 if(silent) showToast("Sesi Login Habis. Silakan Login Ulang.");
                 else showToast("Error Login: " + e.message);
-                
-                // Error Login: Reset to Login Screen
                 resetToLogin();
-            } finally { toggleLoading(false); }
+            } finally { 
+                toggleLoading(false); 
+            }
         }
 
         function resetToLogin() {
@@ -321,22 +328,16 @@
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('main-nav').style.display = 'none';
             document.getElementById('main-header').classList.add('hidden');
+            APP_CONFIG.token = ''; // Clear session token
         }
 
         function handleLogout() { 
-            localStorage.removeItem('gas_dashboard_config'); 
+            APP_CONFIG.token = ''; // Hapus session dari memory
             resetToLogin();
             if(IS_PUBLIC_MODE) window.location.href = window.location.href.split('?')[0];
-            else {
-                // Clear password field for security UX
-                document.getElementById('api-token').value = '';
-            }
         }
 
-        function shareSheet() {
-            const sheetName = APP_CONFIG.sheet;
-            window.open("https://la6.my.id/" + sheetName, '_blank');
-        }
+        function shareSheet() { const sheetName = APP_CONFIG.sheet; window.open("https://la6.my.id/" + sheetName, '_blank'); }
 
         // --- DATA FETCHING ---
         async function fetchData() {
@@ -344,11 +345,10 @@
             try {
                 if (PAYMENT_MODE === 'multi') await fetchMultiData();
                 else await fetchSingleData();
-                
                 renderCards(STATE.data);
                 updateSummaryCards();
                 const currentTab = document.querySelector('.view-section.active').id;
-                if(currentTab === 'view-riwayat') fetchRiwayat();
+                if(currentTab === 'view-riwayat') renderRiwayatUI(STATE.riwayatData);
             } catch (e) {
                 console.error(e);
                 showToast("Gagal mengambil data: " + e.message);
@@ -359,8 +359,8 @@
             const url = new URL(APP_CONFIG.url);
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
-            if (IS_PUBLIC_MODE) url.searchParams.append('mode', 'public');
-            else url.searchParams.append('token', APP_CONFIG.token);
+            // Kirim Session Token
+            url.searchParams.append('token', APP_CONFIG.token);
             
             const res = await fetch(url.toString());
             const json = await res.json();
@@ -402,7 +402,6 @@
                     const fotoKey = getKey(row, ['foto', 'gambar', 'image', 'url', 'pic']);
                     const currentNama = namaKey ? row[namaKey] : '-';
                     const currentFoto = fotoKey ? row[fotoKey] : '';
-
                     if (!mergedMap.has(blok)) {
                         mergedMap.set(blok, { Blok: blok, Nama: currentNama, Foto: currentFoto, _rawData: {} });
                     } else {
@@ -421,31 +420,66 @@
         // --- SAVING ---
         async function saveData() {
             if (IS_PUBLIC_MODE) return showToast("❌ Mode Publik: Tidak bisa mengubah data.");
-            if (PAYMENT_MODE === 'multi') await saveMultiData();
-            else await saveSingleData();
+            closeModal('edit-modal');
+            const blokId = STATE.currentEdit['Blok'];
+            const cardElement = document.querySelector(`.warga-card[data-blok="${blokId}"]`);
+            let loadingAnimPromise;
+            if (cardElement) loadingAnimPromise = animateCardLoading(cardElement);
+            else loadingAnimPromise = Promise.resolve();
+
+            try {
+                const savePromise = (PAYMENT_MODE === 'multi') ? saveMultiData() : saveSingleData();
+                await Promise.all([loadingAnimPromise, savePromise]);
+                fetchRiwayat(true);
+                fetchData(); 
+            } catch (e) {
+                showToast("❌ Gagal simpan: " + e.message);
+                if (cardElement) removeLoadingOverlay(cardElement);
+            }
+        }
+
+        function animateCardLoading(cardElement) {
+            return new Promise((resolve) => {
+                cardElement.setAttribute('disabled', 'true');
+                const overlay = document.createElement('div');
+                overlay.className = 'card-update-overlay';
+                overlay.innerHTML = `<div class="loading-text-small">Memproses...</div><div class="loading-percentage">0%</div><div class="progress-track"><div class="progress-bar" style="width: 0%"></div></div>`;
+                cardElement.appendChild(overlay);
+                const progressBar = overlay.querySelector('.progress-bar');
+                const percentageText = overlay.querySelector('.loading-percentage');
+                let progress = 0;
+                const duration = 2000; 
+                const intervalTime = 20; 
+                const step = 100 / (duration / intervalTime);
+                const timer = setInterval(() => {
+                    progress += step;
+                    if (progress >= 100) { progress = 100; clearInterval(timer); setTimeout(() => { resolve(); }, 200); } 
+                    progressBar.style.width = `${progress}%`;
+                    percentageText.innerText = `${Math.round(progress)}%`;
+                }, intervalTime);
+            });
+        }
+        function removeLoadingOverlay(cardElement) {
+            const overlay = cardElement.querySelector('.card-update-overlay');
+            if (overlay) overlay.remove();
+            cardElement.removeAttribute('disabled');
+            cardElement.style.opacity = '1';
+            cardElement.style.cursor = 'pointer';
         }
 
         async function saveSingleData() {
             const params = { Blok: STATE.currentEdit['Blok'] };
             let totalPembayaran = 0;
-
             STATE.headers.forEach((h, index) => {
-                // Skip Protected Columns (Absen)
                 if (PROTECTED_INDICES.includes(index)) return;
-
                 if (!FORMULA_COLS.includes(h) && h !== 'Blok' && !MONTHS.includes(h) && h !== '2025') {
                     const input = document.getElementById(`field-${h}`);
                     if (input) params[h] = input.value;
                 }
             });
-
             MONTHS.forEach(m => {
                 const input = document.getElementById(`month-input-${m}`);
-                if (input) {
-                    const val = parseFloat(input.value) || 0;
-                    params[m] = val;
-                    totalPembayaran += val;
-                }
+                if (input) { const val = parseFloat(input.value) || 0; params[m] = val; totalPembayaran += val; }
             });
             logAndSend(APP_CONFIG.sheet, params, totalPembayaran);
         }
@@ -459,20 +493,11 @@
                 MONTHS.forEach(m => {
                     const inputId = `month-input-${m}-${sheetName}`;
                     const input = document.getElementById(inputId);
-                    if (input) {
-                        const val = parseFloat(input.value) || 0;
-                        params[m] = val;
-                        totalSheet += val;
-                    }
+                    if (input) { const val = parseFloat(input.value) || 0; params[m] = val; totalSheet += val; }
                 });
                 promises.push(fetchAndLog(sheetName, params, totalSheet));
             });
-            try {
-                await Promise.all(promises);
-                showToast("✅ Pembayaran Berhasil Disimpan!");
-                closeModal('edit-modal');
-                fetchData();
-            } catch (e) { showToast("❌ Gagal simpan sebagian data."); }
+            try { await Promise.all(promises); showToast("✅ Pembayaran Berhasil Disimpan!"); } catch (e) { throw new Error("Gagal simpan sebagian data."); }
         }
 
         async function fetchAndLog(sheetTarget, params, amount) {
@@ -481,11 +506,9 @@
             url.searchParams.append('sheet', sheetTarget);
             url.searchParams.append('action', 'update');
             Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
-            
             const namaWarga = document.getElementById('modal-nama').innerText;
             const tanggalHariIni = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-            params['sheet_log'] = 'Riwayat';     
-            params['Tanggal'] = tanggalHariIni; 
+            params['sheet_log'] = 'Riwayat'; params['Tanggal'] = tanggalHariIni; 
             params['Pesan'] = `Admin Bayar ${sheetTarget} (${namaWarga}): ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount)}`;
             for (const [key, value] of Object.entries(params)) {
                 if (['sheet_log', 'Tanggal', 'Pesan'].includes(key)) url.searchParams.append(key, value);
@@ -496,18 +519,15 @@
         }
 
         async function logAndSend(sheetTarget, params, amount) {
-            toggleLoading(true);
             try {
                 const url = new URL(APP_CONFIG.url);
                 url.searchParams.append('token', APP_CONFIG.token);
                 url.searchParams.append('sheet', sheetTarget);
                 url.searchParams.append('action', 'update');
                 Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
-
                 const namaWarga = document.getElementById('modal-nama').innerText;
                 const tanggalHariIni = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-                params['sheet_log'] = 'Riwayat';     
-                params['Tanggal'] = tanggalHariIni; 
+                params['sheet_log'] = 'Riwayat'; params['Tanggal'] = tanggalHariIni; 
                 params['Pesan'] = `${namaWarga} melakukan pembayaran ${sheetTarget} sebesar ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount)}`;
                 for (const [key, value] of Object.entries(params)) {
                     if (['sheet_log', 'Tanggal', 'Pesan'].includes(key)) url.searchParams.append(key, value);
@@ -515,43 +535,55 @@
                 const res = await fetch(url.toString());
                 const json = await res.json();
                 if (!json.success) throw new Error(json.message);
-                showToast("✅ Pembayaran Berhasil!");
-                closeModal('edit-modal');
-                fetchData();
-            } catch (e) { showToast("❌ Gagal simpan: " + e.message); } 
-            finally { toggleLoading(false); }
+            } catch (e) { throw e; } 
         }
 
+        // --- SECURE PASSWORD UPDATE LOGIC ---
         async function updateTokenAction() {
             if (IS_PUBLIC_MODE) return showToast("❌ Tidak bisa ubah password di mode publik.");
-            const oldToken = document.getElementById('old-token').value.trim();
-            const newToken = document.getElementById('new-token').value.trim();
-            const sheetTarget = document.getElementById('set-sheet-target').value; 
-            if (!oldToken || !newToken) return showToast("Isi token lama dan baru wajib");
-            if (oldToken !== APP_CONFIG.token) return showToast("Token lama salah");
+            
+            const oldPassword = document.getElementById('old-token').value.trim();
+            const newPassword = document.getElementById('new-token').value.trim();
+
+            if (!oldPassword || !newPassword) {
+                showToast("⚠️ Password lama dan baru wajib diisi!");
+                return;
+            }
 
             toggleLoading(true);
             try {
                 const url = new URL(APP_CONFIG.url);
+                
+                // Kirim Session Token untuk otorisasi
+                url.searchParams.append('action', 'update-password');
                 url.searchParams.append('token', APP_CONFIG.token); 
-                url.searchParams.append('sheet_target', sheetTarget);
-                url.searchParams.append('new_token', newToken);
-                url.searchParams.append('action', 'update-token');
+                url.searchParams.append('old_password', oldPassword);
+                url.searchParams.append('new_password', newPassword);
+                
                 const res = await fetch(url.toString());
                 const json = await res.json();
+                
                 if (json.success) {
-                    showToast("✅ Token Berhasil Diupdate! Silakan Refresh.");
-                    document.getElementById('settings-form').reset();
+                    showToast("✅ " + json.message);
                     closeModal('settings-modal');
-                } else { showToast("Gagal: " + json.message); }
-            } catch (e) { showToast("Error: " + e.message); } 
-            finally { toggleLoading(false); }
+                    document.getElementById('settings-form').reset();
+                    
+                    // Reload halaman karena session di server di-destroy
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                    
+                } else {
+                    showToast("❌ " + json.message);
+                }
+            } catch (e) { 
+                console.error(e);
+                showToast("❌ Error Jaringan: " + e.message); 
+            } finally { 
+                toggleLoading(false); 
+            }
         }
 
         function getSettings() {
-            let index = 12; let price = 0;
-            let sourceData = STATE.data;
-            
+            let index = 12; let price = 0; let sourceData = STATE.data;
             if (PAYMENT_MODE === 'multi') {
                 STATE.sheetPrices = {}; 
                 MULTI_SHEETS.forEach(sheetName => {
@@ -560,13 +592,10 @@
                     if (sheetData.length > 3) {
                         const rowT5 = sheetData[3];
                         let foundPrice = 0;
-                        if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) {
-                            foundPrice = parseFloat(rowT5['Bulan_Aktif']);
-                        } else {
+                        if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) foundPrice = parseFloat(rowT5['Bulan_Aktif']);
+                        else {
                             for(let i=0; i<sheetData.length; i++) {
-                                if (sheetData[i]['Bulan_Aktif'] && !isNaN(sheetData[i]['Bulan_Aktif'])) {
-                                    foundPrice = parseFloat(sheetData[i]['Bulan_Aktif']); break;
-                                }
+                                if (sheetData[i]['Bulan_Aktif'] && !isNaN(sheetData[i]['Bulan_Aktif'])) { foundPrice = parseFloat(sheetData[i]['Bulan_Aktif']); break; }
                             }
                         }
                         specificPrice = foundPrice;
@@ -575,133 +604,77 @@
                 });
                 sourceData = STATE.multiDataCache["Kas"] || [];
             } else {
-                // --- SINGLE MODE UPDATE ---
-                // Ambil Price dari Row 5 (Array Index 3) di kolom Bulan_Aktif (di bawah tulisan PerAbsen)
                 if (sourceData.length > 3) {
                     const priceRow = sourceData[3];
                     let priceVal = priceRow['Bulan_Aktif'];
                     if (!priceVal) priceVal = priceRow['PerAbsen'];
-
-                    if (priceVal && !isNaN(parseFloat(priceVal))) {
-                        price = parseFloat(priceVal);
-                    }
+                    if (priceVal && !isNaN(parseFloat(priceVal))) price = parseFloat(priceVal);
                 }
             }
-
-            // Cari Active Month (Index) - Looping baris (umumnya baris setting awal)
             sourceData.forEach(row => {
                 const val = row['Bulan_Aktif'];
-                if (val !== undefined && val !== '' && val !== null) {
-                    const numVal = parseFloat(val);
-                    if (numVal >=1 && numVal <= 12) index = numVal;
-                    // Hapus logika update price di sini agar tidak bentrok dengan harga baris 5
-                }
+                if (val !== undefined && val !== '' && val !== null) { const numVal = parseFloat(val); if (numVal >=1 && numVal <= 12) index = numVal; }
             });
             return { index, price };
         }
 
-        // --- LOCK LOGIC ---
         function toggleLock(btn) {
-            event.preventDefault(); 
-            event.stopPropagation();
-
+            event.preventDefault(); event.stopPropagation();
             const row = btn.closest('.month-row') || btn.closest('.month-row-multi');
             if(!row) return;
-            
-            // Logic Lock untuk Multi Mode: Kunci semua input di dalam row ini
             if (PAYMENT_MODE === 'multi') {
                 const inputs = row.querySelectorAll('.multi-input-field');
                 const checkboxes = row.querySelectorAll('.mini-checkbox');
                 const isLocked = btn.classList.contains('locked');
-
                 if (isLocked) {
-                    btn.classList.remove('locked');
-                    btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
-                    inputs.forEach(i => {
-                        // Enable hanya jika checkbox tidak checked
-                        const wrapper = i.closest('.multi-cat-box');
-                        const cb = wrapper.querySelector('.mini-checkbox');
-                        if(!cb.checked) i.disabled = false;
-                    });
+                    btn.classList.remove('locked'); btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
+                    inputs.forEach(i => { const wrapper = i.closest('.multi-cat-box'); const cb = wrapper.querySelector('.mini-checkbox'); if(!cb.checked) i.disabled = false; });
                     checkboxes.forEach(cb => cb.disabled = false);
                 } else {
-                    btn.classList.add('locked');
-                    btn.innerHTML = document.getElementById('icon-lock').outerHTML;
-                    inputs.forEach(i => i.disabled = true);
-                    checkboxes.forEach(cb => cb.disabled = true);
+                    btn.classList.add('locked'); btn.innerHTML = document.getElementById('icon-lock').outerHTML;
+                    inputs.forEach(i => i.disabled = true); checkboxes.forEach(cb => cb.disabled = true);
                 }
             } else {
-                // Logic Lock Single Mode
                 const inputs = row.querySelectorAll('input:not([type="hidden"])');
                 const isLocked = btn.classList.contains('locked');
-
                 if (isLocked) {
-                    btn.classList.remove('locked');
-                    btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
-                    
+                    btn.classList.remove('locked'); btn.innerHTML = document.getElementById('icon-unlock').outerHTML;
                     const checkboxes = row.querySelectorAll('input[type="checkbox"]');
-                    if(checkboxes.length > 0 && checkboxes[0].checked) {
-                        row.querySelectorAll('input[type="number"]').forEach(i => i.disabled = true);
-                    } else {
-                        inputs.forEach(i => i.disabled = false);
-                    }
+                    if(checkboxes.length > 0 && checkboxes[0].checked) row.querySelectorAll('input[type="number"]').forEach(i => i.disabled = true);
+                    else inputs.forEach(i => i.disabled = false);
                 } else {
-                    btn.classList.add('locked');
-                    btn.innerHTML = document.getElementById('icon-lock').outerHTML;
-                    inputs.forEach(i => i.disabled = true);
+                    btn.classList.add('locked'); btn.innerHTML = document.getElementById('icon-lock').outerHTML; inputs.forEach(i => i.disabled = true);
                 }
             }
         }
 
-        // --- RENDERING ---
         function renderRekap() {
             const container = document.getElementById('rekap-container');
             container.innerHTML = '';
             if (PAYMENT_MODE === 'single') {
-                const settings = getSettings();
-                const activeMonthLimit = settings.index; 
-                let grandTotal = 0;
-
+                const settings = getSettings(); const activeMonthLimit = settings.index; let grandTotal = 0;
                 MONTHS.forEach((m, index) => {
                     if (index >= activeMonthLimit) return;
-
-                    // Hitung total per bulan
-                    let monthTotal = 0;
-                    STATE.data.forEach(row => {
-                        monthTotal += parseFloat(row[m]) || 0;
-                    });
+                    let monthTotal = 0; STATE.data.forEach(row => { monthTotal += parseFloat(row[m]) || 0; });
                     grandTotal += monthTotal;
-
                     const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(monthTotal);
-
-                    // PERUBAHAN: Gunakan List Item (Div) alih-alih Tabel
-                    const div = document.createElement('div');
-                    div.className = 'rekap-row-item';
+                    const div = document.createElement('div'); div.className = 'rekap-row-item';
                     div.innerHTML = `<span class="rekap-row-label">${m}</span><span class="rekap-row-value">${fmtTotal}</span>`;
                     container.appendChild(div);
                 });
-
-                // Baris Total Akhir
                 const fmtGrand = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(grandTotal);
-                const grandDiv = document.createElement('div');
-                grandDiv.className = 'rekap-row-item grand-total-row';
-                grandDiv.innerHTML = `<span class="rekap-row-label">Total Akhir</span><span class="rekap-row-value">${fmtGrand}</span>`;
+                const grandDiv = document.createElement('div'); grandDiv.className = 'rekap-row-item';
+                grandDiv.style.backgroundColor = '#f0fdf4'; grandDiv.style.borderColor = '#bbf7d0';
+                grandDiv.innerHTML = `<span class="rekap-row-label" style="color:var(--success)">Total Akhir</span><span class="rekap-row-value" style="color:var(--success)">${fmtGrand}</span>`;
                 container.appendChild(grandDiv);
                 return;
             }
-            
-            // MULTI MODE: TAMPILKAN ACCORDION (TIDAK DIUBAH)
             const grandTotals = {}; MONTHS.forEach(m => grandTotals[m] = 0);
             const sheetTotals = {}; MULTI_SHEETS.forEach(s => { sheetTotals[s] = {}; MONTHS.forEach(m => sheetTotals[s][m] = 0); });
             STATE.data.forEach(row => {
                 MONTHS.forEach(m => {
                     MULTI_SHEETS.forEach(sheet => {
-                        const r = row._rawData[sheet];
-                        if (r) {
-                            const val = parseFloat(r[m]) || 0;
-                            sheetTotals[sheet][m] += val;
-                            grandTotals[m] += val;
-                        }
+                        const r = row._rawData[sheet]; if (r) { const val = parseFloat(r[m]) || 0; sheetTotals[sheet][m] += val; grandTotals[m] += val; }
                     });
                 });
             });
@@ -709,12 +682,9 @@
                 const total = grandTotals[m];
                 const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(total);
                 const itemDiv = document.createElement('div'); itemDiv.className = 'rekap-item';
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'rekap-header';
-                headerDiv.onclick = function() { toggleRekap(this); };
+                const headerDiv = document.createElement('div'); headerDiv.className = 'rekap-header'; headerDiv.onclick = function() { toggleRekap(this); };
                 headerDiv.innerHTML = `<span class="rekap-month">${m}</span><div style="display:flex; align-items:center; gap:10px;"><span class="rekap-total">${fmtTotal}</span><span class="rekap-chevron">▼</span></div>`;
-                const detailsDiv = document.createElement('div');
-                detailsDiv.className = 'rekap-details';
+                const detailsDiv = document.createElement('div'); detailsDiv.className = 'rekap-details';
                 MULTI_SHEETS.forEach(sheet => {
                     const sheetTotal = sheetTotals[sheet][m];
                     const fmtSheet = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(sheetTotal);
@@ -728,8 +698,7 @@
                     subDiv.innerHTML = `<span>${sheet}</span><span class="rekap-sub-val">${fmtSheet}</span>`;
                     detailsDiv.appendChild(subDiv);
                 });
-                itemDiv.appendChild(headerDiv);
-                itemDiv.appendChild(detailsDiv);
+                itemDiv.appendChild(headerDiv); itemDiv.appendChild(detailsDiv);
                 container.appendChild(itemDiv);
             });
         }
@@ -737,39 +706,26 @@
         function toggleRekap(headerElement) {
             document.querySelectorAll('.rekap-details').forEach(el => el.classList.remove('show'));
             document.querySelectorAll('.rekap-item').forEach(el => el.classList.remove('expanded'));
-            const details = headerElement.nextElementSibling;
-            const item = headerElement.parentElement;
-            details.classList.add('show');
-            item.classList.add('expanded');
+            const details = headerElement.nextElementSibling; const item = headerElement.parentElement;
+            details.classList.add('show'); item.classList.add('expanded');
         }
 
-        async function fetchRiwayat() {
+        async function fetchRiwayat(silent = false) {
             const container = document.getElementById('riwayat-container');
-            container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat Data...</p></div>';
-
+            if (!silent) container.innerHTML = '<div style="text-align:center; padding:2rem;"><div class="spinner" style="margin:0 auto;"></div><p style="margin-top:10px;">Memuat Data...</p></div>';
             try {
                 const url = new URL(APP_CONFIG.url);
                 url.searchParams.set('nocache', new Date().getTime());
-
-                if (!IS_PUBLIC_MODE) url.searchParams.append('token', APP_CONFIG.token); 
-                else url.searchParams.append('mode', 'public');
-                url.searchParams.append('sheet', 'Riwayat'); 
-                url.searchParams.append('action', 'get-data');
-                
+                url.searchParams.append('id', RIWAYAT_CONFIG.id); 
+                url.searchParams.append('gid', RIWAYAT_CONFIG.gid);
+                // Jika public, token kosong, tapi tetap kirim param
+                if (!IS_PUBLIC_MODE) url.searchParams.append('token', APP_CONFIG.token);
+                url.searchParams.append('sheet', 'Riwayat'); url.searchParams.append('action', 'get-data');
                 const res = await fetch(url.toString());
                 const json = await res.json();
-                
-                if (!json.success) { 
-                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Error: ${json.message}</p></div>`; 
-                    return; 
-                }
-
+                if (!json.success) { if(!silent) container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Gagal memuat Riwayat.<br>Error: ${json.message}</p></div>`; return; }
                 const data = json.data;
-                if (data.length === 0) { 
-                    container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; 
-                    return; 
-                }
-
+                if (data.length === 0) { if(!silent) container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; return; }
                 const sheetName = APP_CONFIG.sheet;
                 const filteredData = data.filter(row => {
                     if (!row.Pesan) return false;
@@ -777,22 +733,32 @@
                     if (PAYMENT_MODE === 'multi') return MULTI_SHEETS.some(cat => row.Pesan.includes(cat));
                     else return row.Pesan.includes(sheetName);
                 }).reverse();
-                
-                setTimeout(() => {
-                    container.innerHTML = '';
-                    
-                    filteredData.forEach(row => {
-                        let dateDisplay = row.Tanggal || row.Timestamp || "-";
-                        if (dateDisplay instanceof Date) dateDisplay = dateDisplay.toLocaleDateString('id-ID');
-                        const div = document.createElement('div');
-                        div.className = 'riwayat-item';
-                        div.innerHTML = `<div class="riwayat-date">${dateDisplay}</div><div class="riwayat-msg">${row.Pesan}</div>`;
-                        container.appendChild(div);
-                    });
-                }, 50);
-            } catch (e) { 
-                container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Error: ${e.message}</p></div>`; 
-            }
+                STATE.riwayatData = filteredData;
+                if (!silent) renderRiwayatUI(filteredData);
+            } catch (e) { console.error(e); if(!silent) container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--danger);"><p>Error: ${e.message}</p></div>`; }
+        }
+
+        function renderRiwayatUI(data) {
+            const container = document.getElementById('riwayat-container');
+            container.innerHTML = ''; 
+            if (!data || data.length === 0) { container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; return; }
+            data.forEach(row => {
+                let rawDate = row.Times || row.Tanggal || row.Timestamp || "-"; let dateDisplay = rawDate;
+                if (typeof rawDate === 'number' && rawDate > 25569) {
+                    const excelDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
+                    dateDisplay = excelDate.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                } else if (rawDate !== "-" && rawDate) {
+                    try {
+                        const dateObj = new Date(rawDate);
+                        if (!isNaN(dateObj.getTime())) dateDisplay = dateObj.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    } catch (e) { }
+                }
+                const div = document.createElement('div');
+                div.className = 'rekap-row-item';
+                div.style.flexDirection = 'column'; div.style.alignItems = 'flex-start'; div.style.gap = '4px';
+                div.innerHTML = `<div style="font-size:0.8rem; color:var(--secondary);">${dateDisplay}</div><div style="font-weight:500;">${row.Pesan}</div>`;
+                container.appendChild(div);
+            });
         }
 
         function switchTab(tabName, el) {
@@ -804,7 +770,10 @@
             views.forEach(v => v.classList.remove('active'));
             if (tabName === 'pembayaran') document.getElementById('view-pembayaran').classList.add('active');
             else if (tabName === 'rekap') { document.getElementById('view-rekap').classList.add('active'); renderRekap(); }
-            else if (tabName === 'riwayat') { document.getElementById('view-riwayat').classList.add('active'); fetchRiwayat(); }
+            else if (tabName === 'riwayat') { 
+                document.getElementById('view-riwayat').classList.add('active'); 
+                if (STATE.riwayatData && STATE.riwayatData.length > 0) renderRiwayatUI(STATE.riwayatData); else fetchRiwayat(false);
+            }
             else if (tabName === 'settings') openSettingsModal();
         }
 
@@ -833,18 +802,10 @@
                 } else { kurang = parseFloat(getVal(row, idxKurang)) || 0; }
                 
                 let badgeHTML = '';
-                
-                // PERUBAHAN LOGIKA BADGE LUNAS
                 if (kurang <= 0) {
                     const fmtOverpay = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.abs(kurang));
-                    
-                    // Badge Nominal (Hanya muncul jika ada overpay/kurang < 0)
                     const overpayBadge = (kurang < 0) ? `<div class="lunas-amount-tag">+${fmtOverpay}</div>` : '';
-                    
-                    // Badge Label (Selalu muncul)
                     const labelBadge = `<div class="lunas-button-tag">✅ Lunas</div>`;
-                    
-                    // Wrapper
                     badgeHTML = `<div class="lunas-status-container">${overpayBadge}${labelBadge}</div>`;
                 } else {
                     const fmtKurang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(kurang);
@@ -854,8 +815,16 @@
                 
                 const div = document.createElement('div');
                 div.className = 'warga-card';
+                div.setAttribute('data-blok', blok);
                 if (!IS_PUBLIC_MODE) { div.onclick = function() { openEdit(blok); }; div.style.cursor = "pointer"; }
-                div.innerHTML = `<img src="${avatarSrc}" class="avatar" onerror="this.src='${DEFAULT_IMG}'"><div class="info"><div class="info-name" title="${nama}">${nama}</div><div class="info-blok">Rumah Blok ${blok}</div></div>${badgeHTML}`;
+                div.innerHTML = `
+                    <img src="${avatarSrc}" class="avatar" onerror="this.src='${DEFAULT_IMG}'">
+                    <div class="info">
+                        <div class="info-name" title="${nama}">${nama}</div>
+                        <div class="info-blok">Blok ${blok}</div>
+                    </div>
+                    <div class="status-right">${badgeHTML}</div>
+                `;
                 container.appendChild(div);
             });
         }
@@ -866,10 +835,8 @@
             if (sourceData.length > 0) {
                 if (PAYMENT_MODE === 'multi') {
                     sourceData.forEach(row => {
-                        // PERUBAHAN: Cek apakah kolom Nama ada
                         const nama = row['Nama'];
                         if (!nama || nama.trim() === "" || nama.toLowerCase() === '-') return;
-
                         MULTI_SHEETS.forEach(sheet => {
                             const r = row._rawData[sheet];
                             if (r) {
@@ -885,12 +852,9 @@
                     const idxBayar = headerKeys.findIndex(h => h.toLowerCase().includes('sudah_bayar'));
                     const idxKurang = headerKeys.findIndex(h => h.toLowerCase().includes('kurang'));
                     const idxNama = findIdx(['nama', 'pemilik', 'name']);
-
                     sourceData.forEach(row => {
-                        // PERUBAHAN: Cek apakah kolom Nama ada
                         const nama = getVal(row, idxNama);
                         if (!nama || nama.trim() === "" || nama.toLowerCase() === '-') return;
-
                         if (idxBayar !== -1) totalSudahBayar += parseFloat(row[headerKeys[idxBayar]]) || 0;
                         if (idxKurang !== -1) totalKurang += parseFloat(row[headerKeys[idxKurang]]) || 0;
                     });
@@ -944,44 +908,32 @@
 
             const generalContainer = document.getElementById('general-fields');
             const monthlyContainer = document.getElementById('monthly-fields');
-            generalContainer.innerHTML = '';
-            monthlyContainer.innerHTML = '';
+            generalContainer.innerHTML = ''; monthlyContainer.innerHTML = '';
 
             const settings = getSettings();
             const activeMonthLimit = settings.index; 
 
             if (PAYMENT_MODE === 'single') {
                 const globalPrice = settings.price; 
-                
                 STATE.headers.forEach((h, index) => {
                     if (MONTHS.includes(h) || FORMULA_COLS.includes(h)) return; 
                     if (h === 'Blok' || h === 'Nama' || h === 'nama' || h === 'Foto') return;
-                    
                     if (PROTECTED_INDICES.includes(index)) {
                         const val = row[h] !== undefined ? row[h] : '';
-                        const div = document.createElement('div');
-                        div.className = 'protected-field';
-                        div.innerHTML = `
-                            <label class="form-label">${h} (Aman)</label>
-                            <div class="readonly-value">${val}</div>
-                        `;
-                        generalContainer.appendChild(div);
-                        return;
+                        const div = document.createElement('div'); div.className = 'protected-field';
+                        div.style.marginBottom = '10px'; div.style.fontSize = '0.8rem'; div.style.color = '#64748b';
+                        div.innerHTML = `<strong>${h}:</strong> <span style="color:#1e293b;">${val}</span>`;
+                        generalContainer.appendChild(div); return;
                     }
-
                     if (h === '2025') {
-                         const val = row[h] || 0;
-                         const fmtVal = new Intl.NumberFormat('id-ID').format(val);
-                         const div = document.createElement('div');
-                         div.className = 'form-group';
-                         div.innerHTML = `<div class="note-2025">Catatan: ${h} tunggakan <span>${fmtVal}</span></div>`;
-                         generalContainer.appendChild(div);
-                         return; 
+                         const val = row[h] || 0; const fmtVal = new Intl.NumberFormat('id-ID').format(val);
+                         const div = document.createElement('div'); div.style.marginBottom = '10px'; div.style.fontSize = '0.8rem';
+                         div.innerHTML = `<div style="background:#fff7ed; color:#c2410c; padding:8px; border-radius:6px; font-size:0.75rem;">Tunggakan 2025: <strong>${fmtVal}</strong></div>`;
+                         generalContainer.appendChild(div); return; 
                     }
                     const val = row[h] !== undefined ? row[h] : '';
-                    const div = document.createElement('div');
-                    div.className = 'form-group';
-                    div.innerHTML = `<label class="form-label">${h}</label><input type="text" id="field-${h}" class="form-input" value="${val}">`;
+                    const div = document.createElement('div'); div.className = 'input-group';
+                    div.innerHTML = `<label class="form-label">${h}</label><input type="text" id="field-${h}" class="input-field" value="${val}">`;
                     generalContainer.appendChild(div);
                 });
 
@@ -990,49 +942,37 @@
                     const monthVal = parseFloat(row[month]) || 0;
                     const isChecked = (monthVal === globalPrice);
                     const isLocked = isChecked;
-
-                    const div = document.createElement('div');
-                    div.className = `month-row`;
-                    
-                    let iconHtml = document.getElementById('icon-unlock').outerHTML;
-                    let lockClass = '';
+                    const div = document.createElement('div'); div.className = `month-row`;
+                    let iconHtml = document.getElementById('icon-unlock').outerHTML; let lockClass = '';
                     if(isLocked) { iconHtml = document.getElementById('icon-lock').outerHTML; lockClass = 'locked'; }
-
                     let absenHtml = '';
                     if (ABSEN_MAP[month] !== undefined) {
                         const absenIndex = ABSEN_MAP[month];
                         const absenVal = row[STATE.headers[absenIndex]] || 0;
-                        if (absenVal && absenVal !== 0) {
-                            absenHtml = `<span class="absen-badge">${absenVal}x</span>`;
-                        }
+                        if (absenVal && absenVal !== 0) absenHtml = `<span style="font-size:0.7rem; background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px;">Absen: ${absenVal}x</span>`;
                     }
-
                     div.innerHTML = `
                         <div class="month-header">
                             <div class="title-group">
                                 <button class="btn-lock ${lockClass}" onclick="toggleLock(this)">${iconHtml}</button>
                                 <label class="month-label">${month}</label>
                             </div>
-                            <span class="month-total-display" style="font-size: 0.8rem; color: #666; font-weight:600;">Total: ${new Intl.NumberFormat('id-ID').format(monthVal)}</span>
+                            <span style="font-size: 0.75rem; color: #666; font-weight:600;">Rp ${new Intl.NumberFormat('id-ID').format(monthVal)}</span>
                         </div>
                         <div class="month-controls">
                             <input type="checkbox" id="check-${month}" class="month-checkbox" onchange="toggleMonthMode('${month}', this)" ${isChecked ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-                            <div class="input-wrapper">
-                                <input type="number" id="month-input-${month}" class="month-input" value="${monthVal}" oninput="handleManualInput('${month}', this)" ${isChecked || isLocked ? 'disabled' : ''}>
-                                ${absenHtml}
+                            <div style="flex:1;">
+                                <input type="number" id="month-input-${month}" class="month-input" value="${monthVal}" oninput="handleManualInput('${month}', this)" ${isChecked || isLocked ? 'disabled' : ''} style="width:100%; text-align:right;">
                             </div>
+                            ${absenHtml}
                         </div>
                     `;
                     monthlyContainer.appendChild(div);
                 });
-
             } else {
-                // RENDER MULTI MODE (UPDATED LAYOUT)
                 MONTHS.forEach((month, index) => {
                     if (index >= activeMonthLimit) return;
-                    let monthTotal = 0;
-                    let allPaid = true;
-                    
+                    let monthTotal = 0; let allPaid = true;
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
@@ -1040,12 +980,8 @@
                         monthTotal += val;
                         if (val !== standardPrice) allPaid = false;
                     });
-
                     const isLocked = false; 
-                    const div = document.createElement('div');
-                    div.className = `month-row-multi`; 
-                    let iconHtml = document.getElementById('icon-unlock').outerHTML;
-
+                    const div = document.createElement('div'); div.className = `month-row`; let iconHtml = document.getElementById('icon-unlock').outerHTML;
                     div.innerHTML = `
                         <div class="month-header">
                             <div class="title-group">
@@ -1054,29 +990,23 @@
                             </div>
                             <div style="font-size:0.75rem; color:var(--secondary); font-weight:600;">Total: ${new Intl.NumberFormat('id-ID').format(monthTotal)}</div>
                         </div>
-                        <div class="month-multi-inputs" id="inputs-${month}"></div>
+                        <div class="month-multi-inputs" id="inputs-${month}" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
                     `;
                     monthlyContainer.appendChild(div);
-
                     const inputsContainer = div.querySelector(`#inputs-${month}`);
                     MULTI_SHEETS.forEach(sheet => {
                         const r = row._rawData[sheet];
                         const val = r ? parseFloat(r[month]) || 0 : 0;
                         const standardPrice = STATE.sheetPrices[sheet] || 0;
                         const isChecked = (val === standardPrice);
-                        
-                        // --- UPDATED HTML STRUCTURE ---
                         const group = document.createElement('div');
-                        group.className = 'multi-cat-box'; 
+                        group.style.display = 'flex'; group.style.alignItems = 'center'; group.style.gap = '8px';
+                        group.style.background = '#f1f5f9'; group.style.padding = '8px'; group.style.borderRadius = '6px';
                         group.innerHTML = `
-                            <div class="cat-header">
-                                <input type="checkbox" id="check-${month}-${sheet}" class="mini-checkbox" onchange="toggleMultiSheetMode('${month}', '${sheet}', this)" ${isChecked ? 'checked' : ''}>
-                                <label class="cat-label">${sheet}</label>
-                            </div>
-                            <div class="cat-input-box">
-                                <input type="number" id="month-input-${month}-${sheet}" class="multi-input-field" value="${val}" 
-                                oninput="handleMultiManualInput('${month}', '${sheet}', this)" ${isChecked ? 'disabled' : ''}>
-                            </div>
+                            <input type="checkbox" id="check-${month}-${sheet}" onchange="toggleMultiSheetMode('${month}', '${sheet}', this)" ${isChecked ? 'checked' : ''}>
+                            <label style="flex:1; font-size:0.85rem;">${sheet}</label>
+                            <input type="number" id="month-input-${month}-${sheet}" style="width:80px; padding:4px; text-align:right;" value="${val}" 
+                            oninput="handleMultiManualInput('${month}', '${sheet}', this)" ${isChecked ? 'disabled' : ''}>
                         `;
                         inputsContainer.appendChild(group);
                     });
@@ -1093,28 +1023,19 @@
             const btnKurang = document.getElementById('btn-kurang-modal');
             const valKurang = parseFloat(btnKurang.dataset.val) || 0;
             if (valKurang <= 0) return showToast("Tidak ada tagihan (Kurang).");
-
             let targetMonthDiv = null;
-            const monthDivs = document.querySelectorAll(PAYMENT_MODE === 'multi' ? '.month-row-multi' : '.month-row');
+            const monthDivs = document.querySelectorAll(PAYMENT_MODE === 'multi' ? '.month-row' : '.month-row');
             for (let div of monthDivs) {
                 const lockBtn = div.querySelector('.btn-lock');
                 if(lockBtn && lockBtn.classList.contains('locked')) continue;
                 const cb = div.querySelector('input[type="checkbox"]');
-                if (cb && !cb.checked) {
-                    targetMonthDiv = div;
-                    break;
-                }
+                if (cb && !cb.checked) { targetMonthDiv = div; break; }
             }
-
             if (!targetMonthDiv) return showToast("Semua bulan sudah terisi penuh atau terkunci.");
-
             if (PAYMENT_MODE === 'single') {
                 const globalPrice = getSettings().price;
                 const input = targetMonthDiv.querySelector('.month-input');
-                if (input) {
-                    input.value = valKurang;
-                    input.dispatchEvent(new Event('input'));
-                }
+                if (input) { input.value = valKurang; input.dispatchEvent(new Event('input')); }
             } else {
                 let sisa = valKurang;
                 MULTI_SHEETS.forEach((sheet) => {
@@ -1122,16 +1043,9 @@
                     if (!input) return;
                     const standardPrice = STATE.sheetPrices[sheet] || 0;
                     if (document.getElementById(`check-${getMonthFromDiv(targetMonthDiv)}-${sheet}`).checked) return;
-
-                    if (sisa >= standardPrice) {
-                        input.value = standardPrice;
-                        sisa -= standardPrice;
-                    } else if (sisa > 0) {
-                        input.value = sisa;
-                        sisa = 0;
-                    } else {
-                        input.value = 0;
-                    }
+                    if (sisa >= standardPrice) { input.value = standardPrice; sisa -= standardPrice; } 
+                    else if (sisa > 0) { input.value = sisa; sisa = 0; } 
+                    else input.value = 0;
                     input.dispatchEvent(new Event('input'));
                 });
                 checkMultiMonthStatus(getMonthFromDiv(targetMonthDiv));
@@ -1139,126 +1053,70 @@
             showToast("Nilai Kurang dimasukkan ke input.");
         }
 
-        function getMonthFromDiv(div) {
-            const label = div.querySelector('.month-label');
-            return label ? label.innerText : '';
-        }
-
+        function getMonthFromDiv(div) { const label = div.querySelector('.month-label'); return label ? label.innerText : ''; }
         function toggleMonthMode(month, checkbox) {
             const row = checkbox.closest('.month-row');
             const lockBtn = row.querySelector('.btn-lock');
             if(lockBtn && lockBtn.classList.contains('locked')) return;
-
             const input = document.getElementById(`month-input-${month}`);
             const rowDiv = checkbox.closest('.month-row');
             const globalPrice = getSettings().price;
-
-            if (checkbox.checked) {
-                input.value = globalPrice;
-                input.disabled = true;
-                rowDiv.classList.add('active-month');
-            } else {
-                input.value = 0;
-                input.disabled = false;
-                rowDiv.classList.remove('active-month');
-                input.focus();
-            }
+            if (checkbox.checked) { input.value = globalPrice; input.disabled = true; rowDiv.classList.add('active-month'); } 
+            else { input.value = 0; input.disabled = false; rowDiv.classList.remove('active-month'); input.focus(); }
             checkSingleMonthTotal(month);
         }
-
         function handleManualInput(month, input) {
             const row = input.closest('.month-row');
             const lockBtn = row.querySelector('.btn-lock');
-            if(lockBtn && lockBtn.classList.contains('locked')) {
-                input.value = parseFloat(input.getAttribute('value') || 0); 
-                return;
-            }
-
+            if(lockBtn && lockBtn.classList.contains('locked')) { input.value = parseFloat(input.getAttribute('value') || 0); return; }
             const rowDiv = input.closest('.month-row');
             const checkbox = document.getElementById(`check-${month}`);
             if (input.disabled) return;
-
             const globalPrice = getSettings().price;
             const currentVal = parseFloat(input.value) || 0;
-
-            if (currentVal === globalPrice) {
-                checkbox.checked = true;
-                input.disabled = true;
-                rowDiv.classList.add('active-month');
-            } else {
-                checkbox.checked = false;
-                input.disabled = false;
-                rowDiv.classList.remove('active-month');
-            }
+            if (currentVal === globalPrice) { checkbox.checked = true; input.disabled = true; rowDiv.classList.add('active-month'); } 
+            else { checkbox.checked = false; input.disabled = false; rowDiv.classList.remove('active-month'); }
             checkSingleMonthTotal(month);
         }
-
         function checkSingleMonthTotal(month) {
             const input = document.getElementById(`month-input-${month}`);
             if(!input) return;
             const val = parseFloat(input.value) || 0;
             const row = input.closest('.month-row');
-            const totalDisplay = row.querySelector('.month-total-display');
-            if(totalDisplay) totalDisplay.innerText = "Total: " + new Intl.NumberFormat('id-ID').format(val);
+            const totalDisplay = row.querySelector('.month-header span:last-child');
+            if(totalDisplay) totalDisplay.innerText = "Rp " + new Intl.NumberFormat('id-ID').format(val);
         }
-
         function toggleMultiSheetMode(month, sheetName, checkbox) {
-            const row = checkbox.closest('.month-row-multi');
+            const row = checkbox.closest('.month-row');
             const lockBtn = row.querySelector('.btn-lock');
             if(lockBtn && lockBtn.classList.contains('locked')) return;
-
             const input = document.getElementById(`month-input-${month}-${sheetName}`);
             const sheetPrice = STATE.sheetPrices[sheetName] || 0;
-            
-            if (checkbox.checked) {
-                input.value = sheetPrice;
-                input.disabled = true;
-            } else {
-                input.value = 0;
-                input.disabled = false;
-                input.focus();
-            }
+            if (checkbox.checked) { input.value = sheetPrice; input.disabled = true; } 
+            else { input.value = 0; input.disabled = false; input.focus(); }
             checkMultiMonthTotal(month);
         }
-
         function handleMultiManualInput(month, sheetName, input) {
-            const row = input.closest('.month-row-multi');
+            const row = input.closest('.month-row');
             const lockBtn = row.querySelector('.btn-lock');
-            if(lockBtn && lockBtn.classList.contains('locked')) {
-                input.value = parseFloat(input.getAttribute('value') || 0); // Revert
-                return;
-            }
-
+            if(lockBtn && lockBtn.classList.contains('locked')) { input.value = parseFloat(input.getAttribute('value') || 0); return; }
             const checkbox = document.getElementById(`check-${month}-${sheetName}`);
             const sheetPrice = STATE.sheetPrices[sheetName] || 0;
             const currentVal = parseFloat(input.value) || 0;
-
-            if (currentVal === sheetPrice) {
-                checkbox.checked = true;
-                input.disabled = true;
-            } else {
-                checkbox.checked = false;
-                input.disabled = false;
-            }
+            if (currentVal === sheetPrice) { checkbox.checked = true; input.disabled = true; } 
+            else { checkbox.checked = false; input.disabled = false; }
             checkMultiMonthTotal(month);
         }
-
         function checkMultiMonthTotal(month) {
-            const rows = document.querySelectorAll('.month-row-multi');
-            let targetRow;
-            rows.forEach(r => {
-                if (r.querySelector('.month-label').innerText === month) targetRow = r;
-            });
+            const rows = document.querySelectorAll('.month-row'); let targetRow;
+            rows.forEach(r => { if (r.querySelector('.month-label').innerText === month) targetRow = r; });
             if(targetRow) {
-                // Ambil semua input di dalam .month-multi-inputs
-                const inputs = targetRow.querySelectorAll('.multi-input-field');
-                let total = 0;
+                const inputs = targetRow.querySelectorAll('input[type="number"]'); let total = 0;
                 inputs.forEach(i => total += parseFloat(i.value) || 0);
                 const totalDiv = targetRow.querySelector('.month-header div:last-child');
                 if(totalDiv) totalDiv.innerText = "Total: " + new Intl.NumberFormat('id-ID').format(total);
             }
         }
-        
         function checkMultiMonthStatus(month) { }
         
         function closeModal(modalId) {
@@ -1269,8 +1127,6 @@
 
         function openSettingsModal() {
             if (IS_PUBLIC_MODE) return;
-            if (APP_CONFIG.sheet === 'Riwayat') { showToast("⚠️ Sheet Riwayat bersifat Publik, password tidak bisa diganti."); return; }
-            document.getElementById('set-sheet-target').value = APP_CONFIG.sheet;
             const overlay = document.getElementById('settings-modal');
             overlay.style.display = 'flex';
             setTimeout(() => overlay.classList.add('active'), 10);
