@@ -18,10 +18,12 @@
             --border: #e2e8f0;
             --text-main: #1e293b;
             --text-muted: #64748b;
+            --expense-bg: #fff1f2; /* Light red bg for expenses */
+            --expense-text: #be123c;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; /* Space for bottom nav */ }
 
         /* --- INTRO ANIMATION STYLE --- */
         #intro-screen {
@@ -80,6 +82,7 @@
         .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
         .input-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; outline: none; transition: border 0.2s; }
         .input-field:focus { border-color: var(--primary); }
+        .input-field:disabled { background: #e2e8f0; color: var(--text-muted); }
 
         /* --- MAIN CONTENT --- */
         .view-section { display: none; padding: 1rem; padding-bottom: 80px; }
@@ -129,10 +132,29 @@
         .rekap-sub-val { font-weight: 600; }
         
         /* --- BOTTOM NAV --- */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.75rem; gap: 4px; cursor: pointer; width: 25%; }
-        .nav-item svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0 20px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.7rem; gap: 4px; cursor: pointer; width: 20%; position: relative; }
+        .nav-item svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
         .nav-item.active { color: var(--primary); }
+
+        /* Center Plus Button Style */
+        .nav-item.add-btn {
+            color: white;
+            top: -25px; /* Lift up */
+            background: var(--primary);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+            border: 4px solid var(--bg); /* Create cutout effect */
+        }
+        .nav-item.add-btn:active { transform: scale(0.95); }
+        .nav-item.add-btn svg { width: 28px; height: 28px; stroke: white; }
+        .nav-item.add-btn span { display: none; } /* Hide text for center button */
 
         /* --- MODALS --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
@@ -217,10 +239,6 @@
                     <option value="Sosial">Sosial</option>
                     <option value="Keamanan">Keamanan</option>
                     <option value="Pembangunan">Pembangunan</option>
-                    <option value="Kas">Kas</option>
-                    <option value="Sampah">Sampah</option>
-                    <option value="Konsumsi">Konsumsi</option>
-                    <option value="Arisan">Arisan</option>
                 </select>
             </div>
 
@@ -238,6 +256,7 @@
             <div class="search-container">
                 <input type="text" id="search-box" class="search-input" placeholder="Cari Blok atau Nama..." onkeyup="filterCards()">
             </div>
+            
             <div id="card-container" class="card-grid"></div>
             <div id="empty-state" class="hidden" style="text-align: center; margin-top: 3rem; color: var(--secondary);"><p>Data tidak ditemukan.</p></div>
         </section>
@@ -267,7 +286,7 @@
         </section>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Updated) -->
     <nav class="bottom-nav" id="main-nav" style="display:none;">
         <div class="nav-item active" onclick="switchTab('pembayaran', this)">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -277,18 +296,22 @@
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10h.01M9 17h.01M9 17l.01.01M12 12l-3.5-6m11.5 6l-1 1m-14.5 6l3.5-6m4.5 6l-1 1m-14.5 6l1 1"></path></svg>
             <span>Rekap</span>
         </div>
+        <!-- NEW: Center Add Button -->
+        <div class="nav-item add-btn" onclick="openExpenseModal()">
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+            <span>Tambah</span>
+        </div>
         <div class="nav-item" onclick="switchTab('riwayat', this)">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span>Riwayat</span>
         </div>
         <div class="nav-item" onclick="openSettingsModal()">
-            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317l.426-5.355a1.99 1.99 0 012.827-1.764l3.975.424a4.5 4.5 0 00-6.373-3.006l4.91 2.535zM17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-            <svg viewBox="0 0 24 24" style="position:absolute;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             <span>Pengaturan</span>
         </div>
     </nav>
 
-    <!-- Edit Modal -->
+    <!-- Edit Modal (Existing) -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header-bg">
@@ -309,6 +332,56 @@
                 <div class="modal-actions" style="margin-top: 1.5rem;">
                     <button type="button" class="btn btn-primary btn-save" onclick="document.getElementById('edit-form').requestSubmit()">Bayar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW FEATURE: EXPENSE MODAL -->
+    <div id="expense-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header-bg" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
+                <button class="btn-close-edit" onclick="closeModal('expense-modal')">&times;</button>
+                <h2 style="margin:0; font-size:1.4rem;">Input Pengeluaran</h2>
+                <div style="opacity:0.9; font-size:0.8rem;">Catat pengeluaran dana</div>
+            </div>
+            <div class="modal-body">
+                <form id="expense-form" onsubmit="event.preventDefault(); saveExpenseData();">
+                    <div class="input-group">
+                        <label>Tanggal</label>
+                        <input type="date" id="exp-date" class="input-field" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Sumber Dana</label>
+                        <select id="exp-source" class="input-field" required>
+                            <option value="Kas">Kas</option>
+                            <option value="Sampah">Sampah</option>
+                            <option value="Konsumsi">Konsumsi</option>
+                            <option value="Arisan">Arisan</option>
+                            <option value="Sosial">Sosial</option>
+                            <option value="Jimpitan">Jimpitan</option>
+                            <option value="Keamanan">Keamanan</option>
+                        </select>
+                    </div>
+
+                    <!-- Pengurus Hidden (Automatic) -->
+                    <div class="input-group hidden">
+                        <label>Pengurus</label>
+                        <input type="hidden" id="exp-admin" class="input-field">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Keterangan</label>
+                        <input type="text" id="exp-desc" class="input-field" placeholder="Contoh: Beli Alat Tulis" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Nominal (Rp)</label>
+                        <input type="number" id="exp-amount" class="input-field" placeholder="0" min="1" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--danger);">Simpan Pengeluaran</button>
+                </form>
             </div>
         </div>
     </div>
@@ -351,11 +424,28 @@
         const PROTECTED_INDICES = [5, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27];
         const ABSEN_MAP = { "Januari": 5, "Februari": 9, "Maret": 11, "April": 13, "Mei": 15, "Juni": 17, "Juli": 19, "Agustus": 21, "September": 23, "Oktober": 25, "November": 27 };
         
-        let APP_CONFIG = { url: '', token: '', sheet: '' }; // 'token' sekarang adalah Session Token
+        let APP_CONFIG = { url: '', token: '', sheet: '' }; 
         let IS_PUBLIC_MODE = false;
         let PAYMENT_MODE = 'single'; 
         
-        let STATE = { data: [], headers: [], currentEdit: null, multiDataCache: {}, sheetPrices: {}, riwayatData: [] };
+        let STATE = { data: [], headers: [], currentEdit: null, multiDataCache: {}, sheetPrices: {}, riwayatData: [], expenses: [] };
+
+        // --- NEW: SORTING HELPER ---
+        // Returns months sorted: Current Month Top -> Previous Months (Descending)
+        function getSortedMonths() {
+            const currentIdx = new Date().getMonth();
+            const months = MONTHS.map((m, i) => ({ name: m, index: i }));
+            
+            // Filter: Keep only current month and months BEFORE (Past months)
+            const validMonths = months.filter(m => m.index <= currentIdx);
+            
+            // Sort: Current month first, then others descending by index
+            return validMonths.sort((a, b) => {
+                if (a.index === currentIdx) return -1;
+                if (b.index === currentIdx) return 1;
+                return b.index - a.index;
+            });
+        }
 
         function getKey(obj, candidates) {
             if (!obj) return null;
@@ -384,11 +474,8 @@
                 if(headerTitle) headerTitle.innerText = APP_CONFIG.sheet + " (Lihat Saja)";
                 fetchData(); 
             } else {
-                // Cek session di memory (tidak persist di localstorage demi keamanan session based)
-                // Tapi kita simpan URL app
                 const storedUrl = localStorage.getItem('gas_app_url');
                 if (storedUrl) document.getElementById('app-url').value = storedUrl;
-                
                 document.getElementById('login-view').classList.remove('hidden');
             }
         });
@@ -396,22 +483,19 @@
         // --- SECURE LOGIN LOGIC ---
         async function doLogin(silent = false) {
             APP_CONFIG.url = document.getElementById('app-url').value.trim();
-            // Username = Sheet Name (Role)
             const username = document.getElementById('sheet-name').value.trim();
-            const password = document.getElementById('api-token').value.trim(); // Password asli
+            const password = document.getElementById('api-token').value.trim();
 
             if (!APP_CONFIG.url || !username || !password) {
                 if(!silent) showToast("Mohon isi data login lengkap");
                 return resetToLogin();
             }
             
-            // Simpan URL untuk reload berikutnya
             localStorage.setItem('gas_app_url', APP_CONFIG.url);
 
             if (username.toLowerCase() === 'bendahara') PAYMENT_MODE = 'multi';
             else PAYMENT_MODE = 'single';
 
-            // UI Loading & Intro
             document.getElementById('login-view').classList.add('hidden');
             const introScreen = document.getElementById('intro-screen');
             const introText = document.getElementById('intro-text');
@@ -446,7 +530,6 @@
 
             toggleLoading(true);
             try {
-                // 1. REQUEST LOGIN KE SERVER
                 const loginUrl = new URL(APP_CONFIG.url);
                 loginUrl.searchParams.append('action', 'login');
                 loginUrl.searchParams.append('username', username);
@@ -455,19 +538,15 @@
                 const loginRes = await fetch(loginUrl.toString());
                 const loginJson = await loginRes.json();
                 
-                if (!loginJson.success) {
-                    throw new Error(loginJson.message);
-                }
+                if (!loginJson.success) throw new Error(loginJson.message);
                 
-                // 2. SIMPAN SESSION TOKEN
-                APP_CONFIG.token = loginJson.data.token; // Ini Session Token, bukan Password
+                APP_CONFIG.token = loginJson.data.token;
                 APP_CONFIG.sheet = username;
 
-                // 3. FETCH DATA UTAMA
                 await fetchData();
+                fetchExpenses(); // NEW: Fetch Expenses
                 fetchRiwayat(true); 
                 
-                // Selesai Loading
                 clearInterval(animationInterval);
                 introScreen.classList.remove('active');
                 document.getElementById('main-content').style.display = 'block';
@@ -486,8 +565,7 @@
                 console.error(e);
                 clearInterval(animationInterval);
                 introScreen.classList.remove('active');
-                document.getElementById('api-token').value = ''; // Clear password input on error
-                
+                document.getElementById('api-token').value = '';
                 if(silent) showToast("Sesi Login Habis. Silakan Login Ulang.");
                 else showToast("Error Login: " + e.message);
                 resetToLogin();
@@ -501,16 +579,23 @@
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('main-nav').style.display = 'none';
             document.getElementById('main-header').classList.add('hidden');
-            APP_CONFIG.token = ''; // Clear session token
+            APP_CONFIG.token = '';
         }
 
+        // UPDATED: Handle Logout
         function handleLogout() { 
-            APP_CONFIG.token = ''; // Hapus session dari memory
+            closeModal('settings-modal'); // Close Modal First
+            APP_CONFIG.token = ''; 
             resetToLogin();
             if(IS_PUBLIC_MODE) window.location.href = window.location.href.split('?')[0];
         }
 
-        function shareSheet() { const sheetName = APP_CONFIG.sheet; window.open("https://la6.my.id/" + sheetName, '_blank'); }
+        // UPDATED: Share Sheet Logic
+        function shareSheet() { 
+            // window.open("https://la6.my.id/" + APP_CONFIG.sheet, '_blank'); // OLD
+            const mainDomain = window.location.origin; // e.g. https://la6.my.id
+            window.open(mainDomain, '_blank');
+        }
 
         // --- DATA FETCHING ---
         async function fetchData() {
@@ -532,7 +617,6 @@
             const url = new URL(APP_CONFIG.url);
             url.searchParams.append('sheet', APP_CONFIG.sheet);
             url.searchParams.append('action', 'get-data');
-            // Kirim Session Token
             url.searchParams.append('token', APP_CONFIG.token);
             
             const res = await fetch(url.toString());
@@ -590,7 +674,89 @@
             if (STATE.data.length === 0) showToast("⚠️ Data gabungan kosong.");
         }
 
-        // --- SAVING ---
+        // --- EXPENSE LOGIC (NEW FEATURE) ---
+        
+        async function fetchExpenses() {
+            try {
+                const url = new URL(APP_CONFIG.url);
+                url.searchParams.append('action', 'get-expenses');
+                url.searchParams.append('token', APP_CONFIG.token);
+                
+                const res = await fetch(url.toString());
+                const json = await res.json();
+                if (json.success) {
+                    STATE.expenses = json.data || [];
+                    // Don't render here, only store data.
+                } else {
+                    console.error("Gagal ambil pengeluaran:", json.message);
+                }
+            } catch (e) {
+                console.error("Error fetch expenses:", e);
+            }
+        }
+
+        function openExpenseModal() {
+            if (IS_PUBLIC_MODE) return showToast("❌ Mode Publik: Tidak bisa input data.");
+            
+            // Default Date to Today
+            document.getElementById('exp-date').valueAsDate = new Date();
+            
+            // Auto-fill Admin/Pengurus (Hidden Field)
+            document.getElementById('exp-admin').value = APP_CONFIG.sheet;
+            
+            // Pre-select Source based on login role if possible, default to APP_CONFIG.sheet if valid source
+            const sourceSelect = document.getElementById('exp-source');
+            const options = Array.from(sourceSelect.options).map(o => o.value);
+            if (options.includes(APP_CONFIG.sheet)) {
+                sourceSelect.value = APP_CONFIG.sheet;
+            }
+
+            const overlay = document.getElementById('expense-modal');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+        }
+
+        async function saveExpenseData() {
+            const date = document.getElementById('exp-date').value;
+            const source = document.getElementById('exp-source').value;
+            const admin = document.getElementById('exp-admin').value; // Readonly from input
+            const desc = document.getElementById('exp-desc').value;
+            const amount = document.getElementById('exp-amount').value;
+
+            if(!date || !source || !desc || !amount) {
+                return showToast("Mohon lengkapi semua data.");
+            }
+
+            closeModal('expense-modal');
+            toggleLoading(true);
+
+            try {
+                const url = new URL(APP_CONFIG.url);
+                url.searchParams.append('action', 'add-expense');
+                url.searchParams.append('token', APP_CONFIG.token);
+                url.searchParams.append('Tanggal', date);
+                url.searchParams.append('Sumber_Dana', source);
+                url.searchParams.append('Pengurus', admin); 
+                url.searchParams.append('Keterangan', desc);
+                url.searchParams.append('Nominal', amount);
+
+                const res = await fetch(url.toString());
+                const json = await res.json();
+
+                if(json.success) {
+                    showToast("✅ Pengeluaran berhasil disimpan!");
+                    fetchExpenses(); // Refresh data
+                } else {
+                    throw new Error(json.message);
+                }
+            } catch(e) {
+                showToast("❌ Gagal menyimpan: " + e.message);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // --- SAVING (OLD) ---
         async function saveData() {
             if (IS_PUBLIC_MODE) return showToast("❌ Mode Publik: Tidak bisa mengubah data.");
             closeModal('edit-modal');
@@ -726,8 +892,6 @@
             toggleLoading(true);
             try {
                 const url = new URL(APP_CONFIG.url);
-                
-                // Kirim Session Token untuk otorisasi
                 url.searchParams.append('action', 'update-password');
                 url.searchParams.append('token', APP_CONFIG.token); 
                 url.searchParams.append('old_password', oldPassword);
@@ -740,10 +904,7 @@
                     showToast("✅ " + json.message);
                     closeModal('settings-modal');
                     document.getElementById('settings-form').reset();
-                    
-                    // Reload halaman karena session di server di-destroy
                     setTimeout(() => { window.location.reload(); }, 1000);
-                    
                 } else {
                     showToast("❌ " + json.message);
                 }
@@ -762,7 +923,7 @@
                 MULTI_SHEETS.forEach(sheetName => {
                     let specificPrice = 0;
                     const sheetData = STATE.multiDataCache[sheetName] || [];
-                    if (sheetData.length > 3) {
+                    if (sheetData.length >3) {
                         const rowT5 = sheetData[3];
                         let foundPrice = 0;
                         if (rowT5 && rowT5['Bulan_Aktif'] && !isNaN(rowT5['Bulan_Aktif'])) foundPrice = parseFloat(rowT5['Bulan_Aktif']);
@@ -777,7 +938,7 @@
                 });
                 sourceData = STATE.multiDataCache["Kas"] || [];
             } else {
-                if (sourceData.length > 3) {
+                if (sourceData.length >3) {
                     const priceRow = sourceData[3];
                     let priceVal = priceRow['Bulan_Aktif'];
                     if (!priceVal) priceVal = priceRow['PerAbsen'];
@@ -821,20 +982,82 @@
             }
         }
 
+        // --- UPDATED: RENDER REKAP WITH EXPENSE FILTER ---
         function renderRekap() {
             const container = document.getElementById('rekap-container');
             container.innerHTML = '';
+            
+            const displayMonths = getSortedMonths();
+            
             if (PAYMENT_MODE === 'single') {
                 const settings = getSettings(); const activeMonthLimit = settings.index; let grandTotal = 0;
-                MONTHS.forEach((m, index) => {
+                
+                displayMonths.forEach((mObj) => {
+                    const m = mObj.name;
+                    const index = mObj.index;
+                    
                     if (index >= activeMonthLimit) return;
                     let monthTotal = 0; STATE.data.forEach(row => { monthTotal += parseFloat(row[m]) || 0; });
                     grandTotal += monthTotal;
                     const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(monthTotal);
-                    const div = document.createElement('div'); div.className = 'rekap-row-item';
-                    div.innerHTML = `<span class="rekap-row-label">${m}</span><span class="rekap-row-value">${fmtTotal}</span>`;
+                    
+                    const div = document.createElement('div'); div.className = 'rekap-item';
+                    const headerDiv = document.createElement('div'); headerDiv.className = 'rekap-header'; headerDiv.onclick = function() { toggleRekap(this); };
+                    headerDiv.innerHTML = `<span class="rekap-month">${m}</span><div style="display:flex; align-items:center; gap:10px;"><span class="rekap-total">${fmtTotal}</span><span class="rekap-chevron">▼</span></div>`;
+                    const detailsDiv = document.createElement('div'); detailsDiv.className = 'rekap-details';
+                    
+                    // 1. INCOME ITEM
+                    const incItem = document.createElement('div');
+                    incItem.className = 'rekap-row-item';
+                    incItem.innerHTML = `<span class="rekap-row-label">Total Pemasukan</span><span class="rekap-row-value">${fmtTotal}</span>`;
+                    detailsDiv.appendChild(incItem);
+
+                    // 2. EXPENSE ITEMS (UPDATED: Filter by Login Role)
+                    // Filter by Pengurus === APP_CONFIG.sheet
+                    let monthExpenses = STATE.expenses.filter(exp => {
+                        const d = new Date(exp.Tanggal);
+                        if (isNaN(d.getTime())) return false;
+                        if (MONTHS[d.getMonth()] !== m) return false;
+                        return exp.Pengurus === APP_CONFIG.sheet; // STRICT FILTER
+                    });
+
+                    if (monthExpenses.length > 0) {
+                        const titleDiv = document.createElement('div');
+                        titleDiv.style.padding = "8px 0";
+                        titleDiv.style.borderTop = "1px dashed #ccc";
+                        titleDiv.style.marginTop = "8px";
+                        titleDiv.style.color = "#ef4444";
+                        titleDiv.style.fontWeight = "600";
+                        titleDiv.style.fontSize = "0.85rem";
+                        titleDiv.innerText = "PENGELUARAN";
+                        detailsDiv.appendChild(titleDiv);
+
+                        let monthTotalExpense = 0;
+                        monthExpenses.forEach(exp => {
+                            const val = parseFloat(exp.Nominal) || 0;
+                            monthTotalExpense += val;
+                            
+                            const row = document.createElement('div');
+                            row.className = 'rekap-sub-item';
+                            row.innerHTML = `
+                                <span>${exp.Keterangan}</span>
+                                <span class="rekap-sub-val" style="color:#ef4444">-${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val)}</span>
+                            `;
+                            detailsDiv.appendChild(row);
+                        });
+                        const totalRow = document.createElement('div');
+                        totalRow.style.textAlign = "right";
+                        totalRow.style.fontSize = "0.8rem";
+                        totalRow.style.fontWeight = "bold";
+                        totalRow.style.color = "#991b1b";
+                        totalRow.style.marginTop = "5px";
+                        totalRow.innerText = `Total Pengeluaran: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(monthTotalExpense)}`;
+                        detailsDiv.appendChild(totalRow);
+                    }
+                    div.appendChild(headerDiv); div.appendChild(detailsDiv);
                     container.appendChild(div);
                 });
+                
                 const fmtGrand = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(grandTotal);
                 const grandDiv = document.createElement('div'); grandDiv.className = 'rekap-row-item';
                 grandDiv.style.backgroundColor = '#f0fdf4'; grandDiv.style.borderColor = '#bbf7d0';
@@ -842,6 +1065,8 @@
                 container.appendChild(grandDiv);
                 return;
             }
+            
+            // MULTI MODE (BENDAHARA)
             const grandTotals = {}; MONTHS.forEach(m => grandTotals[m] = 0);
             const sheetTotals = {}; MULTI_SHEETS.forEach(s => { sheetTotals[s] = {}; MONTHS.forEach(m => sheetTotals[s][m] = 0); });
             STATE.data.forEach(row => {
@@ -851,13 +1076,17 @@
                     });
                 });
             });
-            MONTHS.forEach(m => {
+            
+            displayMonths.forEach((mObj) => {
+                const m = mObj.name;
                 const total = grandTotals[m];
                 const fmtTotal = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(total);
                 const itemDiv = document.createElement('div'); itemDiv.className = 'rekap-item';
                 const headerDiv = document.createElement('div'); headerDiv.className = 'rekap-header'; headerDiv.onclick = function() { toggleRekap(this); };
                 headerDiv.innerHTML = `<span class="rekap-month">${m}</span><div style="display:flex; align-items:center; gap:10px;"><span class="rekap-total">${fmtTotal}</span><span class="rekap-chevron">▼</span></div>`;
                 const detailsDiv = document.createElement('div'); detailsDiv.className = 'rekap-details';
+
+                // 1. INCOME GROUPS
                 MULTI_SHEETS.forEach(sheet => {
                     const sheetTotal = sheetTotals[sheet][m];
                     const fmtSheet = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(sheetTotal);
@@ -871,6 +1100,49 @@
                     subDiv.innerHTML = `<span>${sheet}</span><span class="rekap-sub-val">${fmtSheet}</span>`;
                     detailsDiv.appendChild(subDiv);
                 });
+
+                // 2. EXPENSE ITEMS (UPDATED: Filter by Login Role)
+                let monthExpenses = STATE.expenses.filter(exp => {
+                    const d = new Date(exp.Tanggal);
+                    if (isNaN(d.getTime())) return false;
+                    if (MONTHS[d.getMonth()] !== m) return false;
+                    return exp.Pengurus === APP_CONFIG.sheet; // STRICT FILTER FOR BENDAHARA TOO
+                });
+
+                if (monthExpenses.length > 0) {
+                    const titleDiv = document.createElement('div');
+                    titleDiv.style.padding = "8px 0";
+                    titleDiv.style.borderTop = "1px dashed #ccc";
+                    titleDiv.style.marginTop = "8px";
+                    titleDiv.style.color = "#ef4444";
+                    titleDiv.style.fontWeight = "600";
+                    titleDiv.style.fontSize = "0.85rem";
+                    titleDiv.innerText = "PENGELUARAN";
+                    detailsDiv.appendChild(titleDiv);
+
+                    let monthTotalExpense = 0;
+                    monthExpenses.forEach(exp => {
+                        const val = parseFloat(exp.Nominal) || 0;
+                        monthTotalExpense += val;
+                        
+                        const row = document.createElement('div');
+                        row.className = 'rekap-sub-item';
+                        row.innerHTML = `
+                            <span>${exp.Keterangan}</span>
+                            <span class="rekap-sub-val" style="color:#ef4444">-${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val)}</span>
+                        `;
+                        detailsDiv.appendChild(row);
+                    });
+                    const totalRow = document.createElement('div');
+                    totalRow.style.textAlign = "right";
+                    totalRow.style.fontSize = "0.8rem";
+                    totalRow.style.fontWeight = "bold";
+                    totalRow.style.color = "#991b1b";
+                    totalRow.style.marginTop = "5px";
+                    totalRow.innerText = `Total Pengeluaran: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(monthTotalExpense)}`;
+                    detailsDiv.appendChild(totalRow);
+                }
+
                 itemDiv.appendChild(headerDiv); itemDiv.appendChild(detailsDiv);
                 container.appendChild(itemDiv);
             });
@@ -891,7 +1163,6 @@
                 url.searchParams.set('nocache', new Date().getTime());
                 url.searchParams.append('id', RIWAYAT_CONFIG.id); 
                 url.searchParams.append('gid', RIWAYAT_CONFIG.gid);
-                // Jika public, token kosong, tapi tetap kirim param
                 if (!IS_PUBLIC_MODE) url.searchParams.append('token', APP_CONFIG.token);
                 url.searchParams.append('sheet', 'Riwayat'); url.searchParams.append('action', 'get-data');
                 const res = await fetch(url.toString());
@@ -917,7 +1188,7 @@
             if (!data || data.length === 0) { container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--secondary);"><p>Belum ada riwayat.</p></div>`; return; }
             data.forEach(row => {
                 let rawDate = row.Times || row.Tanggal || row.Timestamp || "-"; let dateDisplay = rawDate;
-                if (typeof rawDate === 'number' && rawDate > 25569) {
+                if (typeof rawDate === 'number' && rawDate >25569) {
                     const excelDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
                     dateDisplay = excelDate.toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
                 } else if (rawDate !== "-" && rawDate) {
@@ -1086,6 +1357,9 @@
             const settings = getSettings();
             const activeMonthLimit = settings.index; 
 
+            // --- UPDATED: USE SORTED MONTHS ---
+            const displayMonths = getSortedMonths();
+
             if (PAYMENT_MODE === 'single') {
                 const globalPrice = settings.price; 
                 STATE.headers.forEach((h, index) => {
@@ -1110,7 +1384,10 @@
                     generalContainer.appendChild(div);
                 });
 
-                MONTHS.forEach((month, index) => {
+                displayMonths.forEach((mObj) => {
+                    const month = mObj.name;
+                    const index = mObj.index;
+
                     if (index >= activeMonthLimit) return;
                     const monthVal = parseFloat(row[month]) || 0;
                     const isChecked = (monthVal === globalPrice);
@@ -1143,7 +1420,10 @@
                     monthlyContainer.appendChild(div);
                 });
             } else {
-                MONTHS.forEach((month, index) => {
+                displayMonths.forEach((mObj) => {
+                    const month = mObj.name;
+                    const index = mObj.index;
+
                     if (index >= activeMonthLimit) return;
                     let monthTotal = 0; let allPaid = true;
                     MULTI_SHEETS.forEach(sheet => {
