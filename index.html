@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Total Iuran RT</title>
     
-    <!-- FAVICON (Ikon Web) -->
+    <!-- FAVICON -->
     <link rel="icon" href="https://avatars.githubusercontent.com/u/61934361?v=4">
+
+    <!-- LIBRARY HTML2CANVAS (Untuk Download Gambar) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -41,7 +44,14 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
             position: sticky; 
             top: 0; 
-            z-index: 20; 
+            z-index: 20;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        header.hide-up {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .brand { 
@@ -54,135 +64,92 @@
         }
 
         .brand-logo { 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 2px solid rgba(255,255,255,0.5); 
-            background-color: #ffffff; 
+            width: 32px; height: 32px; border-radius: 50%; object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.5); background-color: #ffffff; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* MAIN */
         main { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 1.5rem; 
-            width: 100%; 
+            max-width: 800px; margin: 0 auto; padding: 1.5rem; width: 100%; 
+            position: relative; 
         }
 
-        /* --- LOADING OVERLAY BARU --- */
+        /* --- LOADING OVERLAY --- */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--loader-bg); z-index: 100;
             display: flex; justify-content: center; align-items: center;
-            flex-direction: column;
-            backdrop-filter: blur(10px);
+            flex-direction: column; backdrop-filter: blur(10px);
             transition: opacity 0.5s ease;
         }
-
-        .loader-content {
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
-        }
-
-        /* Lingkaran Loading Atas */
+        .loader-content { text-align: center; width: 90%; max-width: 350px; }
         .spinner-circle {
-            width: 60px; height: 60px;
-            margin: 0 auto 20px auto;
-            position: relative;
+            width: 60px; height: 60px; margin: 0 auto 20px auto; position: relative;
         }
-        
-        .spinner-circle svg {
-            width: 100%; height: 100%;
-            animation: spin 1.5s linear infinite;
-        }
-        
+        .spinner-circle svg { width: 100%; height: 100%; animation: spin 1.5s linear infinite; }
         .spinner-circle circle {
-            fill: none;
-            stroke: var(--primary);
-            stroke-width: 4;
-            stroke-dasharray: 150, 200;
-            stroke-dashoffset: 0;
-            stroke-linecap: round;
+            fill: none; stroke: var(--primary); stroke-width: 4;
+            stroke-dasharray: 150, 200; stroke-dashoffset: 0; stroke-linecap: round;
             animation: dash 1.5s ease-in-out infinite;
         }
-
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes dash {
             0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
             50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
             100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
         }
-
-        /* Teks Status Utama */
-        .loading-status-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            min-height: 1.5em; /* Mencegah layout jump */
-        }
-
-        /* Container List Item */
-        .loading-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center; /* Center items */
-        }
-
-        /* Item Individual (Kapsul) */
+        .loading-status-text { font-size: 1.1rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 20px; min-height: 1.5em; }
+        .loading-list { list-style: none; display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .loading-item {
-            background: #fff;
-            color: var(--secondary);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            
-            /* Animasi Masuk */
-            opacity: 0;
-            transform: translateX(-30px) scale(0.9);
+            background: #fff; color: var(--secondary); padding: 10px 20px; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 500; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0; opacity: 0; transform: translateX(-30px) scale(0.9);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
         }
-
-        /* Status Aktif (Sedang diproses) */
         .loading-item.active {
-            opacity: 1;
-            transform: translateX(0) scale(1.05);
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            opacity: 1; transform: translateX(0) scale(1.05); background: var(--primary);
+            color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
         }
-
-        /* Status Selesai (Sudah lewat) */
         .loading-item.done {
-            opacity: 0.6;
-            transform: translateX(0) scale(1);
-            color: var(--success);
-            background: var(--success-light);
-            border-color: var(--success);
+            opacity: 0.6; transform: translateX(0) scale(1); color: var(--success);
+            background: var(--success-light); border-color: var(--success);
         }
-
-        /* Icon checkmark kecil */
-        .check-icon {
-            display: none;
-            width: 16px; height: 16px;
-        }
+        .check-icon { display: none; width: 16px; height: 16px; }
         .loading-item.done .check-icon { display: block; }
 
-        /* SEARCH */
-        .search-container { margin-bottom: 1.5rem; }
+        /* SEARCH CONTAINER */
+        .search-container { 
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .search-container.is-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 10px 1.5rem;
+            z-index: 50;
+            background: var(--bg-body);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .search-input { 
             width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 50px; 
             background: var(--bg-card); box-shadow: var(--shadow); font-size: 1rem; 
@@ -195,27 +162,17 @@
         .card-grid { display: flex; flex-direction: column; gap: 0.8rem; padding-bottom: 2rem; }
         
         .warga-card { 
-            background: var(--bg-card); 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
-            border: 1px solid transparent; 
-            transition: all 0.3s ease;
-            cursor: pointer;
-            overflow: hidden; 
+            background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); 
+            border: 1px solid transparent; transition: all 0.3s ease; cursor: pointer; overflow: hidden; 
         }
 
         .warga-card.active {
-            border-color: var(--primary);
-            transform: scale(1.01);
+            border-color: var(--primary); transform: scale(1.01); 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .card-header {
-            padding: 1rem; 
-            padding-right: 1.5rem;
-            display: flex; 
-            align-items: center; 
-            gap: 1rem;
+            padding: 1rem; padding-right: 1.5rem; display: flex; align-items: center; gap: 1rem;
         }
 
         .avatar { 
@@ -227,46 +184,164 @@
         .info-blok { font-size: 0.8rem; color: var(--secondary); font-weight: 500; }
 
         /* BADGES */
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .badge { padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
         .badge-green { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
         .badge-red { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
-        /* Detail Section */
+        /* DETAIL SECTION */
         .details-section {
-            max-height: 0;
-            overflow: hidden;
-            background-color: #f8fafc;
-            transition: max-height 0.3s ease-out, padding 0.3s ease;
-            border-top: 1px solid transparent;
+            max-height: 0; overflow: hidden; background-color: #f8fafc;
+            transition: max-height 0.3s ease-out, padding 0.3s ease; border-top: 1px solid transparent;
         }
 
         .warga-card.active .details-section {
-            max-height: 500px; 
-            border-top-color: #e2e8f0;
-            padding: 1rem 1rem 1.5rem 1rem;
+            max-height: 1000px; border-top-color: #e2e8f0; padding: 1rem 1rem 1.5rem 1rem;
         }
 
-        .detail-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
+        .detail-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
         .detail-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            padding: 0.5rem;
-            background: #fff;
-            border-radius: 8px;
-            border: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between; font-size: 0.9rem;
+            padding: 0.5rem; background: #fff; border-radius: 8px; border: 1px solid #f1f5f9;
         }
-
         .detail-label { color: var(--secondary); }
         .detail-value { font-weight: 600; color: var(--text-main); }
         .text-green { color: var(--success); }
         .text-red { color: var(--danger); }
+
+        /* --- RONDA SUMMARY BOX --- */
+        .ronda-summary-box {
+            margin-top: 1rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        /* Wrapper untuk sejajarkan Title dan Buttons */
+        .ronda-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .ronda-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ronda-dates-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .ronda-date-item {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-main);
+            gap: 6px;
+        }
+
+        .ronda-circle-date {
+            background: var(--danger);
+            color: #ffffff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 400;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .ronda-bulanan-msg {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* BUTTONS GROUP (PIN & DOWNLOAD) */
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* PIN BUTTON STYLE */
+        .pin-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+        
+        .pin-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .pin-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--secondary);
+        }
+
+        .pin-btn.active {
+            color: var(--primary); 
+            transform: translateY(-2px);
+        }
+        
+        .pin-btn.active svg {
+            fill: currentColor;
+        }
+
+        /* DOWNLOAD BUTTON STYLE */
+        .download-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--secondary);
+        }
+
+        .download-btn:active {
+            transform: scale(0.95);
+        }
 
         .hidden { display: none !important; }
         #empty-state { text-align: center; margin-top: 3rem; color: var(--secondary); }
@@ -275,7 +350,7 @@
 </head>
 <body>
 
-    <!-- LOADING OVERLAY (Didesain ulang) -->
+    <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
         <div class="loader-content">
             <div class="spinner-circle">
@@ -285,130 +360,134 @@
             </div>
             <div class="loading-status-text" id="loading-text">Menginisialisasi...</div>
             <ul class="loading-list" id="loading-list">
-                <!-- Item akan di-generate via JS -->
+                <!-- JS Generated -->
             </ul>
         </div>
     </div>
 
     <header>
         <div class="brand">
-            <img 
-                src="https://avatars.githubusercontent.com/u/61934361?v=4" 
-                class="brand-logo" 
-                alt="Logo RT"
-            >
+            <img src="https://avatars.githubusercontent.com/u/61934361?v=4" class="brand-logo" alt="Logo RT">
             <span id="header-title">Total Iuran RT</span>
         </div>
     </header>
 
     <main>
-        <div class="search-container">
+        <div class="search-container" id="search-container">
             <input type="text" id="search-box" class="search-input" placeholder="Cari Nama atau Blok..." onkeyup="filterCards()">
         </div>
 
         <div id="card-container" class="card-grid">
-            <!-- Data akan dimuat di sini -->
+            <!-- Content Generated Here -->
         </div>
         <div id="empty-state" class="hidden"><p>Data tidak ditemukan.</p></div>
     </main>
 
     <script>
-        // --- KONFIGURASI SPREADSHEET ---
+        // --- KONFIGURASI ---
         const SHEET_ID = '1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0';
-        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan'];
+        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan', 'Warga'];
         
         const TARGET_COLS = {
             nama: 'Nama',
             blok: 'Blok',
             foto: 'Foto',
-            kurang: 'Kurang'
+            kurang: 'Kurang',
+            group: 'Group',
+            jadwal: 'Jadwal'
         };
 
         const DEFAULT_IMG = 'https://avatars.githubusercontent.com/u/61934361?v=4';
+        const PIN_KEY = 'rt_app_single_pinned';
+        
         let allData = [];
         let loadingAnimationInterval = null;
 
-        // --- FUNGSI ANIMASI LOADING BARU ---
-        function startLoadingAnimation() {
-            const listContainer = document.getElementById('loading-list');
-            const statusText = document.getElementById('loading-text');
-            
-            // Bersihkan list
-            listContainer.innerHTML = '';
-            
-            // Generate HTML Item untuk setiap sheet
-            SHEET_NAMES.forEach((name, index) => {
-                const li = document.createElement('li');
-                li.className = 'loading-item';
-                li.id = `load-item-${index}`;
-                li.innerHTML = `
-                    <span>${name}</span>
-                    <svg class="check-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                `;
-                listContainer.appendChild(li);
-            });
+        // --- FUNGSI DOWNLOAD CARD (BARU) ---
+        async function downloadCard(e) {
+            if (e) e.stopPropagation();
 
-            // Jalankan urutan animasi
-            let currentIndex = 0;
+            // Cari kartu yang sedang aktif (terbuka)
+            const cardElement = document.querySelector('.warga-card.active');
             
-            function processNext() {
-                if (currentIndex >= SHEET_NAMES.length) {
-                    // Semua selesai
-                    statusText.textContent = "Menyatukan data...";
-                    return;
-                }
-
-                // Tampilkan item saat ini
-                const currentItem = document.getElementById(`load-item-${currentIndex}`);
-                const sheetName = SHEET_NAMES[currentIndex];
-                
-                // Update Teks
-                statusText.textContent = `Memproses ${sheetName}...`;
-                
-                // Efek Visual
-                if(currentIndex > 0) {
-                    const prevItem = document.getElementById(`load-item-${currentIndex - 1}`);
-                    prevItem.classList.remove('active');
-                    prevItem.classList.add('done');
-                }
-                
-                currentItem.classList.add('active');
-
-                currentIndex++;
-                
-                // Ke item berikutnya dalam 600ms
-                loadingAnimationInterval = setTimeout(processNext, 600);
+            if (!cardElement) {
+                alert("Silakan buka (klik) kartu terlebih dahulu sebelum mengunduh.");
+                return;
             }
 
-            // Mulai setelah jeda singkat
-            setTimeout(processNext, 400);
+            const namaWarga = cardElement.querySelector('.info-name').innerText.replace(/[^a-zA-Z0-9]/g, "_"); // Bersihkan nama untuk filename
+            const originalButton = e ? e.currentTarget : null;
+            const originalHtml = originalButton ? originalButton.innerHTML : '';
+
+            // Ubah icon loading (opsional, visual feedback)
+            if(originalButton) {
+                originalButton.innerHTML = `<svg class="spinner-circle" style="width:18px;height:18px;margin:0;" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="4"></circle></svg>`;
+            }
+
+            try {
+                // Gunakan html2canvas
+                const canvas = await html2canvas(cardElement, {
+                    scale: 2, // Kualitas HD (2x pixel density)
+                    useCORS: true, // Memuat gambar eksternal (avatar)
+                    backgroundColor: '#ffffff', // Background putih
+                    logging: false
+                });
+
+                // Buat link download
+                const link = document.createElement('a');
+                link.download = `RT_Iuran_${namaWarga}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+            } catch (error) {
+                console.error("Gagal download:", error);
+                alert("Terjadi kesalahan saat mengunduh gambar.");
+            } finally {
+                // Kembalikan icon button
+                if (originalButton) {
+                    setTimeout(() => {
+                        originalButton.innerHTML = originalHtml;
+                    }, 500);
+                }
+            }
         }
 
-        // --- FUNGSI HENTIKAN LOADING ---
-        function stopLoadingAnimation() {
-            clearTimeout(loadingAnimationInterval);
-            
-            // Pastikan semua item terlihat 'selesai'
-            const items = document.querySelectorAll('.loading-item');
-            items.forEach(item => {
-                item.classList.remove('active');
-                item.classList.add('done');
-            });
-            
-            document.getElementById('loading-text').textContent = "Selesai!";
-            
-            // Fade out overlay
-            setTimeout(() => {
-                document.getElementById('loading-overlay').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loading-overlay').classList.add('hidden');
-                }, 500);
-            }, 500);
+        // --- FUNGSI PIN SINGLE ---
+        function getPinnedKey() {
+            try {
+                return localStorage.getItem(PIN_KEY) || null;
+            } catch (e) {
+                console.error("Gagal membaca LocalStorage", e);
+                return null;
+            }
         }
 
-        // --- SET BULAN SAAT INI ---
+        function togglePin(nama, blok) {
+            if (event) event.stopPropagation();
+
+            const currentPinnedKey = getPinnedKey();
+            const newKey = `${nama}_${blok}`;
+
+            if (currentPinnedKey === newKey) {
+                localStorage.removeItem(PIN_KEY);
+            } else {
+                localStorage.setItem(PIN_KEY, newKey);
+            }
+
+            renderCards(allData);
+            
+            const searchBox = document.getElementById('search-box');
+            if (searchBox.value.length > 0) {
+                filterCards();
+            }
+        }
+
+        // --- FUNGSI UTILITAS ---
+        function getBaseGroup(groupName) {
+            if (!groupName) return null;
+            return groupName.replace(/[a-z]$/i, '');
+        }
+
         function setHeaderDate() {
             const date = new Date();
             const options = { month: 'long' };
@@ -416,37 +495,67 @@
             document.getElementById('header-title').textContent = `Total Iuran RT ${monthName}`;
         }
 
-        // --- FUNGSI FORMAT NILAI ---
         function formatValue(value) {
             const formatter = new Intl.NumberFormat('id-ID', { 
-                style: 'currency', 
-                currency: 'IDR', 
-                maximumFractionDigits: 0 
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0 
             });
-
             if (value < 0) {
-                const absVal = Math.abs(value);
-                return {
-                    text: `Saldo : ${formatter.format(absVal)}`,
-                    className: 'text-green',
-                    badgeClass: 'badge-green'
-                };
+                return { text: `Saldo : ${formatter.format(Math.abs(value))}`, className: 'text-green', badgeClass: 'badge-green' };
             } else if (value === 0) {
-                return {
-                    text: '✔️ Lunas',
-                    className: 'text-green',
-                    badgeClass: 'badge-green'
-                };
+                return { text: '✔️ Lunas', className: 'text-green', badgeClass: 'badge-green' };
             } else {
-                return {
-                    text: formatter.format(value),
-                    className: 'text-red',
-                    badgeClass: 'badge-red'
-                };
+                return { text: formatter.format(value), className: 'text-red', badgeClass: 'badge-red' };
             }
         }
 
-        // --- FUNGSI AMBIL SATU SHEET ---
+        // --- LOADING ANIMATION ---
+        function startLoadingAnimation() {
+            const listContainer = document.getElementById('loading-list');
+            const statusText = document.getElementById('loading-text');
+            listContainer.innerHTML = '';
+            
+            SHEET_NAMES.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.className = 'loading-item';
+                li.id = `load-item-${index}`;
+                li.innerHTML = `<span>${name}</span><svg class="check-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin='round' d="M5 13l4 4L19 7" /></svg>`;
+                listContainer.appendChild(li);
+            });
+
+            let currentIndex = 0;
+            function processNext() {
+                if (currentIndex >= SHEET_NAMES.length) {
+                    statusText.textContent = "Menyatukan data...";
+                    return;
+                }
+                const currentItem = document.getElementById(`load-item-${currentIndex}`);
+                const sheetName = SHEET_NAMES[currentIndex];
+                statusText.textContent = `Memproses ${sheetName}...`;
+                
+                if(currentIndex > 0) {
+                    const prevItem = document.getElementById(`load-item-${currentIndex - 1}`);
+                    prevItem.classList.remove('active'); prevItem.classList.add('done');
+                }
+                currentItem.classList.add('active');
+                currentIndex++;
+                loadingAnimationInterval = setTimeout(processNext, 600);
+            }
+            setTimeout(processNext, 400);
+        }
+
+        function stopLoadingAnimation() {
+            clearTimeout(loadingAnimationInterval);
+            document.querySelectorAll('.loading-item').forEach(item => {
+                item.classList.remove('active'); item.classList.add('done');
+            });
+            document.getElementById('loading-text').textContent = "Selesai!";
+            setTimeout(() => {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.classList.add('hidden'), 500);
+            }, 500);
+        }
+
         async function fetchSingleSheet(sheetName) {
             const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}`;
             try {
@@ -462,23 +571,116 @@
             }
         }
 
-        // --- FUNGSI UTAMA AMBIL DATA ---
+        // --- LOGIKA JADWAL RONDA ---
+        function getMonthlySchedule(wargaJson) {
+            if (!wargaJson) return null;
+
+            const table = wargaJson.table;
+            const cols = table.cols;
+            const rows = table.rows;
+
+            const indices = {
+                nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                group: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.group.toLowerCase()),
+                jadwal: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.jadwal.toLowerCase())
+            };
+
+            let startGroupBase = null;
+            rows.forEach(row => {
+                const c = row.c;
+                const groupRaw = (indices.group !== -1 && c[indices.group]) ? c[indices.group].v : null;
+                const jadwalVal = (indices.jadwal !== -1 && c[indices.jadwal]) ? c[indices.jadwal].v : null;
+
+                if (groupRaw && String(jadwalVal).trim() === '1') {
+                    startGroupBase = getBaseGroup(groupRaw);
+                }
+            });
+
+            let uniqueGroupsSet = new Set();
+            rows.forEach(row => {
+                const groupRaw = (indices.group !== -1 && row.c[indices.group]) ? row.c[indices.group].v : null;
+                if (groupRaw && groupRaw.toLowerCase() !== 'bulanan') {
+                    uniqueGroupsSet.add(getBaseGroup(groupRaw));
+                }
+            });
+
+            let sortedGroups = Array.from(uniqueGroupsSet).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            if (sortedGroups.length === 0) return null;
+
+            let startIndex = 0;
+            if (startGroupBase) {
+                const idx = sortedGroups.indexOf(startGroupBase);
+                if (idx !== -1) startIndex = idx;
+            }
+
+            const scheduleMap = {};
+            const currentDate = new Date();
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            
+            let currentGroupIndex = startIndex;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const group = sortedGroups[currentGroupIndex];
+                scheduleMap[day] = group;
+                currentGroupIndex = (currentGroupIndex + 1) % sortedGroups.length;
+            }
+
+            return scheduleMap;
+        }
+
+        // --- FUNGSI UTAMA ---
         async function fetchData() {
             setHeaderDate();
-            
-            // Mulai animasi loading visual
             startLoadingAnimation();
 
             try {
                 const promises = SHEET_NAMES.map(name => fetchSingleSheet(name));
                 const results = await Promise.all(promises);
 
+                // 1. PROSES DATA WARGA
+                let wargaLookup = {};
+                let scheduleMap = {};
+
+                const wargaIndex = SHEET_NAMES.indexOf('Warga');
+                if (wargaIndex !== -1 && results[wargaIndex]) {
+                    const wargaJson = results[wargaIndex];
+                    const table = wargaJson.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const indices = {
+                        nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                        blok: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase()),
+                        group: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.group.toLowerCase())
+                    };
+
+                    rows.forEach(row => {
+                        const c = row.c;
+                        const getVal = (idx) => (idx !== -1 && c[idx] && c[idx].v !== null) ? c[idx].v : '';
+                        
+                        const nama = getVal(indices.nama);
+                        const blok = getVal(indices.blok);
+                        const group = getVal(indices.group);
+
+                        if (nama && blok && group) {
+                            const key = `${nama}_${blok}`;
+                            wargaLookup[key] = { group: group };
+                        }
+                    });
+
+                    scheduleMap = getMonthlySchedule(wargaJson);
+                }
+
+                // 2. PROSES DATA KEUANGAN & GABUNGKAN
                 let combinedData = {};
 
                 results.forEach((json, index) => {
-                    if (!json) return;
-
                     const sheetName = SHEET_NAMES[index];
+                    if (!json) return;
+                    if (sheetName === 'Warga') return;
+
                     const table = json.table;
                     const cols = table.cols;
                     const rows = table.rows;
@@ -504,48 +706,62 @@
                         const kurang = parseFloat(getVal(indices.kurang)) || 0;
 
                         const uniqueKey = `${nama}_${blok}`;
+                        const wargaInfo = wargaLookup[uniqueKey] || {};
 
                         if (combinedData[uniqueKey]) {
                             combinedData[uniqueKey].totalKurang += kurang;
                             combinedData[uniqueKey].details[sheetName] = kurang;
-                            
-                            if (!combinedData[uniqueKey].foto && foto) {
-                                combinedData[uniqueKey].foto = foto;
-                            }
+                            if (!combinedData[uniqueKey].foto && foto) combinedData[uniqueKey].foto = foto;
                         } else {
                             combinedData[uniqueKey] = {
                                 nama,
                                 blok,
                                 foto,
                                 totalKurang: kurang,
-                                details: { [sheetName]: kurang }
+                                details: { [sheetName]: kurang },
+                                group: wargaInfo.group || null
                             };
                         }
                     });
                 });
 
-                allData = Object.values(combinedData);
-                allData.sort((a, b) => a.nama.localeCompare(b.nama));
+                // 3. HITUNG TANGGAL RONDA PER WARGA
+                allData = Object.values(combinedData).map(user => {
+                    let userRondaDates = [];
+                    
+                    if (user.group) {
+                        const userBaseGroup = getBaseGroup(user.group);
+                        if (userBaseGroup && scheduleMap) {
+                            for (const [dayStr, groupInSchedule] of Object.entries(scheduleMap)) {
+                                if (groupInSchedule === userBaseGroup) {
+                                    const dayNum = parseInt(dayStr);
+                                    const dateObj = new Date(new Date().getFullYear(), new Date().getMonth(), dayNum);
+                                    const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+                                    
+                                    userRondaDates.push({
+                                        dayName: dayName,
+                                        dateNum: String(dayNum).padStart(2, '0')
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    
+                    return { ...user, rondaDates: userRondaDates };
+                });
+
                 renderCards(allData);
 
             } catch (error) {
                 console.error(error);
                 document.getElementById('loading-text').textContent = "Terjadi Kesalahan!";
                 document.getElementById('loading-text').style.color = "red";
-                
-                document.getElementById('card-container').innerHTML = `
-                    <div style="text-align:center; color: var(--danger); padding: 2rem;">
-                        <p><b>Terjadi kesalahan sistem.</b></p>
-                        <p style="font-size:0.8rem; margin-top:10px;">${error.message}</p>
-                    </div>
-                `;
             } finally {
-                // Matikan animasi loading, biarkan tampilan konten muncul
                 stopLoadingAnimation();
             }
         }
 
-        // --- FUNGSI RENDER ---
+        // --- RENDER ---
         function renderCards(data) {
             const container = document.getElementById('card-container');
             container.innerHTML = '';
@@ -556,19 +772,35 @@
             }
             document.getElementById('empty-state').classList.add('hidden');
 
-            data.forEach(item => {
+            // Ambil 1 Key yang di-pin
+            const pinnedKey = getPinnedKey();
+
+            // Pisahkan data menjadi Item Pinned dan Item Lain
+            const pinnedItem = data.find(item => `${item.nama}_${item.blok}` === pinnedKey);
+            const otherItems = data.filter(item => `${item.nama}_${item.blok}` !== pinnedKey);
+
+            // Sort item lain secara alfabetis
+            otherItems.sort((a, b) => a.nama.localeCompare(b.nama));
+
+            // Gabungkan: Pinned (jika ada) di depan, sisanya belakang
+            const finalDisplayData = pinnedItem ? [pinnedItem, ...otherItems] : otherItems;
+
+            finalDisplayData.forEach(item => {
                 let avatarSrc = DEFAULT_IMG;
-                if (item.foto && item.foto.startsWith('http')) {
-                    avatarSrc = item.foto;
-                }
+                if (item.foto && item.foto.startsWith('http')) avatarSrc = item.foto;
 
                 const mainFormat = formatValue(item.totalKurang);
+                const key = `${item.nama}_${item.blok}`;
+                const isPinned = (key === pinnedKey);
+                const currentMonth = new Date().toLocaleDateString('id-ID', { month: 'long' });
 
+                // Generate List Iuran
                 let detailsHTML = `<ul class="detail-list">`;
-                SHEET_NAMES.forEach(sheet => {
+                const financeSheets = SHEET_NAMES.filter(n => n !== 'Warga');
+                
+                financeSheets.forEach(sheet => {
                     const val = item.details[sheet] || 0;
                     const itemFormat = formatValue(val);
-                    
                     detailsHTML += `
                         <li class="detail-item">
                             <span class="detail-label">${sheet}</span>
@@ -578,8 +810,56 @@
                 });
                 detailsHTML += `</ul>`;
 
+                // Generate Box Jadwal Ronda (dengan DOWNLOAD & PIN BUTTON)
+                let rondaHTML = '';
+                
+                const isBulanan = item.group && item.group.toLowerCase() === 'bulanan';
+
+                // Icons SVG Strings
+                const downloadSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+                const pinSvg = `<svg viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>`;
+
+                if (isBulanan) {
+                    rondaHTML = `
+                        <div class="ronda-summary-box">
+                            <div class="ronda-header-actions">
+                                <span class="ronda-title">Jadwal Ronda ${currentMonth}</span>
+                                <div class="action-buttons-group">
+                                    <button class="download-btn" onclick="downloadCard(event)">${downloadSvg}</button>
+                                    <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin('${item.nama.replace(/'/g, "\\'")}', '${item.blok.replace(/'/g, "\\'")}')">${pinSvg}</button>
+                                </div>
+                            </div>
+                            <div class="ronda-bulanan-msg">Denda Bulanan (tidak masuk ke jadwal ronda)</div>
+                        </div>
+                    `;
+                } else if (item.rondaDates && item.rondaDates.length > 0) {
+                    const datesHtml = item.rondaDates.map(d => `
+                        <span class="ronda-date-item">
+                            ${d.dayName} <span class="ronda-circle-date">${d.dateNum}</span>
+                        </span>
+                    `).join('');
+
+                    rondaHTML = `
+                        <div class="ronda-summary-box">
+                            <div class="ronda-header-actions">
+                                <span class="ronda-title">Jadwal Ronda ${currentMonth}</span>
+                                <div class="action-buttons-group">
+                                    <button class="download-btn" onclick="downloadCard(event)">${downloadSvg}</button>
+                                    <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin('${item.nama.replace(/'/g, "\\'")}', '${item.blok.replace(/'/g, "\\'")}')">${pinSvg}</button>
+                                </div>
+                            </div>
+                            <div class="ronda-dates-container">
+                                ${datesHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'warga-card';
+                // Auto-Open jika di-PIN
+                if (isPinned) card.classList.add('active');
+                
                 card.onclick = function() { toggleCard(this); };
 
                 card.innerHTML = `
@@ -589,10 +869,13 @@
                             <div class="info-name">${item.nama}</div>
                             <div class="info-blok">Blok ${item.blok}</div>
                         </div>
-                        <div class="badge ${mainFormat.badgeClass}">${mainFormat.text}</div>
+                        <div class="card-actions">
+                            <div class="badge ${mainFormat.badgeClass}">${mainFormat.text}</div>
+                        </div>
                     </div>
                     <div class="details-section">
                         ${detailsHTML}
+                        ${rondaHTML}
                     </div>
                 `;
                 container.appendChild(card);
@@ -608,14 +891,34 @@
 
         function filterCards() {
             const term = document.getElementById('search-box').value.toLowerCase();
-            const filtered = allData.filter(item => 
+            let filtered = allData.filter(item => 
                 item.nama.toLowerCase().includes(term) || 
                 item.blok.toLowerCase().includes(term)
             );
             renderCards(filtered);
         }
 
-        document.addEventListener('DOMContentLoaded', fetchData);
+        // --- SCROLL BEHAVIOR ---
+        function initScrollBehavior() {
+            const header = document.querySelector('header');
+            const searchContainer = document.getElementById('search-container');
+            const scrollThreshold = 60;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > scrollThreshold) {
+                    header.classList.add('hide-up');
+                    searchContainer.classList.add('is-sticky');
+                } else {
+                    header.classList.remove('hide-up');
+                    searchContainer.classList.remove('is-sticky');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            initScrollBehavior();
+        });
 
     </script>
 </body>
