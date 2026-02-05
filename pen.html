@@ -1,477 +1,653 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Text Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro HTML Editor - Split & Mobile Resizable</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="/logo.png" rel="icon" type="image/jpeg"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.css"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        .history-item {
-            white-space: nowrap;
-            font-size: xx-small;
+        /* --- RESET & BASE --- */
+        :root {
+            --split-pos: 50vw; /* Default desktop split */
+            --transition-speed: 0.3s;
         }
-        #historyMenu {
-            scrollbar-width: thin;
-            scrollbar-color: #a0aec0 #edf2f7;
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f7fafc;
+            width: 100vw; height: 100vh;
+            position: relative;
         }
-        #historyMenu::-webkit-scrollbar {
-            width: 8px;
+
+        /* Mencegah seleksi teks saat drag */
+        body.is-dragging {
+            cursor: col-resize !important;
+            user-select: none;
         }
-        #historyMenu::-webkit-scrollbar-track {
-            background: #edf2f7;
+        body.is-dragging * {
+            cursor: col-resize !important;
+            user-select: none;
         }
-        #historyMenu::-webkit-scrollbar-thumb {
-            background-color: #a0aec0;
-            border-radius: 10px;
-            border: 2px solid #edf2f7;
-        }
-        #clearHistory {
-            font-size: xx-small;
-        }
-        #endOfHistory {
-            font-size: xx-small;
-        }
+
+        /* --- SCROLLBARS --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+
+        /* --- NOTIFICATION --- */
         #notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #38a169;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed; top: 20px; right: 20px;
+            background: #2d3748; color: white;
+            padding: 10px 20px; border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999; display: none;
+            transform: translateY(-20px); transition: all 0.3s;
+        }
+        #notification.show { display: block; transform: translateY(0); }
+
+        /* --- ICON BUTTONS --- */
+        .icon-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 4px; color: #4a5568;
+            transition: all 0.2s; cursor: pointer; font-size: 0.9rem;
+        }
+        .icon-btn:hover { background-color: #edf2f7; color: #2d3748; }
+        .icon-btn.active { background-color: #ebf4ff; color: #3182ce; }
+
+        /* --- PREVIEW IFRAME --- */
+        #previewFrame {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none; z-index: 0;
+            background: white;
+            transition: left var(--transition-speed), width var(--transition-speed), transform var(--transition-speed);
+            pointer-events: auto;
+        }
+
+        /* --- RESIZER (DRAGGABLE BAR) --- */
+        #resizer {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: var(--split-pos);
+            width: 10px;
+            margin-left: -5px;
+            background: #cbd5e0;
+            z-index: 20;
+            cursor: col-resize;
             display: none;
-            z-index: 1000;
+            border-radius: 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
         }
-        .icon-button {
-            font-size: 1.5rem;
+        
+        #resizer:hover {
+            background: #667eea;
+            opacity: 1;
+            width: 12px;
         }
-        .bg-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Area klik tak terlihat */
+        #resizer::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            left: -10px; right: -10px;
         }
-        .touch-cursor {
-            cursor: pointer;
-        }
-        .highlight {
-            background-color: yellow;
-        }
-        #eyeIcon {
-            position: fixed;
-            top: 50%;
-            left: 50%;
+
+        /* --- EDITOR POPUP --- */
+        #editorPopup {
+            position: absolute;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.05;
-            z-index: 1000;
+            width: 90%; height: 85vh;
+            max-width: 1000px;
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all var(--transition-speed); 
         }
+
+        /* --- MODES --- */
+
+        /* 1. SPLIT MODE */
+        body.mode-split #editorPopup {
+            top: 0; left: 0;
+            width: var(--split-pos); 
+            height: 100vh;
+            transform: none !important;
+            border-radius: 0;
+            border-right: 1px solid #cbd5e0;
+            z-index: 10;
+            transition: none; 
+        }
+        
+        body.mode-split #resizer { display: block; }
+
+        body.mode-split #previewFrame {
+            left: var(--split-pos);
+            width: calc(100% - var(--split-pos));
+            top: 0; height: 100%;
+            transform: none;
+            border: none; border-radius: 0;
+            z-index: 0;
+            transition: none;
+        }
+
+        body.mode-split #eyeIcon { display: none !important; }
+
+        /* 2. MOBILE MODE (Dengan Drag Resizable) */
+        body.mode-mobile #editorPopup {
+            top: 0; left: 0;
+            width: var(--split-pos); /* Lebar mengikuti drag */
+            height: 100vh;
+            transform: none !important;
+            border-radius: 0;
+            border-right: 1px solid #cbd5e0;
+            z-index: 10;
+            transition: none;
+        }
+        
+        body.mode-mobile #resizer {
+            display: block; /* Resizer aktif di mobile mode */
+        }
+
+        body.mode-mobile #previewFrame {
+            width: 375px; height: 667px;
+            top: 50%;
+            /* Rumus: Tengah area sisa (Layar - Editor) */
+            left: calc(var(--split-pos) + (100vw - var(--split-pos)) / 2);
+            transform: translate(-50%, -50%);
+            border: 12px solid #2d3748;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            z-index: 5;
+            transition: left 0.1s; /* Smooth movement saat drag */
+        }
+
+        body.mode-mobile #eyeIcon { display: none !important; }
+
+        /* Responsive Fix untuk layar HP kecil */
+        @media (max-width: 768px) {
+            body.mode-split #resizer, 
+            body.mode-mobile #resizer { display: none; } 
+            
+            body.mode-split #editorPopup, 
+            body.mode-mobile #editorPopup { width: 100%; } 
+            
+            body.mode-split #previewFrame, 
+            body.mode-mobile #previewFrame { display: none; }
+        }
+
+        /* --- EDITOR WRAPPER & LINE NUMBERS --- */
+        .editor-wrapper {
+            position: relative; flex: 1;
+            display: flex; background: #f8fafc; overflow: hidden;
+        }
+        .line-numbers {
+            width: 40px; background: #edf2f7; color: #718096;
+            text-align: right; padding: 10px 5px;
+            font-family: 'Consolas', monospace; font-size: 14px;
+            line-height: 24px; user-select: none; overflow: hidden;
+            border-right: 1px solid #cbd5e0;
+        }
+        #htmlEditor {
+            flex: 1; border: none; resize: none; outline: none;
+            padding: 10px; font-family: 'Consolas', monospace;
+            font-size: 14px; line-height: 24px;
+            background: transparent; color: #2d3748;
+            white-space: pre; overflow: auto; tab-size: 4;
+        }
+
+        /* --- RED LINE GUIDE --- */
+        #redLineGuide {
+            position: absolute; left: 40px; right: 0;
+            border-left: 2px solid #ef4444;
+            background-color: rgba(254, 202, 202, 0.1);
+            pointer-events: none; display: none; z-index: 5;
+            transition: top 0.1s, height 0.1s;
+        }
+
+        /* --- FAB ICON --- */
+        #eyeIcon {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 3.5rem; height: 3.5rem;
+            background: #667eea; color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 20;
+            transition: transform 0.2s; border: 2px solid white;
+        }
+        #eyeIcon:hover { transform: scale(1.1); }
+
+        .history-item { white-space: nowrap; font-size: 0.75rem; }
+        #historyMenu { max-height: 300px; overflow-y: auto; width: 250px; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen bg-gradient">
+<body>
 
-    <div id="editorPopup" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 md:w-3/4 lg:w-1/2 bg-white shadow-lg rounded-lg p-4 z-50 hidden">
-        <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center space-x-2">
-                <button id="pasteText" class="text-gray-600 icon-button">
-                    <i class="fas fa-paste"></i>
-                </button>
-                <button id="selectAllCopy" class="text-gray-600 icon-button">
-                    <i class="fas fa-copy"></i>
-                </button>
-                <button id="openFile" class="text-gray-600 icon-button">
-                    <i class="fas fa-folder-open"></i>
-                </button>
+    <!-- RESIZER BAR -->
+    <div id="resizer" title="Geser untuk ubah lebar editor"></div>
+
+    <!-- BACKGROUND IFRAME -->
+    <iframe id="previewFrame"></iframe>
+
+    <!-- EDITOR POPUP -->
+    <div id="editorPopup">
+        <!-- HEADER -->
+        <div class="flex justify-between items-center px-3 py-2 border-b border-gray-200 bg-white select-none shadow-sm z-10">
+            <div class="flex items-center space-x-1">
+                <button id="pasteText" class="icon-btn" title="Paste"><i class="fas fa-paste"></i></button>
+                <button id="selectAllCopy" class="icon-btn" title="Copy All"><i class="fas fa-copy"></i></button>
+                <button id="openFile" class="icon-btn" title="Open File"><i class="fas fa-folder-open"></i></button>
                 <input type="file" id="fileInput" class="hidden">
             </div>
-            <div class="flex space-x-2 relative">
-                <button id="saveContent" class="text-gray-600 icon-button">
-                    <i class="fas fa-save"></i>
-                </button>
-                <button id="historyButton" class="text-gray-600 icon-button">
-                    <i class="fas fa-history"></i>
-                </button>
-                <div id="historyMenu" class="absolute top-10 right-0 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-64 overflow-y-auto">
-                    <ul id="historyList" class="p-2">
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 1 01/01/2023 12:00:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 2 01/01/2023 12:05:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 3 01/01/2023 12:10:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 4 01/01/2023 12:15:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 5 01/01/2023 12:20:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 6 01/01/2023 12:25:00</li>
-                        <li class="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-100 history-item">Version 7 01/01/2023 12:30:00</li>
-                    </ul>
-                    <div class="flex justify-between items-center p-2 border-t border-gray-300">
-                        <button id="clearHistory" class="text-red-600 hover:bg-gray-100">Clear</button>
-                        <div id="endOfHistory" class="text-gray-600">Terakhir</div>
-                    </div>
+
+            <div class="font-bold text-gray-700 text-sm md:text-base">HTML Editor</div>
+
+            <div class="flex items-center space-x-1">
+                <button id="toggleSplit" class="icon-btn" title="Split View"><i class="fas fa-columns"></i></button>
+
+                <button id="saveContent" class="icon-btn" title="Save History"><i class="fas fa-save"></i></button>
+                <button id="historyButton" class="icon-btn" title="History"><i class="fas fa-history"></i></button>
+                
+                <button id="downloadHistory" class="icon-btn" title="Download ZIP"><i class="fas fa-file-archive"></i></button>
+                <button id="saveEditor" class="icon-btn" title="Download HTML"><i class="fas fa-download"></i></button>
+                
+                <div class="w-px h-5 bg-gray-300 mx-1"></div>
+
+                <button id="desktopView" class="icon-btn active" title="Desktop View"><i class="fas fa-desktop"></i></button>
+                <button id="mobileView" class="icon-btn" title="Mobile View (Resizable)"><i class="fas fa-mobile-alt"></i></button>
+                
+                <button id="closeEditor" class="icon-btn text-red-500 hover:bg-red-50 ml-2" title="Close"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- HISTORY DROPDOWN -->
+        <div id="historyMenu" class="absolute top-12 right-0 bg-white border border-gray-200 rounded-lg shadow-xl hidden z-[200] flex flex-col">
+            <ul id="historyList" class="p-2"></ul>
+            <div class="p-2 border-t bg-gray-50 flex justify-between">
+                <button id="clearHistory" class="text-xs text-red-600 font-bold">Clear History</button>
+            </div>
+        </div>
+
+        <!-- EDITOR AREA -->
+        <div class="editor-wrapper">
+            <div class="line-numbers" id="lineNumbers">1</div>
+            <div id="redLineGuide"></div>
+            <textarea id="htmlEditor" spellcheck="false" placeholder="Write HTML here..."></textarea>
+        </div>
+
+        <!-- FOOTER / SEARCH -->
+        <div class="flex justify-between items-center px-3 py-2 border-t border-gray-200 bg-gray-50 text-sm z-10">
+            <div class="flex items-center bg-white border border-gray-300 rounded px-2 py-1">
+                <button id="clearText" class="text-gray-400 hover:text-red-500 px-1"><i class="fas fa-eraser"></i></button>
+                <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                <input type="text" id="searchInput" class="border-none outline-none text-sm px-2 w-24 md:w-32" placeholder="Search...">
+                <button id="searchButton" class="text-gray-500 hover:text-blue-600 px-1"><i class="fas fa-search"></i></button>
+                <div id="navButtons" class="hidden flex space-x-1 border-l border-gray-300 pl-2 ml-1">
+                    <button id="prevMatch" class="text-gray-500 hover:text-blue-600 px-1"><i class="fas fa-chevron-up"></i></button>
+                    <button id="nextMatch" class="text-gray-500 hover:text-blue-600 px-1"><i class="fas fa-chevron-down"></i></button>
                 </div>
-                <button id="downloadHistory" class="text-gray-600 icon-button">
-                    <i class="fas fa-file-archive"></i>
-                </button>
-                <button id="saveEditor" class="text-gray-600 icon-button">
-                    <i class="fas fa-download"></i>
-                </button>
-                <button id="desktopView" class="text-gray-600 icon-button">
-                    <i class="fas fa-desktop"></i>
-                </button>
-                <button id="mobileView" class="text-gray-600 icon-button">
-                    <i class="fas fa-mobile-alt"></i>
-                </button>
-                <button id="closeEditor" class="text-gray-600 icon-button">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
-        </div>
-        <textarea id="htmlEditor" class="w-full h-64 p-2 border border-gray-300 rounded-lg"></textarea>
-        <div class="flex justify-between items-center mt-2">
-            <div class="flex items-center space-x-2">
-                <button id="clearText" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-eraser"></i>
-                </button>
-                <input type="text" id="searchInput" class="border border-gray-300 rounded-lg p-1 text-sm" placeholder="Search...">
-                <button id="searchButton" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button id="prevMatch" class="text-gray-600 icon-button text-sm hidden">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <button id="nextMatch" class="text-gray-600 icon-button text-sm hidden">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-            <div class="flex space-x-2">
-                <button id="scrollToTop" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-arrow-up"></i>
-                </button>
-                <button id="scrollToBottom" class="text-gray-600 icon-button text-sm">
-                    <i class="fas fa-arrow-down"></i>
-                </button>
-            </div>
+            <div class="text-xs text-gray-400 whitespace-nowrap" id="statusText">Ln 1</div>
         </div>
     </div>
 
-    <div id="preview" class="w-full h-full p-0 m-0">
-        <!-- Preview content will be injected here -->
-    </div>
-
-    <div id="notification">Sukses</div>
-    <div id="eyeIcon">
-        <i class="fas fa-eye text-gray-600 text-6xl"></i>
-    </div>
+    <!-- FLOATING ACTION BUTTON -->
+    <div id="eyeIcon"><i class="fas fa-pen"></i></div>
+    
+    <!-- NOTIFICATION -->
+    <div id="notification"></div>
 
     <script>
+        // --- ELEMENTS ---
         const editorPopup = document.getElementById('editorPopup');
-        const saveEditorButton = document.getElementById('saveEditor');
-        const saveContentButton = document.getElementById('saveContent');
         const htmlEditor = document.getElementById('htmlEditor');
-        const preview = document.getElementById('preview');
-        const desktopViewButton = document.getElementById('desktopView');
-        const mobileViewButton = document.getElementById('mobileView');
-        const historyButton = document.getElementById('historyButton');
-        const historyMenu = document.getElementById('historyMenu');
-        const historyList = document.getElementById('historyList');
-        const clearHistoryButton = document.getElementById('clearHistory');
-        const endOfHistory = document.getElementById('endOfHistory');
-        const notification = document.getElementById('notification');
-        const scrollToTopButton = document.getElementById('scrollToTop');
-        const scrollToBottomButton = document.getElementById('scrollToBottom');
-        const selectAllCopyButton = document.getElementById('selectAllCopy');
-        const pasteTextButton = document.getElementById('pasteText');
-        const clearTextButton = document.getElementById('clearText');
-        const downloadHistoryButton = document.getElementById('downloadHistory');
-        const openFileButton = document.getElementById('openFile');
-        const fileInput = document.getElementById('fileInput');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const previewFrame = document.getElementById('previewFrame');
+        const redLineGuide = document.getElementById('redLineGuide');
+        const statusText = document.getElementById('statusText');
         const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const prevMatchButton = document.getElementById('prevMatch');
-        const nextMatchButton = document.getElementById('nextMatch');
-        const closeEditorButton = document.getElementById('closeEditor');
-        const eyeIcon = document.getElementById('eyeIcon');
-
-        let saveCount = 0;
-        let history = [];
-        let historyDisplayCount = 7;
-        let currentMatchIndex = 0;
+        const navButtons = document.getElementById('navButtons');
+        const body = document.body;
+        const resizer = document.getElementById('resizer');
+        
+        // --- STATE ---
+        let history = JSON.parse(localStorage.getItem('htmlHistory')) || [];
         let matches = [];
+        let matchIndex = 0;
+        const lineHeight = 24;
 
-        // Load saved content from localStorage
+        // --- INIT ---
         window.addEventListener('load', () => {
-            const savedContent = localStorage.getItem('htmlEditorContent');
-            if (savedContent) {
-                htmlEditor.value = savedContent;
-                updatePreview();
-                document.body.classList.remove('bg-gradient');
-            }
-            const savedHistory = JSON.parse(localStorage.getItem('htmlEditorHistory'));
-            if (savedHistory) {
-                history = savedHistory;
-                updateHistoryMenu();
-            }
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!editorPopup.contains(event.target) && !eyeIcon.contains(event.target)) {
-                editorPopup.classList.add('hidden');
-                eyeIcon.style.display = 'block';
-            }
-        });
-
-        eyeIcon.addEventListener('click', () => {
-            editorPopup.classList.remove('hidden');
-            eyeIcon.style.display = 'none';
-        });
-
-        saveEditorButton.addEventListener('click', () => {
-            saveCount++;
-            const blob = new Blob([htmlEditor.value], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `index-v${saveCount}.html`;
-            a.click();
-        });
-
-        saveContentButton.addEventListener('click', () => {
-            addToHistory(htmlEditor.value);
-            showNotification('Sukses');
-        });
-
-        desktopViewButton.addEventListener('click', () => {
-            preview.style.width = '100%';
-            preview.style.height = '100%';
-            preview.classList.remove('touch-cursor');
-            updatePreview();
-        });
-
-        mobileViewButton.addEventListener('click', () => {
-            preview.style.width = '375px';
-            preview.style.height = '667px';
-            preview.classList.add('touch-cursor');
-            updatePreview();
-        });
-
-        historyButton.addEventListener('click', () => {
-            historyMenu.classList.toggle('hidden');
-        });
-
-        clearHistoryButton.addEventListener('click', () => {
-            history = [];
-            localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
-            htmlEditor.value = '';
-            localStorage.setItem('htmlEditorContent', '');
-            updateHistoryMenu();
-            updatePreview();
-            document.body.classList.add('bg-gradient');
-        });
-
-        historyMenu.addEventListener('scroll', () => {
-            if (historyMenu.scrollTop + historyMenu.clientHeight >= historyMenu.scrollHeight) {
-                loadMoreHistory();
-            }
-        });
-
-        htmlEditor.addEventListener('input', () => {
-            localStorage.setItem('htmlEditorContent', htmlEditor.value);
-            updatePreview();
-            if (htmlEditor.value.trim() === "") {
-                document.body.classList.add('bg-gradient');
+            const saved = localStorage.getItem('htmlContent');
+            if(saved) {
+                htmlEditor.value = saved;
+                editorPopup.style.display = 'flex'; 
+                eyeIcon.style.display = 'none';
             } else {
-                document.body.classList.remove('bg-gradient');
+                eyeIcon.style.display = 'flex';
             }
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!historyMenu.contains(event.target) && !historyButton.contains(event.target)) {
-                historyMenu.classList.add('hidden');
-            }
-        });
-
-        scrollToTopButton.addEventListener('click', () => {
-            htmlEditor.scrollTop = 0;
-        });
-
-        scrollToBottomButton.addEventListener('click', () => {
-            htmlEditor.scrollTop = htmlEditor.scrollHeight;
-        });
-
-        selectAllCopyButton.addEventListener('click', () => {
-            htmlEditor.select();
-            document.execCommand('copy');
-            showNotification('Copied to clipboard');
-        });
-
-        pasteTextButton.addEventListener('click', async () => {
-            try {
-                const text = await navigator.clipboard.readText();
-                htmlEditor.value += text;
-                updatePreview();
-                showNotification('Pasted from clipboard');
-            } catch (err) {
-                showNotification('Failed to paste');
-            }
-        });
-
-        clearTextButton.addEventListener('click', () => {
-            htmlEditor.value = '';
             updatePreview();
-            showNotification('Text cleared');
+            updateLineNumbers();
+            renderHistory();
+            initResizer();
         });
 
-        downloadHistoryButton.addEventListener('click', () => {
-            const zip = new JSZip();
-            history.forEach((item, index) => {
-                zip.file(`version-${index + 1}.html`, item.content);
+        // --- RESIZER LOGIC (GLOBAL FOR ALL MODES) ---
+        function initResizer() {
+            let isResizing = false;
+
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                body.classList.add('is-dragging');
+                e.preventDefault(); 
             });
-            zip.generateAsync({ type: 'blob' }).then((content) => {
-                saveAs(content, 'history.zip');
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+
+                let newWidth = e.clientX;
+                
+                // Min Width 200px, Max Width (Layar - 400px) agar HP masih muat
+                const minWidth = 200;
+                const maxWidth = window.innerWidth - 400;
+
+                if (newWidth < minWidth) newWidth = minWidth;
+                if (newWidth > maxWidth) newWidth = maxWidth;
+
+                // Update CSS Variable
+                body.style.setProperty('--split-pos', newWidth + 'px');
             });
-        });
 
-        openFileButton.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    htmlEditor.value = e.target.result;
-                    updatePreview();
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        searchButton.addEventListener('click', () => {
-            searchInEditor();
-        });
-
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                searchInEditor();
-            }
-        });
-
-        prevMatchButton.addEventListener('click', () => {
-            if (matches.length > 0) {
-                currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
-                scrollToMatch(currentMatchIndex);
-            }
-        });
-
-        nextMatchButton.addEventListener('click', () => {
-            if (matches.length > 0) {
-                currentMatchIndex = (currentMatchIndex + 1) % matches.length;
-                scrollToMatch(currentMatchIndex);
-            }
-        });
-
-        closeEditorButton.addEventListener('click', () => {
-            editorPopup.classList.add('hidden');
-            eyeIcon.style.display = 'block';
-        });
-
-        function searchInEditor() {
-            const searchTerm = searchInput.value;
-            if (searchTerm) {
-                const regex = new RegExp(searchTerm, 'gi');
-                const content = htmlEditor.value;
-                matches = [...content.matchAll(regex)];
-                if (matches.length > 0) {
-                    showNotification(`Found ${matches.length} matches`);
-                    highlightMatches(content, regex);
-                    currentMatchIndex = 0;
-                    scrollToMatch(currentMatchIndex);
-                    prevMatchButton.classList.remove('hidden');
-                    nextMatchButton.classList.remove('hidden');
-                } else {
-                    showNotification('No matches found');
-                    prevMatchButton.classList.add('hidden');
-                    nextMatchButton.classList.add('hidden');
+            window.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    body.classList.remove('is-dragging');
                 }
-            }
+            });
         }
 
-        function highlightMatches(content, regex) {
-            const highlightedContent = content.replace(regex, (match) => `<span class="highlight">${match}</span>`);
-            htmlEditor.innerHTML = highlightedContent;
-            updatePreview();
+        // --- VIEW LOGIC ---
+
+        function resetModes() {
+            body.classList.remove('mode-mobile', 'mode-split');
+            // Reset ke default 50vw
+            body.style.setProperty('--split-pos', '50vw');
+            
+            document.getElementById('toggleSplit').classList.remove('active');
+            document.getElementById('mobileView').classList.remove('active');
+            document.getElementById('desktopView').classList.add('active');
         }
 
-        function scrollToMatch(index) {
-            if (matches.length > 0) {
-                const match = matches[index];
-                const start = match.index;
-                const end = start + match[0].length;
-                htmlEditor.focus();
-                htmlEditor.setSelectionRange(start, end);
-                htmlEditor.scrollTop = htmlEditor.scrollHeight * (start / htmlEditor.value.length);
-            }
-        }
+        // 1. Toggle Split View
+        document.getElementById('toggleSplit').addEventListener('click', function() {
+            resetModes();
+            body.classList.toggle('mode-split');
+            this.classList.toggle('active');
+            
+            const isActive = body.classList.contains('mode-split');
+            showNotification(isActive ? 'Split View: Geser Garis' : 'Popup View');
+        });
 
+        // 2. Desktop View
+        document.getElementById('desktopView').addEventListener('click', () => {
+            resetModes();
+            showNotification('Desktop View');
+        });
+
+        // 3. Mobile View (Resizable)
+        document.getElementById('mobileView').addEventListener('click', () => {
+            resetModes(); // Bersihkan mode lain
+            body.classList.add('mode-mobile');
+            
+            // Set ukuran awal editor mobile ke 350px (bukan 50vw)
+            body.style.setProperty('--split-pos', '350px');
+
+            document.getElementById('mobileView').classList.add('active');
+            document.getElementById('desktopView').classList.remove('active');
+            
+            editorPopup.style.display = 'flex';
+            eyeIcon.style.display = 'none';
+            showNotification('Mobile View: Geser Garis untuk Lebar');
+        });
+
+        // --- EDITOR CORE ---
         function updatePreview() {
-            const iframe = document.createElement('iframe');
-            iframe.classList.add('w-full', 'h-full', 'border-0');
-            preview.innerHTML = '';
-            preview.appendChild(iframe);
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
             doc.open();
             doc.write(htmlEditor.value);
             doc.close();
+            localStorage.setItem('htmlContent', htmlEditor.value);
+            updateStatus();
         }
 
-        function addToHistory(content) {
-            const timestamp = new Date();
-            const formattedTimestamp = `${timestamp.toLocaleDateString('en-GB')} ${timestamp.toLocaleTimeString('en-GB')}`;
-            history.unshift({ content, timestamp: formattedTimestamp, name: `Version ${history.length + 1}` });
-            localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
-            updateHistoryMenu();
+        htmlEditor.addEventListener('input', () => {
+            updatePreview();
+            updateLineNumbers();
+            hideRedLine();
+        });
+
+        // --- LINE NUMBERS ---
+        function updateLineNumbers() {
+            const lines = htmlEditor.value.split('\n').length;
+            lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => i + 1).join('<br>');
+        }
+        htmlEditor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = htmlEditor.scrollTop;
+        });
+
+        // --- STATUS & CURSOR ---
+        htmlEditor.addEventListener('keyup', updateStatus);
+        htmlEditor.addEventListener('click', updateStatus);
+
+        function updateStatus() {
+            const val = htmlEditor.value;
+            const sel = htmlEditor.selectionStart;
+            const line = val.substr(0, sel).split('\n').length;
+            const col = sel - val.lastIndexOf('\n', sel - 1);
+            statusText.textContent = `Ln ${line}, Col ${col}`;
         }
 
-        function updateHistoryMenu() {
-            historyList.innerHTML = '';
-            const displayHistory = history.slice(0, historyDisplayCount);
-            displayHistory.forEach((item, index) => {
-                const listItem = document.createElement('li');
-                listItem.classList.add('p-2', 'border-b', 'border-gray-300', 'cursor-pointer', 'hover:bg-gray-100', 'history-item');
-                listItem.textContent = `${item.name} ${item.timestamp}`;
-                listItem.addEventListener('click', () => {
-                    htmlEditor.value = item.content;
-                    updatePreview();
-                });
-                listItem.addEventListener('dblclick', () => {
-                    const newName = prompt('Rename this version:', item.name);
-                    if (newName) {
-                        item.name = newName;
-                        localStorage.setItem('htmlEditorHistory', JSON.stringify(history));
-                        updateHistoryMenu();
+        // --- BRACKET MATCHING ---
+        htmlEditor.addEventListener('click', (e) => {
+            const cursorPos = htmlEditor.selectionStart;
+            const text = htmlEditor.value;
+            if (text[cursorPos] === '<') {
+                const remainingText = text.substring(cursorPos);
+                const tagMatch = remainingText.match(/^<([a-zA-Z0-9]+)/);
+                if (tagMatch) {
+                    const tagName = tagMatch[1];
+                    const openTagEnd = text.indexOf('>', cursorPos);
+                    if (openTagEnd === -1) return;
+                    const searchArea = text.substring(openTagEnd);
+                    const closeRegex = new RegExp(`</${tagName}>`);
+                    const closeMatch = searchArea.match(closeRegex);
+                    if (closeMatch) {
+                        const closeTagIndex = openTagEnd + closeMatch.index;
+                        showRedLine(cursorPos, closeTagIndex + closeMatch[0].length);
                     }
-                });
-                historyList.appendChild(listItem);
-            });
-
-            if (historyDisplayCount >= history.length) {
-                endOfHistory.classList.remove('hidden');
+                }
             } else {
-                endOfHistory.classList.add('hidden');
+                hideRedLine();
+            }
+        });
+
+        function showRedLine(startIndex, endIndex) {
+            const textBeforeStart = htmlEditor.value.substring(0, startIndex);
+            const textBeforeEnd = htmlEditor.value.substring(0, endIndex);
+            const startLine = textBeforeStart.split('\n').length;
+            const endLine = textBeforeEnd.split('\n').length;
+            const lineDiff = endLine - startLine;
+            if (lineDiff > 0) {
+                const topPos = (startLine - 1) * lineHeight;
+                const height = (lineDiff + 1) * lineHeight;
+                redLineGuide.style.display = 'block';
+                redLineGuide.style.top = topPos + 'px';
+                redLineGuide.style.height = height + 'px';
+            }
+        }
+        function hideRedLine() { redLineGuide.style.display = 'none'; }
+
+        // --- SEARCH ---
+        document.getElementById('searchButton').addEventListener('click', doSearch);
+        searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') doSearch(); });
+
+        function doSearch() {
+            const term = searchInput.value;
+            if(!term) return;
+            const regex = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            matches = [...htmlEditor.value.matchAll(regex)];
+            if(matches.length > 0) {
+                navButtons.classList.remove('hidden');
+                matchIndex = 0;
+                jumpTo(0);
+                showNotification(`${matches.length} found`);
+            } else {
+                navButtons.classList.add('hidden');
+                showNotification('Not found');
             }
         }
 
-        function loadMoreHistory() {
-            if (historyDisplayCount < history.length) {
-                historyDisplayCount += 7;
-                updateHistoryMenu();
-            }
+        function jumpTo(idx) {
+            const m = matches[idx];
+            htmlEditor.focus();
+            htmlEditor.setSelectionRange(m.index, m.index + m[0].length);
+            const textBefore = htmlEditor.value.substring(0, m.index);
+            const lineNum = textBefore.split('\n').length;
+            const scrollPos = ((lineNum - 1) * lineHeight) - (htmlEditor.clientHeight / 2);
+            htmlEditor.scrollTop = scrollPos;
+            statusText.textContent = `Match ${idx+1}/${matches.length}`;
         }
 
-        function showNotification(message) {
-            notification.textContent = message;
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 2000);
+        document.getElementById('prevMatch').addEventListener('click', () => {
+            matchIndex = (matchIndex - 1 + matches.length) % matches.length;
+            jumpTo(matchIndex);
+        });
+        document.getElementById('nextMatch').addEventListener('click', () => {
+            matchIndex = (matchIndex + 1) % matches.length;
+            jumpTo(matchIndex);
+        });
+
+        // --- CLEAR BUTTON ---
+        document.getElementById('clearText').addEventListener('click', () => {
+            htmlEditor.value = '';
+            localStorage.removeItem('htmlContent');
+            updatePreview();
+            updateLineNumbers();
+            hideRedLine();
+            showNotification('Cleared');
+        });
+
+        // --- HISTORY ---
+        document.getElementById('saveContent').addEventListener('click', () => {
+            history.unshift({ content: htmlEditor.value, name: `Ver ${history.length + 1}`, time: new Date().toLocaleTimeString() });
+            if(history.length > 20) history.pop();
+            localStorage.setItem('htmlHistory', JSON.stringify(history));
+            renderHistory();
+            showNotification('Saved');
+        });
+
+        document.getElementById('historyButton').addEventListener('click', () => {
+            document.getElementById('historyMenu').classList.toggle('hidden');
+        });
+        document.getElementById('clearHistory').addEventListener('click', () => {
+            history = []; localStorage.removeItem('htmlHistory'); renderHistory();
+        });
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.forEach((item, i) => {
+                const li = document.createElement('li');
+                li.className = "cursor-pointer hover:bg-gray-100 p-2 border-b text-sm";
+                li.innerHTML = `<b>${item.name}</b> <span class="text-xs text-gray-400">(${item.time})</span>`;
+                li.onclick = () => {
+                    htmlEditor.value = item.content;
+                    updatePreview(); updateLineNumbers();
+                    document.getElementById('historyMenu').classList.add('hidden');
+                };
+                list.appendChild(li);
+            });
         }
+
+        // --- MISC UI ---
+        document.getElementById('closeEditor').addEventListener('click', () => {
+            resetModes();
+            editorPopup.style.display = 'none';
+            eyeIcon.style.display = 'flex';
+        });
+
+        eyeIcon.addEventListener('click', () => {
+            editorPopup.style.display = 'flex';
+            eyeIcon.style.display = 'none';
+        });
+
+        document.getElementById('pasteText').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                htmlEditor.setRangeText(text, htmlEditor.selectionStart, htmlEditor.selectionEnd, 'end');
+                updatePreview();
+                showNotification('Pasted');
+            } catch(err) { showNotification('Paste Failed'); }
+        });
+
+        document.getElementById('selectAllCopy').addEventListener('click', () => {
+            htmlEditor.select();
+            document.execCommand('copy');
+            showNotification('Copied');
+            htmlEditor.setSelectionRange(htmlEditor.value.length, htmlEditor.value.length);
+        });
+
+        document.getElementById('openFile').addEventListener('click', () => document.getElementById('fileInput').click());
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                const r = new FileReader();
+                r.onload = (ev) => { htmlEditor.value = ev.target.result; updatePreview(); updateLineNumbers(); };
+                r.readAsText(file);
+            }
+        });
+
+        document.getElementById('saveEditor').addEventListener('click', () => {
+            const blob = new Blob([htmlEditor.value], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'index.html';
+            a.click();
+        });
+
+        document.getElementById('downloadHistory').addEventListener('click', () => {
+            if(!history.length) return showNotification('Empty history');
+            const zip = new JSZip();
+            history.forEach((item, i) => zip.file(`v${i+1}.html`, item.content));
+            zip.generateAsync({type:"blob"}).then(c => saveAs(c, "history.zip"));
+        });
+
+        function showNotification(msg) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 2000);
+        }
+
+        document.addEventListener('click', (e) => {
+            const hm = document.getElementById('historyMenu');
+            const hb = document.getElementById('historyButton');
+            if (!hm.contains(e.target) && !hb.contains(e.target)) hm.classList.add('hidden');
+        });
     </script>
 </body>
 </html>
