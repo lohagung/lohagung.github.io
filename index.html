@@ -6,7 +6,7 @@
     <title>Total Iuran RT</title>
     
     <!-- FAVICON -->
-    <link href="/logo.png" rel="icon" type="image/jpeg"/>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/61934361?v=4">
 
     <!-- LIBRARY HTML2CANVAS (Untuk Download Gambar) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -140,7 +140,7 @@
             margin: 0;
             padding: 10px 1.5rem;
             z-index: 50;
-            background: linear-gradient(90deg, #115e59 0%, #000000 100%);
+            background: var(--bg-body);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             animation: slideDown 0.3s ease forwards;
         }
@@ -255,8 +255,9 @@
             gap: 6px;
         }
 
+        /* Lingkaran Tanggal */
         .ronda-circle-date {
-            background: var(--danger);
+            background: var(--danger); /* Default Merah */
             color: #ffffff;
             width: 24px;
             height: 24px;
@@ -267,6 +268,12 @@
             font-size: 0.75rem;
             font-weight: 400;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
+        }
+
+        /* Class baru jika hadir (Hijau) */
+        .ronda-circle-date.hadir {
+            background: var(--success);
         }
 
         .ronda-bulanan-msg {
@@ -386,7 +393,7 @@
     <script>
         // --- KONFIGURASI ---
         const SHEET_ID = '1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0';
-        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan', 'Warga'];
+        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan', 'Warga', 'Absensi'];
         
         const TARGET_COLS = {
             nama: 'Nama',
@@ -394,20 +401,21 @@
             foto: 'Foto',
             kurang: 'Kurang',
             group: 'Group',
-            jadwal: 'Jadwal'
+            jadwal: 'Jadwal',
+            timestamp: 'Timestamp'
         };
 
         const DEFAULT_IMG = 'https://avatars.githubusercontent.com/u/61934361?v=4';
         const PIN_KEY = 'rt_app_single_pinned';
         
         let allData = [];
+        let presentTodayKeys = new Set(); // Menyimpan key nama_blok yang hadir hari ini
         let loadingAnimationInterval = null;
 
-        // --- FUNGSI DOWNLOAD CARD (BARU) ---
+        // --- FUNGSI DOWNLOAD CARD ---
         async function downloadCard(e) {
             if (e) e.stopPropagation();
 
-            // Cari kartu yang sedang aktif (terbuka)
             const cardElement = document.querySelector('.warga-card.active');
             
             if (!cardElement) {
@@ -415,25 +423,22 @@
                 return;
             }
 
-            const namaWarga = cardElement.querySelector('.info-name').innerText.replace(/[^a-zA-Z0-9]/g, "_"); // Bersihkan nama untuk filename
+            const namaWarga = cardElement.querySelector('.info-name').innerText.replace(/[^a-zA-Z0-9]/g, "_");
             const originalButton = e ? e.currentTarget : null;
             const originalHtml = originalButton ? originalButton.innerHTML : '';
 
-            // Ubah icon loading (opsional, visual feedback)
             if(originalButton) {
                 originalButton.innerHTML = `<svg class="spinner-circle" style="width:18px;height:18px;margin:0;" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="4"></circle></svg>`;
             }
 
             try {
-                // Gunakan html2canvas
                 const canvas = await html2canvas(cardElement, {
-                    scale: 2, // Kualitas HD (2x pixel density)
-                    useCORS: true, // Memuat gambar eksternal (avatar)
-                    backgroundColor: '#ffffff', // Background putih
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff', 
                     logging: false
                 });
 
-                // Buat link download
                 const link = document.createElement('a');
                 link.download = `RT_Iuran_${namaWarga}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -443,13 +448,50 @@
                 console.error("Gagal download:", error);
                 alert("Terjadi kesalahan saat mengunduh gambar.");
             } finally {
-                // Kembalikan icon button
                 if (originalButton) {
                     setTimeout(() => {
                         originalButton.innerHTML = originalHtml;
                     }, 500);
                 }
             }
+        }
+
+        // --- FUNGSI PARSE TANGGAL GOOGLE SHEETS ---
+        function parseSheetDate(val) {
+            if (!val) return null;
+            let dateObj;
+
+            // Tipe 1: String format Google Date "Date(2023, 1, 15, ...)"
+            if (typeof val === 'string' && val.startsWith('Date(')) {
+                // Gunakan regex untuk mengambil angka tahun, bulan, tanggal
+                const match = val.match(/Date\((\d+),(\d+),(\d+)/);
+                if (match) {
+                    // Bulan di JS mulai dari 0, tapi di string Date(...) biasanya 0-based juga
+                    // Namun seringkali output GVIZ: Date(Year, MonthIndex, Day)
+                    // Perlu cek bulan. Jika output CSV seringkali format excel.
+                    // Asumsi standard GVIZ:
+                    dateObj = new Date(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
+                }
+            } 
+            // Tipe 2: Number (Excel Serial Date)
+            else if (typeof val === 'number') {
+                // Konversi Excel Serial ke JS Date (Epoch MS)
+                // Excel base date (Dec 30, 1899) vs JS (Jan 1, 1970)
+                // Rumus: (Val - 25569) * 86400 * 1000
+                // (25569 adalah 1 Jan 1970 di Excel)
+                const excelDate = new Date(Math.round((val - 25569) * 86400 * 1000));
+                dateObj = excelDate;
+            }
+            // Tipe 3: String Format "DD/MM/YYYY" (Lokal)
+            else if (typeof val === 'string') {
+                const parts = val.split('/');
+                if (parts.length === 3) {
+                    // Asumsi DD/MM/YYYY
+                    dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
+
+            return dateObj;
         }
 
         // --- FUNGSI PIN SINGLE ---
@@ -639,6 +681,48 @@
                 const promises = SHEET_NAMES.map(name => fetchSingleSheet(name));
                 const results = await Promise.all(promises);
 
+                // 0. PROSES ABSENSI (Untuk Cek Kehadiran Hari Ini)
+                const absensiIndex = SHEET_NAMES.indexOf('Absensi');
+                if (absensiIndex !== -1 && results[absensiIndex]) {
+                    const absensiJson = results[absensiIndex];
+                    const table = absensiJson.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const idxTime = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.timestamp.toLowerCase());
+                    const idxNama = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase());
+                    const idxBlok = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase());
+
+                    const today = new Date();
+
+                    if (idxTime !== -1 && idxNama !== -1) {
+                        rows.forEach(row => {
+                            const c = row.c;
+                            const tsVal = (idxTime !== -1 && c[idxTime]) ? c[idxTime].v : null;
+                            const nama = (idxNama !== -1 && c[idxNama]) ? c[idxNama].v : '';
+                            const blok = (idxBlok !== -1 && c[idxBlok]) ? c[idxBlok].v : '';
+
+                            const dateObj = parseSheetDate(tsVal);
+
+                            if (dateObj) {
+                                // Cek apakah tanggal sama dengan hari ini
+                                if (dateObj.getDate() === today.getDate() &&
+                                    dateObj.getMonth() === today.getMonth() &&
+                                    dateObj.getFullYear() === today.getFullYear()) {
+                                    
+                                    // Simpan key unik yang hadir hari ini
+                                    const key = `${nama}_${blok}`;
+                                    // Jika Blok kosong di absensi, coba cari hanya pakai Nama (fallback),
+                                    // tapi lebih aman jika Blok diisi.
+                                    if (blok) {
+                                        presentTodayKeys.add(key);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
                 // 1. PROSES DATA WARGA
                 let wargaLookup = {};
                 let scheduleMap = {};
@@ -679,7 +763,7 @@
                 results.forEach((json, index) => {
                     const sheetName = SHEET_NAMES[index];
                     if (!json) return;
-                    if (sheetName === 'Warga') return;
+                    if (sheetName === 'Warga' || sheetName === 'Absensi') return; // Skip pemrosesan data keuangan untuk warga & absensi
 
                     const table = json.table;
                     const cols = table.cols;
@@ -726,6 +810,8 @@
                 });
 
                 // 3. HITUNG TANGGAL RONDA PER WARGA
+                const today = new Date().getDate(); // Tanggal hari ini (1-31)
+
                 allData = Object.values(combinedData).map(user => {
                     let userRondaDates = [];
                     
@@ -785,6 +871,8 @@
             // Gabungkan: Pinned (jika ada) di depan, sisanya belakang
             const finalDisplayData = pinnedItem ? [pinnedItem, ...otherItems] : otherItems;
 
+            const todayDate = new Date().getDate();
+
             finalDisplayData.forEach(item => {
                 let avatarSrc = DEFAULT_IMG;
                 if (item.foto && item.foto.startsWith('http')) avatarSrc = item.foto;
@@ -796,7 +884,7 @@
 
                 // Generate List Iuran
                 let detailsHTML = `<ul class="detail-list">`;
-                const financeSheets = SHEET_NAMES.filter(n => n !== 'Warga');
+                const financeSheets = SHEET_NAMES.filter(n => n !== 'Warga' && n !== 'Absensi');
                 
                 financeSheets.forEach(sheet => {
                     const val = item.details[sheet] || 0;
@@ -833,11 +921,20 @@
                         </div>
                     `;
                 } else if (item.rondaDates && item.rondaDates.length > 0) {
-                    const datesHtml = item.rondaDates.map(d => `
+                    const datesHtml = item.rondaDates.map(d => {
+                        // Cek apakah tanggal ini HARI INI
+                        const isToday = parseInt(d.dateNum) === todayDate;
+                        // Cek apakah user ini ada di daftar Hadir Hari Ini
+                        const isPresent = isToday && presentTodayKeys.has(key);
+                        
+                        // Tambahkan class 'hadir' jika true
+                        const circleClass = isPresent ? 'ronda-circle-date hadir' : 'ronda-circle-date';
+
+                        return `
                         <span class="ronda-date-item">
-                            ${d.dayName} <span class="ronda-circle-date">${d.dateNum}</span>
+                            ${d.dayName} <span class="${circleClass}">${d.dateNum}</span>
                         </span>
-                    `).join('');
+                    `}).join('');
 
                     rondaHTML = `
                         <div class="ronda-summary-box">
