@@ -2,549 +2,1021 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Absensi Ronda Warga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Iuran RT</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/61934361?v=4">
+
+    <!-- LIBRARY HTML2CANVAS (Untuk Download Gambar) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- VARIABEL CSS --- */
         :root {
-            --primary: #2563eb; --primary-dark: #1e40af; --success: #16a34a; --danger: #dc2626;
-            --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --subtext: #6b7280; --border: #e5e7eb;
-            /* Teal-800 Hex Code: #115e59 */
-            --teal-800: #115e59;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
-
-        header { background: var(--primary); color: white; padding: 2rem 1.5rem 2rem; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); position: relative; z-index: 10; text-align: center; }
-        header h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px; }
-
-        /* Header Description Box Gradient */
-        .header-desc-box {
-            display: inline-block;
-            background: linear-gradient(to right, var(--teal-800), #000000);
-            color: white;
-            padding: 0.6rem 1.2rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            max-width: 90%;
+            --primary: #4f46e5; --primary-dark: #4338ca; --secondary: #64748b;
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+            --danger: #ef4444; --danger-light: #fef2f2; --border: #e2e8f0;
+            --success: #22c55e; --success-light: #dcfce7;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --loader-bg: rgba(255, 255, 255, 0.95);
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 0 1rem; margin-top: -1.5rem; position: relative; z-index: 20; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding-bottom: 80px;
+        }
 
-        .info-card { 
-            background: var(--card); 
-            border-radius: 16px; 
-            padding: 1.5rem; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-            margin-bottom: 1.5rem; 
-            text-align: center; 
+        /* HEADER */
+        header { 
+            background: linear-gradient(90deg, #115e59 0%, #000000 100%);
+            padding: 1rem 1.5rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+            position: sticky; 
+            top: 0; 
+            z-index: 20;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        header.hide-up {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .brand { 
+            font-weight: 600; 
+            font-size: 1.2rem; 
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .brand-logo { 
+            width: 32px; height: 32px; border-radius: 50%; object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.5); background-color: #ffffff; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* MAIN */
+        main { 
+            max-width: 800px; margin: 0 auto; padding: 1.5rem; width: 100%; 
             position: relative; 
-            overflow: hidden; 
-            z-index: 1;
-            background-image: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95));
         }
 
-        /* Status Grid */
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; position: relative; z-index: 2; }
-        .status-item { background: rgba(255, 255, 255, 0.85); padding: 0.75rem; border-radius: 12px; backdrop-filter: blur(4px); }
-        .status-label { font-size: 0.7rem; color: var(--subtext); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .status-val { font-weight: 700; font-size: 1.1rem; }
+        /* --- LOADING OVERLAY --- */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--loader-bg); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column; backdrop-filter: blur(10px);
+            transition: opacity 0.5s ease;
+        }
+        .loader-content { text-align: center; width: 90%; max-width: 350px; }
+        .spinner-circle {
+            width: 60px; height: 60px; margin: 0 auto 20px auto; position: relative;
+        }
+        .spinner-circle svg { width: 100%; height: 100%; animation: spin 1.5s linear infinite; }
+        .spinner-circle circle {
+            fill: none; stroke: var(--primary); stroke-width: 4;
+            stroke-dasharray: 150, 200; stroke-dashoffset: 0; stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes dash {
+            0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+            50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+            100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+        }
+        .loading-status-text { font-size: 1.1rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 20px; min-height: 1.5em; }
+        .loading-list { list-style: none; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .loading-item {
+            background: #fff; color: var(--secondary); padding: 10px 20px; border-radius: 50px;
+            font-size: 0.9rem; font-weight: 500; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0; opacity: 0; transform: translateX(-30px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+        }
+        .loading-item.active {
+            opacity: 1; transform: translateX(0) scale(1.05); background: var(--primary);
+            color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+        .loading-item.done {
+            opacity: 0.6; transform: translateX(0) scale(1); color: var(--success);
+            background: var(--success-light); border-color: var(--success);
+        }
+        .check-icon { display: none; width: 16px; height: 16px; }
+        .loading-item.done .check-icon { display: block; }
+
+        /* SEARCH CONTAINER */
+        .search-container { 
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .search-container.is-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 10px 1.5rem;
+            z-index: 50;
+            background: var(--bg-body);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .search-input { 
+            width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 50px; 
+            background: var(--bg-card); box-shadow: var(--shadow); font-size: 1rem; 
+            padding-left: 3.5rem; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E"); 
+            background-repeat: no-repeat; background-position: 1.2rem center; background-size: 1.2rem; 
+        }
+
+        /* CARD GRID */
+        .card-grid { display: flex; flex-direction: column; gap: 0.8rem; padding-bottom: 2rem; }
         
-        /* Badge Group */
-        .badge-group { 
-            display: inline-block; 
-            background: #fff; 
-            color: var(--primary-dark); 
-            padding: 0.4rem 1rem; 
-            border-radius: 50px; 
-            font-weight: 700; 
-            font-size: 0.9rem; 
-            margin-bottom: 0.5rem; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--bg);
-            position: relative;
-            z-index: 2;
+        .warga-card { 
+            background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); 
+            border: 1px solid transparent; transition: all 0.3s ease; cursor: pointer; overflow: hidden; 
         }
 
-        /* Jam Hitung Mundur */
-        #clock-display {
-            font-size: 2.5rem; 
-            font-weight: 800;
-            margin-bottom: 5px;
-            font-variant-numeric: tabular-nums; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 2;
+        .warga-card.active {
+            border-color: var(--primary); transform: scale(1.01); 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 0.5rem; }
-        .list-title { font-weight: 700; color: var(--text); }
-        .list-hint { font-size: 0.8rem; color: var(--subtext); }
+        .card-header {
+            padding: 1rem; padding-right: 1.5rem; display: flex; align-items: center; gap: 1rem;
+        }
 
-        .warga-card { background: var(--card); padding: 1rem; border-radius: 12px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .warga-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .warga-card.selected { border-color: var(--primary); background: #eff6ff; }
-        .warga-card.leader { border-left: 4px solid var(--primary); }
+        .avatar { 
+            width: 50px; height: 50px; border-radius: 12px; object-fit: cover; 
+            flex-shrink: 0; background-color: #e2e8f0; 
+        }
+        .info { flex: 1; min-width: 0; }
+        .info-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .info-blok { font-size: 0.8rem; color: var(--secondary); font-weight: 500; }
 
-        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #e2e8f0; border: 2px solid white; }
-        .details { flex: 1; }
-        .name { font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
-        .meta { font-size: 0.8rem; color: var(--subtext); }
-        .role-anggota { color: var(--success); font-weight: 600; }
+        /* BADGES */
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); padding: 1rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 50; max-width: 480px; margin: 0 auto; border-top-left-radius: 20px; border-top-right-radius: 20px; }
-        .gps-info { text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 0.75rem; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        .gps-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
-        .gps-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
-        .gps-dot.error { background: var(--danger); }
+        .badge { padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+        .badge-green { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-red { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 
-        .btn-main { width: 100%; padding: 1rem; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; color: white; background: var(--subtext); cursor: not-allowed; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-        .btn-main.active { background: var(--success); cursor: pointer; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4); }
+        /* DETAIL SECTION */
+        .details-section {
+            max-height: 0; overflow: hidden; background-color: #f8fafc;
+            transition: max-height 0.3s ease-out, padding 0.3s ease; border-top: 1px solid transparent;
+        }
 
-        .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .warga-card.active .details-section {
+            max-height: 1000px; border-top-color: #e2e8f0; padding: 1rem 1rem 1.5rem 1rem;
+        }
+
+        .detail-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .detail-item {
+            display: flex; justify-content: space-between; font-size: 0.9rem;
+            padding: 0.5rem; background: #fff; border-radius: 8px; border: 1px solid #f1f5f9;
+        }
+        .detail-label { color: var(--secondary); }
+        .detail-value { font-weight: 600; color: var(--text-main); }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--danger); }
+
+        /* --- RONDA SUMMARY BOX --- */
+        .ronda-summary-box {
+            margin-top: 1rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        /* Wrapper untuk sejajarkan Title dan Buttons */
+        .ronda-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .ronda-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ronda-dates-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .ronda-date-item {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-main);
+            gap: 6px;
+        }
+
+        /* Lingkaran Tanggal */
+        .ronda-circle-date {
+            background: var(--danger); /* Default Merah */
+            color: #ffffff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 400;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
+        }
+
+        /* Class baru jika hadir (Hijau) */
+        .ronda-circle-date.hadir {
+            background: var(--success);
+        }
+
+        .ronda-bulanan-msg {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-style: italic;
+            margin: 0;
+        }
+
+        /* BUTTONS GROUP (PIN & DOWNLOAD) */
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* PIN BUTTON STYLE */
+        .pin-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
         
-        #toast { visibility: hidden; min-width: 280px; background: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 100; left: 50%; bottom: 100px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; }
-        #toast.success { background: var(--success); }
-        #toast.error { background: var(--danger); }
+        .pin-btn svg {
+            width: 20px;
+            height: 20px;
+        }
 
-        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--card); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .error-box { text-align: center; padding: 20px; max-width: 80%; }
-        .btn-retry { margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .pin-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--secondary);
+        }
+
+        .pin-btn.active {
+            color: var(--primary); 
+            transform: translateY(-2px);
+        }
+        
+        .pin-btn.active svg {
+            fill: currentColor;
+        }
+
+        /* DOWNLOAD BUTTON STYLE */
+        .download-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            color: #cbd5e1;
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--secondary);
+        }
+
+        .download-btn:active {
+            transform: scale(0.95);
+        }
+
+        .hidden { display: none !important; }
+        #empty-state { text-align: center; margin-top: 3rem; color: var(--secondary); }
+
     </style>
 </head>
 <body>
 
-    <div id="loading">
-        <div class="spinner" style="width:40px; height:40px; border-color: #e2e8f0; border-top-color: var(--primary); display:block; margin-bottom:1rem;" id="main-spinner"></div>
-        <p id="loading-text">Memuat Data...</p>
-        <div id="error-container" style="display:none;" class="error-box">
-            <p style="color:var(--danger); font-weight:bold; margin-bottom:5px;">Gagal Memuat Data</p>
-            <p id="error-msg" style="font-size:0.9rem; color:var(--subtext);">Cek koneksi internet atau URL Script.</p>
-            <button class="btn-retry" onclick="fetchData()">COBA LAGI</button>
+    <!-- LOADING OVERLAY -->
+    <div id="loading-overlay">
+        <div class="loader-content">
+            <div class="spinner-circle">
+                <svg viewBox="25 25 50 50">
+                    <circle cx="50" cy="50" r="20"></circle>
+                </svg>
+            </div>
+            <div class="loading-status-text" id="loading-text">Menginisialisasi...</div>
+            <ul class="loading-list" id="loading-list">
+                <!-- JS Generated -->
+            </ul>
         </div>
     </div>
 
     <header>
-        <h1>Absensi Ronda</h1>
-        <div class="header-desc-box" id="header-desc">
-            Memuat Jadwal...
+        <div class="brand">
+            <img src="https://avatars.githubusercontent.com/u/61934361?v=4" class="brand-logo" alt="Logo RT">
+            <span id="header-title">Total Iuran RT</span>
         </div>
     </header>
 
-    <div class="container">
-        <div class="info-card" id="info-card-bg">
-            <span class="badge-group" id="group-display">Loading...</span>
-            
-            <!-- Jam Hitung Mundur -->
-            <h2 id="clock-display">00:00:00</h2>
-            
-            <p style="color:var(--subtext); font-size:0.9rem;" id="date-display">...</p>
-            
-            <div class="status-grid">
-                <div class="status-item">
-                    <div class="status-label">Status GPS</div>
-                    <div class="status-val" id="gps-status">Mencari...</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-label">Jarak</div>
-                    <div class="status-val" id="dist-display">-- m</div>
-                </div>
-            </div>
+    <main>
+        <div class="search-container" id="search-container">
+            <input type="text" id="search-box" class="search-input" placeholder="Cari Nama atau Blok..." onkeyup="filterCards()">
         </div>
 
-        <div class="list-header">
-            <span class="list-title">Petugas Hari Ini</span>
-            <span class="list-hint">Pilih nama untuk absen</span>
+        <div id="card-container" class="card-grid">
+            <!-- Content Generated Here -->
         </div>
-
-        <div id="warga-list">
-            <!-- Warga items generated here -->
-        </div>
-    </div>
-
-    <div class="bottom-bar">
-        <div class="gps-info">
-            <div id="gps-dot" class="gps-dot"></div>
-            <span id="selected-user-text">Silakan pilih petugas</span>
-        </div>
-        <button id="btn-absen" class="btn-main" disabled onclick="submitAbsen()">
-            <div class="spinner" id="btn-spinner"></div>
-            <span id="btn-text">Pilih Petugas</span>
-        </button>
-    </div>
-
-    <div id="toast">Notifikasi</div>
+        <div id="empty-state" class="hidden"><p>Data tidak ditemukan.</p></div>
+    </main>
 
     <script>
-        // URL SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbBnvx5gzI6xrOzsFaiVP9t4Onn5x1hufHO2Xfj2R_d0N0joHrubMylGOlK0HkW1YwDw/exec';
+        // --- KONFIGURASI ---
+        const SHEET_ID = '1TUO4JHZS0OSDLnaI6VMVsOy_M06n_bNcwxDNdWzUfU0';
+        const SHEET_NAMES = ['Kas', 'Sampah', 'Konsumsi', 'Arisan', 'Jimpitan', 'Sosial', 'Keamanan', 'Warga', 'Absensi'];
         
-        const state = {
-            warga: [], 
-            scheduleMap: {}, 
-            attendedToday: [], 
-            config: { targetLat: -7.5706038, targetLng: 110.9018608, maxRadius: 10, startTime: 22, endTime: 23 },
-            groupToday: '', 
-            selectedUser: null, 
-            userLoc: null, 
-            distance: null, 
-            currentDateStr: new Date().toDateString()
+        const TARGET_COLS = {
+            nama: 'Nama',
+            blok: 'Blok',
+            foto: 'Foto',
+            kurang: 'Kurang',
+            group: 'Group',
+            jadwal: 'Jadwal',
+            timestamp: 'Timestamp'
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initClock();
-            fetchData();
-            startGPS();
-        });
+        const DEFAULT_IMG = 'https://avatars.githubusercontent.com/u/61934361?v=4';
+        const PIN_KEY = 'rt_app_single_pinned';
+        
+        let allData = [];
+        let presentTodayKeys = new Set(); // Menyimpan key nama_blok yang hadir hari ini
+        let loadingAnimationInterval = null;
 
-        // --- DATA FETCHING ---
-        async function fetchData() {
-            const loading = document.getElementById('loading');
-            const spinner = document.getElementById('main-spinner');
-            const errorBox = document.getElementById('error-container');
-            const loadingText = document.getElementById('loading-text');
+        // --- FUNGSI DOWNLOAD CARD ---
+        async function downloadCard(e) {
+            if (e) e.stopPropagation();
+
+            const cardElement = document.querySelector('.warga-card.active');
             
-            spinner.style.display = 'block';
-            errorBox.style.display = 'none';
-            loadingText.style.display = 'block';
-
-            try {
-                const res = await fetch(SCRIPT_URL + '?action=get-attendance-config');
-                if (!res.ok) throw new Error(`Server Error: ${res.status}`);
-                
-                const json = await res.json();
-                
-                if(json.success && json.data) {
-                    state.warga = json.data.warga || [];
-                    state.scheduleMap = json.data.schedule || {}; 
-                    state.attendedToday = json.data.attended || []; 
-                    
-                    if(json.data.config) state.config = {...state.config, ...json.data.config};
-                    
-                    // RESET LOCALSTORAGE JIKA GANTI HARI (Untuk fitur Wakil)
-                    const storedDate = localStorage.getItem('absen_last_date');
-                    if (storedDate !== state.currentDateStr) {
-                        localStorage.removeItem('first_absen_name');
-                        localStorage.removeItem('absen_last_date');
-                    }
-
-                    processSchedule();
-                    loading.style.opacity = '0';
-                    setTimeout(() => loading.style.display = 'none', 500);
-                } else {
-                    throw new Error(json.message || "Format data salah.");
-                }
-            } catch (e) {
-                console.error(e);
-                spinner.style.display = 'none';
-                loadingText.style.display = 'none';
-                errorBox.style.display = 'block';
-                document.getElementById('error-msg').innerText = e.message;
-            }
-        }
-
-        // --- PROSES JADWAL ---
-        function processSchedule() {
-            const today = new Date().getDate();
-            state.groupToday = state.scheduleMap[today] || "Unknown";
-
-            // 1. Update Header Description
-            const headerDesc = `Jadwal Otomatis Berfungsi Mulai ${state.config.startTime}:00 - ${state.config.endTime}:00`;
-            document.getElementById('header-desc').innerText = headerDesc;
-
-            // 2. Update Badge Group
-            const badge = document.getElementById('group-display');
-            if (state.groupToday === "Unknown") {
-                badge.innerText = "Tidak Ada Jadwal";
-                badge.style.background = "#f3f4f6";
-                badge.style.color = "#6b7280";
-            } else {
-                const groupNum = state.groupToday.replace(/\D/g, ''); 
-                badge.innerText = `Ketua Group ${groupNum}`;
-                badge.style.background = "#fff"; 
-                badge.style.color = "#1e40af";
-            }
-
-            // 3. Atur Background Foto Ketua
-            const leader = state.warga.find(w => w.group === state.groupToday);
-            const infoCard = document.getElementById('info-card-bg');
-            
-            if (leader && leader.foto) {
-                infoCard.style.backgroundImage = `
-                    linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.95)),
-                    url('${leader.foto}')
-                `;
-                infoCard.style.backgroundPosition = "center center";
-                infoCard.style.backgroundSize = "cover";
-                infoCard.style.backgroundRepeat = "no-repeat";
-            } else {
-                infoCard.style.backgroundImage = `linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,1))`;
-                const initials = leader ? leader.nama.substring(0,2) : "NA";
-                infoCard.style.backgroundColor = "#f0f4f8";
-            }
-
-            renderList();
-        }
-
-        // --- RENDER LIST ---
-        function renderList() {
-            const container = document.getElementById('warga-list');
-            container.innerHTML = '';
-            
-            const targetBase = state.groupToday.toUpperCase();
-            
-            const members = state.warga.filter(w => {
-                if (!w.group) return false;
-                const userBase = w.group.replace(/[a-z]$/i, '').toUpperCase();
-                if (userBase !== targetBase) return false;
-
-                const uniqueKey = w.nama + "_" + w.blok;
-                if (state.attendedToday.includes(uniqueKey)) return false;
-
-                return true;
-            });
-            
-            members.sort((a,b) => {
-                const aIsMember = /[a-z]$/i.test(a.group);
-                const bIsMember = /[a-z]$/i.test(b.group);
-                if (!aIsMember && bIsMember) return -1;
-                if (aIsMember && !bIsMember) return 1;
-                return 0;
-            });
-            
-            if(members.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:var(--subtext); padding:2rem;">Tidak ada petugas yang belum absen untuk Group ini hari ini.</p>';
+            if (!cardElement) {
+                alert("Silakan buka (klik) kartu terlebih dahulu sebelum mengunduh.");
                 return;
             }
-            
-            members.forEach(p => {
-                const isLeader = (p.group === state.groupToday);
-                const isMember = /[a-z]$/i.test(p.group);
-                
-                const safeId = p.nama.replace(/[^a-zA-Z0-9]/g, '') + p.blok.replace(/[^a-zA-Z0-9]/g, ''); 
-                const img = p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama)}&background=random`;
-                
-                let groupDisplay = "";
-                if (isMember) {
-                    groupDisplay = `<span class="role-anggota">Anggota</span>`;
-                } else {
-                    groupDisplay = p.group;
+
+            const namaWarga = cardElement.querySelector('.info-name').innerText.replace(/[^a-zA-Z0-9]/g, "_");
+            const originalButton = e ? e.currentTarget : null;
+            const originalHtml = originalButton ? originalButton.innerHTML : '';
+
+            if(originalButton) {
+                originalButton.innerHTML = `<svg class="spinner-circle" style="width:18px;height:18px;margin:0;" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="4"></circle></svg>`;
+            }
+
+            try {
+                const canvas = await html2canvas(cardElement, {
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff', 
+                    logging: false
+                });
+
+                const link = document.createElement('a');
+                link.download = `RT_Iuran_${namaWarga}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+            } catch (error) {
+                console.error("Gagal download:", error);
+                alert("Terjadi kesalahan saat mengunduh gambar.");
+            } finally {
+                if (originalButton) {
+                    setTimeout(() => {
+                        originalButton.innerHTML = originalHtml;
+                    }, 500);
                 }
-
-                const div = document.createElement('div');
-                div.className = `warga-card ${isLeader ? 'leader' : ''}`;
-                div.id = `card-${safeId}`;
-                div.onclick = () => selectUser(p, div);
-                div.innerHTML = `
-                    <img src="${img}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama)}'">
-                    <div class="details">
-                        <div class="name">${p.nama} ${isLeader ? '👑' : ''}</div>
-                        <div class="meta">${p.blok} • ${groupDisplay}</div>
-                    </div>
-                    <div style="color:var(--primary); font-weight:bold;">></div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function selectUser(user, element) {
-            document.querySelectorAll('.warga-card').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            state.selectedUser = user;
-            document.getElementById('selected-user-text').innerText = `Terpilih: ${user.nama}`;
-            validateButton();
-        }
-
-        function startGPS() {
-            if(!navigator.geolocation) return;
-            
-            navigator.geolocation.watchPosition(pos => {
-                state.userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                state.distance = getDistance(state.userLoc.lat, state.userLoc.lng, state.config.targetLat, state.config.targetLng);
-                
-                document.getElementById('dist-display').innerText = Math.round(state.distance) + " m";
-                
-                const gpsDot = document.getElementById('gps-dot');
-                const gpsText = document.getElementById('gps-status');
-                
-                if(state.distance <= state.config.maxRadius) {
-                    gpsDot.className = "gps-dot active";
-                    gpsText.innerText = "Dalam Area";
-                    gpsText.style.color = "var(--success)";
-                } else {
-                    gpsDot.className = "gps-dot error";
-                    gpsText.innerText = "Luar Area";
-                    gpsText.style.color = "var(--danger)";
-                }
-                validateButton();
-            }, err => {
-                document.getElementById('gps-status').innerText = "GPS Error";
-            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
-        }
-
-        function initClock() {
-            const update = () => {
-                const now = new Date();
-                
-                // Update Tanggal
-                document.getElementById('date-display').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
-                
-                // LOGIKA HITUNGAN MUNDUR KE START_TIME (HARI INI ATAU BESOK)
-                let targetStart = new Date();
-                targetStart.setHours(state.config.startTime, 0, 0, 0);
-
-                if (targetStart <= now) {
-                    targetStart.setDate(targetStart.getDate() + 1);
-                }
-
-                const diff = targetStart - now;
-                const clockDisplay = document.getElementById('clock-display');
-
-                if (diff > 0) {
-                    const diffH = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const diffM = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const diffS = Math.floor((diff % (1000 * 60)) / 1000);
-                    
-                    clockDisplay.style.color = "#dc2626"; 
-                    clockDisplay.innerText = `-${String(diffH).padStart(2,'0')}:${String(diffM).padStart(2,'0')}:${String(diffS).padStart(2,'0')}`;
-                } else {
-                    clockDisplay.style.color = "var(--text)";
-                    clockDisplay.innerText = "00:00:00";
-                }
-                
-                if(now.toDateString() !== state.currentDateStr) {
-                    location.reload(); 
-                }
-                
-                validateButton();
-            };
-            update();
-            setInterval(update, 1000);
-        }
-
-        function validateButton() {
-            const btn = document.getElementById('btn-absen');
-            const txt = document.getElementById('btn-text');
-            const now = new Date();
-            const h = now.getHours();
-            
-            const isTimeValid = (h >= state.config.startTime && h <= state.config.endTime);
-            const isLocValid = state.userLoc && state.distance <= state.config.maxRadius;
-            const isUserSelected = !!state.selectedUser;
-            const isScheduleValid = state.groupToday !== "Unknown";
-
-            if(!isUserSelected) { 
-                txt.innerText = "Pilih Petugas"; 
-                btn.disabled = true; 
-            } else if (!isScheduleValid) {
-                txt.innerText = "Tidak Ada Jadwal";
-                btn.disabled = true;
-            } else if (!isTimeValid) { 
-                txt.innerText = `Belum Jam ${state.config.startTime}:00`; 
-                btn.disabled = true; 
-            } else if (!isLocValid) { 
-                txt.innerText = "Luar Jangkauan GPS"; 
-                btn.disabled = true; 
-            } else { 
-                txt.innerText = "ABSENSI SEKARANG"; 
-                btn.disabled = false; 
-                btn.classList.add('active'); 
             }
         }
 
-        function submitAbsen() {
-            if(!state.selectedUser || !state.userLoc) return;
-            
-            const btn = document.getElementById('btn-absen');
-            const spin = document.getElementById('btn-spinner');
-            const txt = document.getElementById('btn-text');
-            
-            btn.disabled = true;
-            spin.style.display = 'block';
-            txt.innerText = "Mengirim...";
+        // --- FUNGSI PARSE TANGGAL GOOGLE SHEETS ---
+        function parseSheetDate(val) {
+            if (!val) return null;
+            let dateObj;
 
-            // --- LOGIKA DETEKSI WAKIL (LOCALSTORAGE) ---
-            const firstAbsenName = localStorage.getItem('first_absen_name');
-            let wakilPayload = null; // Jika null, keterangan kosong (Valid)
-
-            if (firstAbsenName) {
-                // Ada data absen sebelumnya hari ini di device ini
-                if (firstAbsenName !== state.selectedUser.nama) {
-                    // Orangnya beda -> Jadi wakil
-                    wakilPayload = firstAbsenName;
-                    // Notifikasi sesuai permintaan
-                    showToast(`Anda mewakili ${state.selectedUser.nama} terdeteksi otomatis oleh sistem`, "success");
+            // Tipe 1: String format Google Date "Date(2023, 1, 15, ...)"
+            if (typeof val === 'string' && val.startsWith('Date(')) {
+                // Gunakan regex untuk mengambil angka tahun, bulan, tanggal
+                const match = val.match(/Date\((\d+),(\d+),(\d+)/);
+                if (match) {
+                    // Bulan di JS mulai dari 0, tapi di string Date(...) biasanya 0-based juga
+                    // Namun seringkali output GVIZ: Date(Year, MonthIndex, Day)
+                    // Perlu cek bulan. Jika output CSV seringkali format excel.
+                    // Asumsi standard GVIZ:
+                    dateObj = new Date(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
                 }
-                // Jika sama (orang yang sama), dianggap absen ulang/normal -> wakilPayload tetap null
+            } 
+            // Tipe 2: Number (Excel Serial Date)
+            else if (typeof val === 'number') {
+                // Konversi Excel Serial ke JS Date (Epoch MS)
+                // Excel base date (Dec 30, 1899) vs JS (Jan 1, 1970)
+                // Rumus: (Val - 25569) * 86400 * 1000
+                // (25569 adalah 1 Jan 1970 di Excel)
+                const excelDate = new Date(Math.round((val - 25569) * 86400 * 1000));
+                dateObj = excelDate;
+            }
+            // Tipe 3: String Format "DD/MM/YYYY" (Lokal)
+            else if (typeof val === 'string') {
+                const parts = val.split('/');
+                if (parts.length === 3) {
+                    // Asumsi DD/MM/YYYY
+                    dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
+
+            return dateObj;
+        }
+
+        // --- FUNGSI PIN SINGLE ---
+        function getPinnedKey() {
+            try {
+                return localStorage.getItem(PIN_KEY) || null;
+            } catch (e) {
+                console.error("Gagal membaca LocalStorage", e);
+                return null;
+            }
+        }
+
+        function togglePin(nama, blok) {
+            if (event) event.stopPropagation();
+
+            const currentPinnedKey = getPinnedKey();
+            const newKey = `${nama}_${blok}`;
+
+            if (currentPinnedKey === newKey) {
+                localStorage.removeItem(PIN_KEY);
             } else {
-                // Belum ada yang absen hari ini di device ini -> Jadi yang pertama
-                localStorage.setItem('first_absen_name', state.selectedUser.nama);
-                localStorage.setItem('absen_last_date', state.currentDateStr);
+                localStorage.setItem(PIN_KEY, newKey);
             }
-            // --------------------------------------------------
 
-            fetch(SCRIPT_URL, {
-                method: 'POST', 
-                headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
-                body: JSON.stringify({ 
-                    nama: state.selectedUser.nama, 
-                    blok: state.selectedUser.blok, 
-                    group: state.selectedUser.group, 
-                    lat: state.userLoc.lat, 
-                    lng: state.userLoc.lng,
-                    // Kirim data wakil jika ada
-                    wakil_dari: wakilPayload 
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    // Jika bukan wakil, tampilkan notifikasi biasa
-                    if(!wakilPayload) {
-                        showToast(data.message || "Absensi Berhasil!", "success");
+            renderCards(allData);
+            
+            const searchBox = document.getElementById('search-box');
+            if (searchBox.value.length > 0) {
+                filterCards();
+            }
+        }
+
+        // --- FUNGSI UTILITAS ---
+        function getBaseGroup(groupName) {
+            if (!groupName) return null;
+            return groupName.replace(/[a-z]$/i, '');
+        }
+
+        function setHeaderDate() {
+            const date = new Date();
+            const options = { month: 'long' };
+            const monthName = date.toLocaleDateString('id-ID', options);
+            document.getElementById('header-title').textContent = `Total Iuran RT ${monthName}`;
+        }
+
+        function formatValue(value) {
+            const formatter = new Intl.NumberFormat('id-ID', { 
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0 
+            });
+            if (value < 0) {
+                return { text: `Saldo : ${formatter.format(Math.abs(value))}`, className: 'text-green', badgeClass: 'badge-green' };
+            } else if (value === 0) {
+                return { text: '✔️ Lunas', className: 'text-green', badgeClass: 'badge-green' };
+            } else {
+                return { text: formatter.format(value), className: 'text-red', badgeClass: 'badge-red' };
+            }
+        }
+
+        // --- LOADING ANIMATION ---
+        function startLoadingAnimation() {
+            const listContainer = document.getElementById('loading-list');
+            const statusText = document.getElementById('loading-text');
+            listContainer.innerHTML = '';
+            
+            SHEET_NAMES.forEach((name, index) => {
+                const li = document.createElement('li');
+                li.className = 'loading-item';
+                li.id = `load-item-${index}`;
+                li.innerHTML = `<span>${name}</span><svg class="check-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin='round' d="M5 13l4 4L19 7" /></svg>`;
+                listContainer.appendChild(li);
+            });
+
+            let currentIndex = 0;
+            function processNext() {
+                if (currentIndex >= SHEET_NAMES.length) {
+                    statusText.textContent = "Menyatukan data...";
+                    return;
+                }
+                const currentItem = document.getElementById(`load-item-${currentIndex}`);
+                const sheetName = SHEET_NAMES[currentIndex];
+                statusText.textContent = `Memproses ${sheetName}...`;
+                
+                if(currentIndex > 0) {
+                    const prevItem = document.getElementById(`load-item-${currentIndex - 1}`);
+                    prevItem.classList.remove('active'); prevItem.classList.add('done');
+                }
+                currentItem.classList.add('active');
+                currentIndex++;
+                loadingAnimationInterval = setTimeout(processNext, 600);
+            }
+            setTimeout(processNext, 400);
+        }
+
+        function stopLoadingAnimation() {
+            clearTimeout(loadingAnimationInterval);
+            document.querySelectorAll('.loading-item').forEach(item => {
+                item.classList.remove('active'); item.classList.add('done');
+            });
+            document.getElementById('loading-text').textContent = "Selesai!";
+            setTimeout(() => {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.classList.add('hidden'), 500);
+            }, 500);
+        }
+
+        async function fetchSingleSheet(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Gagal akses sheet: ${sheetName}`);
+                const text = await response.text();
+                const jsonString = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/);
+                if (!jsonString) throw new Error(`Format error di sheet: ${sheetName}`);
+                return JSON.parse(jsonString[1]);
+            } catch (error) {
+                console.warn(error.message);
+                return null; 
+            }
+        }
+
+        // --- LOGIKA JADWAL RONDA ---
+        function getMonthlySchedule(wargaJson) {
+            if (!wargaJson) return null;
+
+            const table = wargaJson.table;
+            const cols = table.cols;
+            const rows = table.rows;
+
+            const indices = {
+                nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                group: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.group.toLowerCase()),
+                jadwal: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.jadwal.toLowerCase())
+            };
+
+            let startGroupBase = null;
+            rows.forEach(row => {
+                const c = row.c;
+                const groupRaw = (indices.group !== -1 && c[indices.group]) ? c[indices.group].v : null;
+                const jadwalVal = (indices.jadwal !== -1 && c[indices.jadwal]) ? c[indices.jadwal].v : null;
+
+                if (groupRaw && String(jadwalVal).trim() === '1') {
+                    startGroupBase = getBaseGroup(groupRaw);
+                }
+            });
+
+            let uniqueGroupsSet = new Set();
+            rows.forEach(row => {
+                const groupRaw = (indices.group !== -1 && row.c[indices.group]) ? row.c[indices.group].v : null;
+                if (groupRaw && groupRaw.toLowerCase() !== 'bulanan') {
+                    uniqueGroupsSet.add(getBaseGroup(groupRaw));
+                }
+            });
+
+            let sortedGroups = Array.from(uniqueGroupsSet).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            if (sortedGroups.length === 0) return null;
+
+            let startIndex = 0;
+            if (startGroupBase) {
+                const idx = sortedGroups.indexOf(startGroupBase);
+                if (idx !== -1) startIndex = idx;
+            }
+
+            const scheduleMap = {};
+            const currentDate = new Date();
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            
+            let currentGroupIndex = startIndex;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const group = sortedGroups[currentGroupIndex];
+                scheduleMap[day] = group;
+                currentGroupIndex = (currentGroupIndex + 1) % sortedGroups.length;
+            }
+
+            return scheduleMap;
+        }
+
+        // --- FUNGSI UTAMA ---
+        async function fetchData() {
+            setHeaderDate();
+            startLoadingAnimation();
+
+            try {
+                const promises = SHEET_NAMES.map(name => fetchSingleSheet(name));
+                const results = await Promise.all(promises);
+
+                // 0. PROSES ABSENSI (Untuk Cek Kehadiran Hari Ini)
+                const absensiIndex = SHEET_NAMES.indexOf('Absensi');
+                if (absensiIndex !== -1 && results[absensiIndex]) {
+                    const absensiJson = results[absensiIndex];
+                    const table = absensiJson.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const idxTime = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.timestamp.toLowerCase());
+                    const idxNama = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase());
+                    const idxBlok = cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase());
+
+                    const today = new Date();
+
+                    if (idxTime !== -1 && idxNama !== -1) {
+                        rows.forEach(row => {
+                            const c = row.c;
+                            const tsVal = (idxTime !== -1 && c[idxTime]) ? c[idxTime].v : null;
+                            const nama = (idxNama !== -1 && c[idxNama]) ? c[idxNama].v : '';
+                            const blok = (idxBlok !== -1 && c[idxBlok]) ? c[idxBlok].v : '';
+
+                            const dateObj = parseSheetDate(tsVal);
+
+                            if (dateObj) {
+                                // Cek apakah tanggal sama dengan hari ini
+                                if (dateObj.getDate() === today.getDate() &&
+                                    dateObj.getMonth() === today.getMonth() &&
+                                    dateObj.getFullYear() === today.getFullYear()) {
+                                    
+                                    // Simpan key unik yang hadir hari ini
+                                    const key = `${nama}_${blok}`;
+                                    // Jika Blok kosong di absensi, coba cari hanya pakai Nama (fallback),
+                                    // tapi lebih aman jika Blok diisi.
+                                    if (blok) {
+                                        presentTodayKeys.add(key);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // 1. PROSES DATA WARGA
+                let wargaLookup = {};
+                let scheduleMap = {};
+
+                const wargaIndex = SHEET_NAMES.indexOf('Warga');
+                if (wargaIndex !== -1 && results[wargaIndex]) {
+                    const wargaJson = results[wargaIndex];
+                    const table = wargaJson.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const indices = {
+                        nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                        blok: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase()),
+                        group: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.group.toLowerCase())
+                    };
+
+                    rows.forEach(row => {
+                        const c = row.c;
+                        const getVal = (idx) => (idx !== -1 && c[idx] && c[idx].v !== null) ? c[idx].v : '';
+                        
+                        const nama = getVal(indices.nama);
+                        const blok = getVal(indices.blok);
+                        const group = getVal(indices.group);
+
+                        if (nama && blok && group) {
+                            const key = `${nama}_${blok}`;
+                            wargaLookup[key] = { group: group };
+                        }
+                    });
+
+                    scheduleMap = getMonthlySchedule(wargaJson);
+                }
+
+                // 2. PROSES DATA KEUANGAN & GABUNGKAN
+                let combinedData = {};
+
+                results.forEach((json, index) => {
+                    const sheetName = SHEET_NAMES[index];
+                    if (!json) return;
+                    if (sheetName === 'Warga' || sheetName === 'Absensi') return; // Skip pemrosesan data keuangan untuk warga & absensi
+
+                    const table = json.table;
+                    const cols = table.cols;
+                    const rows = table.rows;
+
+                    const indices = {
+                        nama: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.nama.toLowerCase()),
+                        blok: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.blok.toLowerCase()),
+                        foto: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.foto.toLowerCase()),
+                        kurang: cols.findIndex(c => c.label && c.label.toLowerCase() === TARGET_COLS.kurang.toLowerCase())
+                    };
+
+                    if (indices.nama === -1) return;
+
+                    rows.forEach(row => {
+                        const c = row.c;
+                        const getVal = (idx) => (idx !== -1 && c[idx] && c[idx].v !== null) ? c[idx].v : '';
+
+                        const nama = getVal(indices.nama);
+                        if (!nama) return;
+
+                        const blok = getVal(indices.blok);
+                        const foto = getVal(indices.foto);
+                        const kurang = parseFloat(getVal(indices.kurang)) || 0;
+
+                        const uniqueKey = `${nama}_${blok}`;
+                        const wargaInfo = wargaLookup[uniqueKey] || {};
+
+                        if (combinedData[uniqueKey]) {
+                            combinedData[uniqueKey].totalKurang += kurang;
+                            combinedData[uniqueKey].details[sheetName] = kurang;
+                            if (!combinedData[uniqueKey].foto && foto) combinedData[uniqueKey].foto = foto;
+                        } else {
+                            combinedData[uniqueKey] = {
+                                nama,
+                                blok,
+                                foto,
+                                totalKurang: kurang,
+                                details: { [sheetName]: kurang },
+                                group: wargaInfo.group || null
+                            };
+                        }
+                    });
+                });
+
+                // 3. HITUNG TANGGAL RONDA PER WARGA
+                const today = new Date().getDate(); // Tanggal hari ini (1-31)
+
+                allData = Object.values(combinedData).map(user => {
+                    let userRondaDates = [];
+                    
+                    if (user.group) {
+                        const userBaseGroup = getBaseGroup(user.group);
+                        if (userBaseGroup && scheduleMap) {
+                            for (const [dayStr, groupInSchedule] of Object.entries(scheduleMap)) {
+                                if (groupInSchedule === userBaseGroup) {
+                                    const dayNum = parseInt(dayStr);
+                                    const dateObj = new Date(new Date().getFullYear(), new Date().getMonth(), dayNum);
+                                    const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+                                    
+                                    userRondaDates.push({
+                                        dayName: dayName,
+                                        dateNum: String(dayNum).padStart(2, '0')
+                                    });
+                                }
+                            }
+                        }
                     }
                     
-                    txt.innerText = "Berhasil";
-                    btn.style.background = "#9ca3af";
-                    
-                    const uniqueKey = state.selectedUser.nama + "_" + state.selectedUser.blok;
-                    state.attendedToday.push(uniqueKey);
-                    
-                    renderList(); 
-                    document.getElementById('selected-user-text').innerText = "Silakan pilih petugas";
-                } else {
-                    throw new Error(data.message || "Terjadi kesalahan");
+                    return { ...user, rondaDates: userRondaDates };
+                });
+
+                renderCards(allData);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading-text').textContent = "Terjadi Kesalahan!";
+                document.getElementById('loading-text').style.color = "red";
+            } finally {
+                stopLoadingAnimation();
+            }
+        }
+
+        // --- RENDER ---
+        function renderCards(data) {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('empty-state').classList.add('hidden');
+
+            // Ambil 1 Key yang di-pin
+            const pinnedKey = getPinnedKey();
+
+            // Pisahkan data menjadi Item Pinned dan Item Lain
+            const pinnedItem = data.find(item => `${item.nama}_${item.blok}` === pinnedKey);
+            const otherItems = data.filter(item => `${item.nama}_${item.blok}` !== pinnedKey);
+
+            // Sort item lain secara alfabetis
+            otherItems.sort((a, b) => a.nama.localeCompare(b.nama));
+
+            // Gabungkan: Pinned (jika ada) di depan, sisanya belakang
+            const finalDisplayData = pinnedItem ? [pinnedItem, ...otherItems] : otherItems;
+
+            const todayDate = new Date().getDate();
+
+            finalDisplayData.forEach(item => {
+                let avatarSrc = DEFAULT_IMG;
+                if (item.foto && item.foto.startsWith('http')) avatarSrc = item.foto;
+
+                const mainFormat = formatValue(item.totalKurang);
+                const key = `${item.nama}_${item.blok}`;
+                const isPinned = (key === pinnedKey);
+                const currentMonth = new Date().toLocaleDateString('id-ID', { month: 'long' });
+
+                // Generate List Iuran
+                let detailsHTML = `<ul class="detail-list">`;
+                const financeSheets = SHEET_NAMES.filter(n => n !== 'Warga' && n !== 'Absensi');
+                
+                financeSheets.forEach(sheet => {
+                    const val = item.details[sheet] || 0;
+                    const itemFormat = formatValue(val);
+                    detailsHTML += `
+                        <li class="detail-item">
+                            <span class="detail-label">${sheet}</span>
+                            <span class="detail-value ${itemFormat.className}">${itemFormat.text}</span>
+                        </li>
+                    `;
+                });
+                detailsHTML += `</ul>`;
+
+                // Generate Box Jadwal Ronda (dengan DOWNLOAD & PIN BUTTON)
+                let rondaHTML = '';
+                
+                const isBulanan = item.group && item.group.toLowerCase() === 'bulanan';
+
+                // Icons SVG Strings
+                const downloadSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+                const pinSvg = `<svg viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>`;
+
+                if (isBulanan) {
+                    rondaHTML = `
+                        <div class="ronda-summary-box">
+                            <div class="ronda-header-actions">
+                                <span class="ronda-title">Jadwal Ronda ${currentMonth}</span>
+                                <div class="action-buttons-group">
+                                    <button class="download-btn" onclick="downloadCard(event)">${downloadSvg}</button>
+                                    <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin('${item.nama.replace(/'/g, "\\'")}', '${item.blok.replace(/'/g, "\\'")}')">${pinSvg}</button>
+                                </div>
+                            </div>
+                            <div class="ronda-bulanan-msg">Denda Bulanan (tidak masuk ke jadwal ronda)</div>
+                        </div>
+                    `;
+                } else if (item.rondaDates && item.rondaDates.length > 0) {
+                    const datesHtml = item.rondaDates.map(d => {
+                        // Cek apakah tanggal ini HARI INI
+                        const isToday = parseInt(d.dateNum) === todayDate;
+                        // Cek apakah user ini ada di daftar Hadir Hari Ini
+                        const isPresent = isToday && presentTodayKeys.has(key);
+                        
+                        // Tambahkan class 'hadir' jika true
+                        const circleClass = isPresent ? 'ronda-circle-date hadir' : 'ronda-circle-date';
+
+                        return `
+                        <span class="ronda-date-item">
+                            ${d.dayName} <span class="${circleClass}">${d.dateNum}</span>
+                        </span>
+                    `}).join('');
+
+                    rondaHTML = `
+                        <div class="ronda-summary-box">
+                            <div class="ronda-header-actions">
+                                <span class="ronda-title">Jadwal Ronda ${currentMonth}</span>
+                                <div class="action-buttons-group">
+                                    <button class="download-btn" onclick="downloadCard(event)">${downloadSvg}</button>
+                                    <button class="pin-btn ${isPinned ? 'active' : ''}" onclick="togglePin('${item.nama.replace(/'/g, "\\'")}', '${item.blok.replace(/'/g, "\\'")}')">${pinSvg}</button>
+                                </div>
+                            </div>
+                            <div class="ronda-dates-container">
+                                ${datesHtml}
+                            </div>
+                        </div>
+                    `;
                 }
-            })
-            .catch(err => { 
-                showToast(err.message, "error"); 
-                validateButton(); 
-            })
-            .finally(() => { 
-                spin.style.display = 'none'; 
+
+                const card = document.createElement('div');
+                card.className = 'warga-card';
+                // Auto-Open jika di-PIN
+                if (isPinned) card.classList.add('active');
+                
+                card.onclick = function() { toggleCard(this); };
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${avatarSrc}" class="avatar" alt="${item.nama}" onerror="this.src='${DEFAULT_IMG}'">
+                        <div class="info">
+                            <div class="info-name">${item.nama}</div>
+                            <div class="info-blok">Blok ${item.blok}</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="badge ${mainFormat.badgeClass}">${mainFormat.text}</div>
+                        </div>
+                    </div>
+                    <div class="details-section">
+                        ${detailsHTML}
+                        ${rondaHTML}
+                    </div>
+                `;
+                container.appendChild(card);
             });
         }
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000; 
-            const dLat = (lat2-lat1) * Math.PI/180;
-            const dLon = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
-                      Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-                      Math.sin(dLon/2)*Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
+        function toggleCard(element) {
+            const isActive = element.classList.contains('active');
+            const allCards = document.querySelectorAll('.warga-card');
+            allCards.forEach(card => card.classList.remove('active'));
+            if (!isActive) element.classList.add('active');
         }
 
-        function showToast(msg, type) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; 
-            t.className = `show ${type}`;
-            setTimeout(() => t.className = t.className.replace('show',''), 3000);
+        function filterCards() {
+            const term = document.getElementById('search-box').value.toLowerCase();
+            let filtered = allData.filter(item => 
+                item.nama.toLowerCase().includes(term) || 
+                item.blok.toLowerCase().includes(term)
+            );
+            renderCards(filtered);
         }
+
+        // --- SCROLL BEHAVIOR ---
+        function initScrollBehavior() {
+            const header = document.querySelector('header');
+            const searchContainer = document.getElementById('search-container');
+            const scrollThreshold = 60;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > scrollThreshold) {
+                    header.classList.add('hide-up');
+                    searchContainer.classList.add('is-sticky');
+                } else {
+                    header.classList.remove('hide-up');
+                    searchContainer.classList.remove('is-sticky');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            initScrollBehavior();
+        });
+
     </script>
 </body>
 </html>
