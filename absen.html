@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Absensi Ronda Warga</title>
+    <style>
+        :root {
+            --primary: #2563eb; --primary-dark: #1e40af; --success: #16a34a; --danger: #dc2626;
+            --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --subtext: #6b7280; --border: #e5e7eb;
+            /* Teal-800 Hex Code: #115e59 */
+            --teal-800: #115e59;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
+
+        header { background: var(--primary); color: white; padding: 2rem 1.5rem 2rem; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); position: relative; z-index: 10; text-align: center; }
+        header h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px; }
+
+        /* Header Description Box Gradient */
+        .header-desc-box {
+            display: inline-block;
+            background: linear-gradient(to right, var(--teal-800), #000000);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            max-width: 90%;
+        }
+
+        .container { max-width: 480px; margin: 0 auto; padding: 0 1rem; margin-top: -1.5rem; position: relative; z-index: 20; }
+
+        .info-card { 
+            background: var(--card); 
+            border-radius: 16px; 
+            padding: 1.5rem; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+            margin-bottom: 1.5rem; 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
+            z-index: 1;
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95));
+        }
+
+        /* Status Grid */
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; position: relative; z-index: 2; }
+        .status-item { background: rgba(255, 255, 255, 0.85); padding: 0.75rem; border-radius: 12px; backdrop-filter: blur(4px); }
+        .status-label { font-size: 0.7rem; color: var(--subtext); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .status-val { font-weight: 700; font-size: 1.1rem; }
+        
+        /* Badge Group */
+        .badge-group { 
+            display: inline-block; 
+            background: #fff; 
+            color: var(--primary-dark); 
+            padding: 0.4rem 1rem; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            font-size: 0.9rem; 
+            margin-bottom: 0.5rem; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--bg);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Jam Hitung Mundur */
+        #clock-display {
+            font-size: 2.5rem; 
+            font-weight: 800;
+            margin-bottom: 5px;
+            font-variant-numeric: tabular-nums; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 0.5rem; }
+        .list-title { font-weight: 700; color: var(--text); }
+        .list-hint { font-size: 0.8rem; color: var(--subtext); }
+
+        .warga-card { background: var(--card); padding: 1rem; border-radius: 12px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .warga-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .warga-card.selected { border-color: var(--primary); background: #eff6ff; }
+        .warga-card.leader { border-left: 4px solid var(--primary); }
+
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #e2e8f0; border: 2px solid white; }
+        .details { flex: 1; }
+        .name { font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+        .meta { font-size: 0.8rem; color: var(--subtext); }
+        .role-anggota { color: var(--success); font-weight: 600; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); padding: 1rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 50; max-width: 480px; margin: 0 auto; border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        .gps-info { text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 0.75rem; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .gps-dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; }
+        .gps-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .gps-dot.error { background: var(--danger); }
+
+        .btn-main { width: 100%; padding: 1rem; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; color: white; background: var(--subtext); cursor: not-allowed; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .btn-main.active { background: var(--success); cursor: pointer; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4); }
+
+        .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #toast { visibility: hidden; min-width: 280px; background: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 100; left: 50%; bottom: 100px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; }
+        #toast.success { background: var(--success); }
+        #toast.error { background: var(--danger); }
+
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--card); z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .error-box { text-align: center; padding: 20px; max-width: 80%; }
+        .btn-retry { margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">
+        <div class="spinner" style="width:40px; height:40px; border-color: #e2e8f0; border-top-color: var(--primary); display:block; margin-bottom:1rem;" id="main-spinner"></div>
+        <p id="loading-text">Memuat Data...</p>
+        <div id="error-container" style="display:none;" class="error-box">
+            <p style="color:var(--danger); font-weight:bold; margin-bottom:5px;">Gagal Memuat Data</p>
+            <p id="error-msg" style="font-size:0.9rem; color:var(--subtext);">Cek koneksi internet atau URL Script.</p>
+            <button class="btn-retry" onclick="fetchData()">COBA LAGI</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>Absensi Ronda</h1>
+        <div class="header-desc-box" id="header-desc">
+            Memuat Jadwal...
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="info-card" id="info-card-bg">
+            <span class="badge-group" id="group-display">Loading...</span>
+            
+            <!-- Jam Hitung Mundur -->
+            <h2 id="clock-display">00:00:00</h2>
+            
+            <p style="color:var(--subtext); font-size:0.9rem;" id="date-display">...</p>
+            
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">Status GPS</div>
+                    <div class="status-val" id="gps-status">Mencari...</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Jarak</div>
+                    <div class="status-val" id="dist-display">-- m</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list-header">
+            <span class="list-title">Petugas Hari Ini</span>
+            <span class="list-hint">Pilih nama untuk absen</span>
+        </div>
+
+        <div id="warga-list">
+            <!-- Warga items generated here -->
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="gps-info">
+            <div id="gps-dot" class="gps-dot"></div>
+            <span id="selected-user-text">Silakan pilih petugas</span>
+        </div>
+        <button id="btn-absen" class="btn-main" disabled onclick="submitAbsen()">
+            <div class="spinner" id="btn-spinner"></div>
+            <span id="btn-text">Pilih Petugas</span>
+        </button>
+    </div>
+
+    <div id="toast">Notifikasi</div>
+
+    <script>
+        // URL SCRIPT
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbBnvx5gzI6xrOzsFaiVP9t4Onn5x1hufHO2Xfj2R_d0N0joHrubMylGOlK0HkW1YwDw/exec';
+        
+        const state = {
+            warga: [], 
+            scheduleMap: {}, 
+            attendedToday: [], 
+            config: { targetLat: -7.5706038, targetLng: 110.9018608, maxRadius: 10, startTime: 22, endTime: 23 },
+            groupToday: '', 
+            selectedUser: null, 
+            userLoc: null, 
+            distance: null, 
+            currentDateStr: new Date().toDateString()
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            fetchData();
+            startGPS();
+        });
+
+        // --- DATA FETCHING ---
+        async function fetchData() {
+            const loading = document.getElementById('loading');
+            const spinner = document.getElementById('main-spinner');
+            const errorBox = document.getElementById('error-container');
+            const loadingText = document.getElementById('loading-text');
+            
+            spinner.style.display = 'block';
+            errorBox.style.display = 'none';
+            loadingText.style.display = 'block';
+
+            try {
+                const res = await fetch(SCRIPT_URL + '?action=get-attendance-config');
+                if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+                
+                const json = await res.json();
+                
+                if(json.success && json.data) {
+                    state.warga = json.data.warga || [];
+                    state.scheduleMap = json.data.schedule || {}; 
+                    state.attendedToday = json.data.attended || []; 
+                    
+                    if(json.data.config) state.config = {...state.config, ...json.data.config};
+                    
+                    // RESET LOCALSTORAGE JIKA GANTI HARI (Untuk fitur Wakil)
+                    const storedDate = localStorage.getItem('absen_last_date');
+                    if (storedDate !== state.currentDateStr) {
+                        localStorage.removeItem('first_absen_name');
+                        localStorage.removeItem('absen_last_date');
+                    }
+
+                    processSchedule();
+                    loading.style.opacity = '0';
+                    setTimeout(() => loading.style.display = 'none', 500);
+                } else {
+                    throw new Error(json.message || "Format data salah.");
+                }
+            } catch (e) {
+                console.error(e);
+                spinner.style.display = 'none';
+                loadingText.style.display = 'none';
+                errorBox.style.display = 'block';
+                document.getElementById('error-msg').innerText = e.message;
+            }
+        }
+
+        // --- PROSES JADWAL ---
+        function processSchedule() {
+            const today = new Date().getDate();
+            state.groupToday = state.scheduleMap[today] || "Unknown";
+
+            // 1. Update Header Description
+            const headerDesc = `Jadwal Otomatis Berfungsi Mulai ${state.config.startTime}:00 - ${state.config.endTime}:00`;
+            document.getElementById('header-desc').innerText = headerDesc;
+
+            // 2. Update Badge Group
+            const badge = document.getElementById('group-display');
+            if (state.groupToday === "Unknown") {
+                badge.innerText = "Tidak Ada Jadwal";
+                badge.style.background = "#f3f4f6";
+                badge.style.color = "#6b7280";
+            } else {
+                const groupNum = state.groupToday.replace(/\D/g, ''); 
+                badge.innerText = `Ketua Group ${groupNum}`;
+                badge.style.background = "#fff"; 
+                badge.style.color = "#1e40af";
+            }
+
+            // 3. Atur Background Foto Ketua
+            const leader = state.warga.find(w => w.group === state.groupToday);
+            const infoCard = document.getElementById('info-card-bg');
+            
+            if (leader && leader.foto) {
+                infoCard.style.backgroundImage = `
+                    linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.95)),
+                    url('${leader.foto}')
+                `;
+                infoCard.style.backgroundPosition = "center center";
+                infoCard.style.backgroundSize = "cover";
+                infoCard.style.backgroundRepeat = "no-repeat";
+            } else {
+                infoCard.style.backgroundImage = `linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,1))`;
+                const initials = leader ? leader.nama.substring(0,2) : "NA";
+                infoCard.style.backgroundColor = "#f0f4f8";
+            }
+
+            renderList();
+        }
+
+        // --- RENDER LIST ---
+        function renderList() {
+            const container = document.getElementById('warga-list');
+            container.innerHTML = '';
+            
+            const targetBase = state.groupToday.toUpperCase();
+            
+            const members = state.warga.filter(w => {
+                if (!w.group) return false;
+                const userBase = w.group.replace(/[a-z]$/i, '').toUpperCase();
+                if (userBase !== targetBase) return false;
+
+                const uniqueKey = w.nama + "_" + w.blok;
+                if (state.attendedToday.includes(uniqueKey)) return false;
+
+                return true;
+            });
+            
+            members.sort((a,b) => {
+                const aIsMember = /[a-z]$/i.test(a.group);
+                const bIsMember = /[a-z]$/i.test(b.group);
+                if (!aIsMember && bIsMember) return -1;
+                if (aIsMember && !bIsMember) return 1;
+                return 0;
+            });
+            
+            if(members.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--subtext); padding:2rem;">Tidak ada petugas yang belum absen untuk Group ini hari ini.</p>';
+                return;
+            }
+            
+            members.forEach(p => {
+                const isLeader = (p.group === state.groupToday);
+                const isMember = /[a-z]$/i.test(p.group);
+                
+                const safeId = p.nama.replace(/[^a-zA-Z0-9]/g, '') + p.blok.replace(/[^a-zA-Z0-9]/g, ''); 
+                const img = p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama)}&background=random`;
+                
+                let groupDisplay = "";
+                if (isMember) {
+                    groupDisplay = `<span class="role-anggota">Anggota</span>`;
+                } else {
+                    groupDisplay = p.group;
+                }
+
+                const div = document.createElement('div');
+                div.className = `warga-card ${isLeader ? 'leader' : ''}`;
+                div.id = `card-${safeId}`;
+                div.onclick = () => selectUser(p, div);
+                div.innerHTML = `
+                    <img src="${img}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama)}'">
+                    <div class="details">
+                        <div class="name">${p.nama} ${isLeader ? '👑' : ''}</div>
+                        <div class="meta">${p.blok} • ${groupDisplay}</div>
+                    </div>
+                    <div style="color:var(--primary); font-weight:bold;">></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectUser(user, element) {
+            document.querySelectorAll('.warga-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            state.selectedUser = user;
+            document.getElementById('selected-user-text').innerText = `Terpilih: ${user.nama}`;
+            validateButton();
+        }
+
+        function startGPS() {
+            if(!navigator.geolocation) return;
+            
+            navigator.geolocation.watchPosition(pos => {
+                state.userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                state.distance = getDistance(state.userLoc.lat, state.userLoc.lng, state.config.targetLat, state.config.targetLng);
+                
+                document.getElementById('dist-display').innerText = Math.round(state.distance) + " m";
+                
+                const gpsDot = document.getElementById('gps-dot');
+                const gpsText = document.getElementById('gps-status');
+                
+                if(state.distance <= state.config.maxRadius) {
+                    gpsDot.className = "gps-dot active";
+                    gpsText.innerText = "Dalam Area";
+                    gpsText.style.color = "var(--success)";
+                } else {
+                    gpsDot.className = "gps-dot error";
+                    gpsText.innerText = "Luar Area";
+                    gpsText.style.color = "var(--danger)";
+                }
+                validateButton();
+            }, err => {
+                document.getElementById('gps-status').innerText = "GPS Error";
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+        }
+
+        function initClock() {
+            const update = () => {
+                const now = new Date();
+                
+                // Update Tanggal
+                document.getElementById('date-display').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+                
+                // LOGIKA HITUNGAN MUNDUR KE START_TIME (HARI INI ATAU BESOK)
+                let targetStart = new Date();
+                targetStart.setHours(state.config.startTime, 0, 0, 0);
+
+                if (targetStart <= now) {
+                    targetStart.setDate(targetStart.getDate() + 1);
+                }
+
+                const diff = targetStart - now;
+                const clockDisplay = document.getElementById('clock-display');
+
+                if (diff > 0) {
+                    const diffH = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffM = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const diffS = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    clockDisplay.style.color = "#dc2626"; 
+                    clockDisplay.innerText = `-${String(diffH).padStart(2,'0')}:${String(diffM).padStart(2,'0')}:${String(diffS).padStart(2,'0')}`;
+                } else {
+                    clockDisplay.style.color = "var(--text)";
+                    clockDisplay.innerText = "00:00:00";
+                }
+                
+                if(now.toDateString() !== state.currentDateStr) {
+                    location.reload(); 
+                }
+                
+                validateButton();
+            };
+            update();
+            setInterval(update, 1000);
+        }
+
+        function validateButton() {
+            const btn = document.getElementById('btn-absen');
+            const txt = document.getElementById('btn-text');
+            const now = new Date();
+            const h = now.getHours();
+            
+            const isTimeValid = (h >= state.config.startTime && h <= state.config.endTime);
+            const isLocValid = state.userLoc && state.distance <= state.config.maxRadius;
+            const isUserSelected = !!state.selectedUser;
+            const isScheduleValid = state.groupToday !== "Unknown";
+
+            if(!isUserSelected) { 
+                txt.innerText = "Pilih Petugas"; 
+                btn.disabled = true; 
+            } else if (!isScheduleValid) {
+                txt.innerText = "Tidak Ada Jadwal";
+                btn.disabled = true;
+            } else if (!isTimeValid) { 
+                txt.innerText = `Belum Jam ${state.config.startTime}:00`; 
+                btn.disabled = true; 
+            } else if (!isLocValid) { 
+                txt.innerText = "Luar Jangkauan GPS"; 
+                btn.disabled = true; 
+            } else { 
+                txt.innerText = "ABSENSI SEKARANG"; 
+                btn.disabled = false; 
+                btn.classList.add('active'); 
+            }
+        }
+
+        function submitAbsen() {
+            if(!state.selectedUser || !state.userLoc) return;
+            
+            const btn = document.getElementById('btn-absen');
+            const spin = document.getElementById('btn-spinner');
+            const txt = document.getElementById('btn-text');
+            
+            btn.disabled = true;
+            spin.style.display = 'block';
+            txt.innerText = "Mengirim...";
+
+            // --- LOGIKA DETEKSI WAKIL (LOCALSTORAGE) ---
+            const firstAbsenName = localStorage.getItem('first_absen_name');
+            let wakilPayload = null; // Jika null, keterangan kosong (Valid)
+
+            if (firstAbsenName) {
+                // Ada data absen sebelumnya hari ini di device ini
+                if (firstAbsenName !== state.selectedUser.nama) {
+                    // Orangnya beda -> Jadi wakil
+                    wakilPayload = firstAbsenName;
+                    // Notifikasi sesuai permintaan
+                    showToast(`Anda mewakili ${state.selectedUser.nama} terdeteksi otomatis oleh sistem`, "success");
+                }
+                // Jika sama (orang yang sama), dianggap absen ulang/normal -> wakilPayload tetap null
+            } else {
+                // Belum ada yang absen hari ini di device ini -> Jadi yang pertama
+                localStorage.setItem('first_absen_name', state.selectedUser.nama);
+                localStorage.setItem('absen_last_date', state.currentDateStr);
+            }
+            // --------------------------------------------------
+
+            fetch(SCRIPT_URL, {
+                method: 'POST', 
+                headers: {'Content-Type': 'text/plain;charset=utf-8'}, 
+                body: JSON.stringify({ 
+                    nama: state.selectedUser.nama, 
+                    blok: state.selectedUser.blok, 
+                    group: state.selectedUser.group, 
+                    lat: state.userLoc.lat, 
+                    lng: state.userLoc.lng,
+                    // Kirim data wakil jika ada
+                    wakil_dari: wakilPayload 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    // Jika bukan wakil, tampilkan notifikasi biasa
+                    if(!wakilPayload) {
+                        showToast(data.message || "Absensi Berhasil!", "success");
+                    }
+                    
+                    txt.innerText = "Berhasil";
+                    btn.style.background = "#9ca3af";
+                    
+                    const uniqueKey = state.selectedUser.nama + "_" + state.selectedUser.blok;
+                    state.attendedToday.push(uniqueKey);
+                    
+                    renderList(); 
+                    document.getElementById('selected-user-text').innerText = "Silakan pilih petugas";
+                } else {
+                    throw new Error(data.message || "Terjadi kesalahan");
+                }
+            })
+            .catch(err => { 
+                showToast(err.message, "error"); 
+                validateButton(); 
+            })
+            .finally(() => { 
+                spin.style.display = 'none'; 
+            });
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; 
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
+                      Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+                      Math.sin(dLon/2)*Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; 
+            t.className = `show ${type}`;
+            setTimeout(() => t.className = t.className.replace('show',''), 3000);
+        }
+    </script>
+</body>
+</html>
