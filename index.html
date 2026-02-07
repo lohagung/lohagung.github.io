@@ -140,7 +140,7 @@
             margin: 0;
             padding: 10px 1.5rem;
             z-index: 50;
-            background: var(--bg-body);
+            background: linear-gradient(158deg, #00BCD4 0%, #4c0e65 100%);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             animation: slideDown 0.3s ease forwards;
         }
@@ -171,18 +171,12 @@
             background: linear-gradient(320deg, #00BCD4 0% 0%, #ffffff 37%);
             border: 2px solid #9e9e9e;
             box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.15);
-            transform: scale(1.02);
             z-index: 10;
         }
 
-        .warga-card.ronda-today:hover {
-            transform: scale(1.03);
-        }
+        .warga-card.ronda-today:hover { background: linear-gradient(203deg, #00BCD4 0% 0%, #ffffff 50%); }
         
-        .warga-card.active {
-            border-color: var(--primary); 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+        .warga-card.active { border-color: transparent; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border-radius: 0px; background: #ffffff; }
 
         .card-header {
             padding: 1rem; padding-right: 1.5rem; display: flex; align-items: center; gap: 1rem;
@@ -206,6 +200,7 @@
         .badge { padding: 0.35rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
         .badge-green { background: var(--success-light); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
         .badge-red { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+		.badge-white { background: #ffffff; color: #000000; border: 0px solid rgba(239, 68, 68, 0.2); }
 
         /* Badge Ronda Hari Ini (UPDATE BARU) */
         .badge-ronda-today {
@@ -568,7 +563,7 @@
             } else if (value === 0) {
                 return { text: '✔️ Lunas', className: 'text-green', badgeClass: 'badge-green' };
             } else {
-                return { text: formatter.format(value), className: 'text-red', badgeClass: 'badge-red' };
+                return { text: formatter.format(value), className: 'text-red', badgeClass: 'badge-white' };
             }
         }
 
